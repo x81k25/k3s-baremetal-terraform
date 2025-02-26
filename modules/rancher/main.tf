@@ -4,7 +4,7 @@ resource "helm_release" "cert_manager" {
   create_namespace = true
   repository       = "https://charts.jetstack.io"
   chart            = "cert-manager"
-  version          = var.cert_manager_version
+  version          = var.cert_manager_config.version
 
   set {
     name  = "installCRDs"
@@ -41,11 +41,11 @@ resource "helm_release" "rancher" {
   create_namespace = true
   repository       = "https://releases.rancher.com/server-charts/stable"
   chart            = "rancher"
-  version          = var.rancher_version
+  version          = var.rancher_config.version
 
   set {
     name  = "hostname"
-    value = var.rancher_hostname  
+    value = var.rancher_config.hostname  
   }
 
   set {
@@ -55,7 +55,7 @@ resource "helm_release" "rancher" {
 
   set {
     name  = "bootstrapPassword"
-    value = var.rancher_password
+    value = var.rancher_sensitive.admin_pw
   }
 
   set {
@@ -87,8 +87,8 @@ resource "time_sleep" "wait_for_rancher" {
 resource "null_resource" "update_hosts_file" {
   provisioner "local-exec" {
     command = <<-EOT
-      grep -q "${var.rancher_hostname}" /etc/hosts || \
-      echo "${var.server_ip} ${var.rancher_hostname}" | sudo tee -a /etc/hosts
+      grep -q "${var.rancher_config.hostname}" /etc/hosts || \
+      echo "${var.server_ip} ${var.rancher_config.hostname}" | sudo tee -a /etc/hosts
     EOT
   }
 }

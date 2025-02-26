@@ -1,25 +1,25 @@
 output "k3s_config_path" {
-  value = "${var.k3s.mount_points.k3s_root}/config.yaml"
+  value = "${var.mounts.k3s_root}/config.yaml"
 }
 
 output "kubeconfig_path" {
   description = "Path to the kubeconfig file for kubectl access"
-  value       = "${var.k3s.mount_points.k3s_root}/k3s.yaml"
+  value       = "${var.mounts.k3s_root}/k3s.yaml"
 }
 
 output "k3s_version" {
   description = "Installed version of K3s"
-  value       = var.k3s.version
+  value       = var.k3s_config.version
 }
 
 output "api_server_url" {
   description = "URL for the Kubernetes API server"
-  value       = "https://${var.k3s.network_config.host_ip}:6443"
+  value       = "https://${var.k3s_config.network_config.host_ip}:6443"
 }
 
 output "kubectl_config_command" {
   description = "Command to configure kubectl with the cluster's kubeconfig"
-  value       = "export KUBECONFIG=${var.k3s.mount_points.k3s_root}/k3s.yaml"
+  value       = "export KUBECONFIG=${var.mounts.k3s_root}/k3s.yaml"
 }
 
 output "cluster_info_command" {

@@ -1,17 +1,23 @@
-variable "k3s" {
+variable "server_ip" {
+  type = string
+}
+
+variable "mounts" {
+  type = object({
+    k3s_root = string
+    postgres = string
+    media_cache = string
+  })
+}
+
+variable "k3s_config" {
   description = "K3s Kubernetes configuration settings"
   type = object({
-    version        = string
-    server_ip      = string
+    version       = string
     resource_limits = object({
       cpu_threads = number
       memory_gb   = number
       storage_gb  = number
-    })
-    mount_points = object({
-      k3s_root    = string
-      postgres    = string
-      media_cache = string
     })
     network_config = object({
       network_subnet = string

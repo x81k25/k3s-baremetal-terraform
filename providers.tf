@@ -1,6 +1,11 @@
+################################################################################
+# terraform providers
+################################################################################
+
 terraform {
   required_version = ">= 1.5.0"
   required_providers {
+    # root providers
     helm = {
       source  = "hashicorp/helm"
       version = "~> 2.12.1"
@@ -13,19 +18,47 @@ terraform {
       source  = "hashicorp/null"
       version = "~> 3.2.2"
     }
+    time = {
+      source  = "hashicorp/time"
+      version = "~> 0.9.0"
+    }
+    # rancher provider    
+    rancher2 = {
+      source  = "rancher/rancher2"
+      version = "~> 3.0.0"  
+    }
   }
 }
 
-# helm called by multiple modules
-variable "k3s_configured" {
-  description = "Whether k3s is configured and kubeconfig exists"
-  type        = bool
-  default     = false
-}
+################################################################################
+# providers use by multiple modules
+################################################################################
 
 provider "helm" {
   kubernetes {
-    config_path = var.k3s_configured ? "/d/k8s/k3s.yaml" : null
+    config_path = "/d/k8s/k3s.yaml"
   }
 }
 
+################################################################################
+# kubernetes provider
+################################################################################
+
+provider "kubernetes" {
+  config_path = "/d/k8s/k3s.yaml"
+  config_context = "default"
+}
+
+################################################################################
+# rancher providers
+################################################################################
+
+provider "rancher2" {
+  api_url   = "https://${var.server_ip}"
+  bootstrap = true
+  insecure  = true  # For initial setup only
+}
+
+################################################################################
+# end of providers.tf
+################################################################################

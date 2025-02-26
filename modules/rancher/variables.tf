@@ -5,16 +5,24 @@ variable "server_ip" {
 }
 
 # rancher vars
-variable "rancher" {
+variable "rancher_config" {
   description = "rancher config"
   type = object({
     version = string
     hostname = string
+    
   })
 }
 
+variable "rancher_sensitive" {
+  type = object({
+    admin_pw = string
+  })
+  sensitive = true
+}
+
 # cert manager vars
-variable "cert_manager" {
+variable "cert_manager_config" {
   type = object({
     version = string
   })
