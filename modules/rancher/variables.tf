@@ -1,25 +1,23 @@
-variable "rancher_hostname" {
-  type        = string
-  description = "Hostname for Rancher"
-}
-
-variable "rancher_password" {
-  type        = string
-  description = "Admin password for Rancher"
-  sensitive   = true
-}
-
+# global vars
 variable "server_ip" {
   type        = string
   description = "Server IP address"
 }
 
-variable "rancher_version" {
-  type        = string
-  description = "Version of Rancher to install"
+# rancher vars
+variable "rancher" {
+  description = "rancher config"
+  type = object({
+    version = string
+    hostname = string
+  })
 }
 
-variable "cert_manager_version" {
-  type        = string
-  description = "Version of cert-manager to install"
+# cert manager vars
+variable "cert_manager" {
+  type = object({
+    version = string
+  })
 }
+
+

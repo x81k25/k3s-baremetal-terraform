@@ -3,12 +3,16 @@ module "k3s" {
   k3s = var.k3s
 }
 
+module "kubernetes" {
+  source = "./modules/kubernetes"
+}
+
 /*
-# module "rancher" {
-#   source = "./modules/rancher"
-#   depends_on = [module.k3s]
-#   rancher_config = var.rancher
-# }
+module "rancher" {
+  source = "./modules/rancher"
+  depends_on = [module.k3s]
+  rancher_config = var.rancher
+}
 
 # module "argocd" {
 #   source = "./modules/argocd"
