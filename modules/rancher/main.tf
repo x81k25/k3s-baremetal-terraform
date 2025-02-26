@@ -20,10 +20,10 @@ resource "time_sleep" "wait_for_cert_manager" {
 resource "null_resource" "cleanup_cattle_system" {
   provisioner "local-exec" {
     command = <<-EOT
-      kubectl patch namespace cattle-system -p '{"metadata":{"finalizers":[]}}' --type=merge || true
-      kubectl delete namespace cattle-system --force --grace-period=0 || true
+      kubectl --kubeconfig=${var.kubeconfig_path} patch namespace cattle-system -p '{"metadata":{"finalizers":[]}}' --type=merge || true
+      kubectl --kubeconfig=${var.kubeconfig_path} delete namespace cattle-system --force --grace-period=0 || true
       
-      while kubectl get namespace cattle-system >/dev/null 2>&1; do
+      while kubectl --kubeconfig=${var.kubeconfig_path} get namespace cattle-system >/dev/null 2>&1; do
         echo "Waiting for cattle-system namespace to be deleted..."
         sleep 5
       done
@@ -67,15 +67,33 @@ resource "helm_release" "rancher" {
     name  = "tls"
     value = "external"
   }
+  
+  # Add these new settings
+  set {
+    name  = "ingress.enabled"
+    value = "true"
+  }
+
+  set {
+    name  = "ingress.extraAnnotations.kubernetes\\.io/ingress\\.class"
+    value = "traefik"
+  }
+
+  set {
+    name  = "ingress.http"
+    value = var.rancher_config.ingress_config.http_enabled
+  }
+
+  set {
+    name  = "ingress.https"
+    value = var.rancher_config.ingress_config.https_enabled
+  }
 
   timeout = 600
 
   provisioner "local-exec" {
     when    = destroy
-    command = <<-EOT
-      kubectl delete job -n cattle-system rancher-post-delete || true
-      kubectl delete namespace cattle-system || true
-    EOT
+    command = "kubectl delete job -n cattle-system rancher-post-delete || true && kubectl delete namespace cattle-system || true"
   }
 }
 

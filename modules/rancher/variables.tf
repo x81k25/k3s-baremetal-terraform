@@ -4,13 +4,21 @@ variable "server_ip" {
   description = "Server IP address"
 }
 
+variable "kubeconfig_path" {
+  type = string
+}
+
 # rancher vars
 variable "rancher_config" {
   description = "rancher config"
   type = object({
     version = string
     hostname = string
-    
+    ingress_config = object({
+      http_enabled     = bool
+      https_enabled    = bool
+      additional_ports = list(number)
+    })
   })
 }
 

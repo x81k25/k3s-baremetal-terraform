@@ -10,6 +10,10 @@ variable "mounts" {
   })
 }
 
+variable "kubeconfig_path" {
+  type = string
+}
+
 variable "k3s_config" {
   description = "K3s Kubernetes configuration settings"
   type = object({

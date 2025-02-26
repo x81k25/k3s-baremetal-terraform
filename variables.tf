@@ -14,6 +14,10 @@ variable "mounts" {
   })
 }
 
+variable "kubeconfig_path" {
+  description = "Path to kubeconfig file"
+}
+
 ################################################################################
 # secure vars
 ################################################################################
@@ -68,7 +72,11 @@ variable "rancher_config" {
   type = object({
     version = string
     hostname = string
-    
+    ingress_config = object({
+      http_enabled     = bool
+      https_enabled    = bool
+      additional_ports = list(number)
+    })
   })
 }
 

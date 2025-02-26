@@ -17,7 +17,7 @@ resource "local_file" "k3s_config" {
     data-dir  = var.mounts.k3s_root
     node-label      = []
     node-taint     = []
-    write-kubeconfig = "${var.mounts.k3s_root}/k3s.yaml"
+    write-kubeconfig = "${var.kubeconfig_path}"
     write-kubeconfig-mode = "644"
     kube-apiserver-arg  = []
     kubelet-arg = [
