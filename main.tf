@@ -33,11 +33,11 @@ module "rancher" {
   }
 }
 
-/*
-# module "argocd" {
-#   source = "./modules/argocd"
-#   depends_on = [module.rancher]
-#   argocd_config = var.argocd
-#   github_config = var.github
-# }
-*/
+module "argo_cd" {
+  source = "./modules/argo_cd"
+  depends_on = [module.rancher]
+  
+  github_config = var.github_config
+  argo_cd_config = var.argo_cd_config
+  argo_cd_sensitive = var.argo_cd_sensitive
+}

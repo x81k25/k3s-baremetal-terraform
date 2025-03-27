@@ -1,7 +1,7 @@
 # Create namespace for ArgoCD
 resource "kubernetes_namespace" "argocd" {
   metadata {
-    name = var.namespace
+    name = var.argo_cd_config.namespace
     labels = {
       managed-by  = "terraform"
     }
@@ -17,13 +17,13 @@ resource "kubernetes_secret" "argocd_admin_password" {
 
   data = {
     # Add this line to set the admin password
-    "password" = bcrypt(var.argocd_admin_password)
+    "password" = bcrypt(var.argo_cd_sensitive.admin_pw)
   }
 
   depends_on = [kubernetes_namespace.argocd]
 }
 
-resource "random_password" "argocd_server_secretkey" {
+resource "random_password" "argo_cd_server_secretkey" {
   length  = 32
   special = false
 }
@@ -43,8 +43,8 @@ resource "kubernetes_secret" "ghcr_argocd" {
     ".dockerconfigjson" = jsonencode({
       auths = {
         "ghcr.io" = {
-          username = var.ghcr_username
-          password = var.ghcr_pull_image_token
+          username = var.github_config.username
+          password = var.github_config.pull_image_token
         }
       }
     })
@@ -63,8 +63,8 @@ resource "kubernetes_secret" "ghcr_automatic_transmission" {
     ".dockerconfigjson" = jsonencode({
       auths = {
         "ghcr.io" = {
-          username = var.ghcr_username
-          password = var.ghcr_pull_image_token
+          username = var.github_config.username
+          password = var.github_config.pull_image_token
         }
       }
     })
@@ -120,7 +120,7 @@ resource "helm_release" "argocd" {
   name       = "argocd"
   repository = "https://argoproj.github.io/argo-helm"
   chart      = "argo-cd"
-  version    = var.argocd_version
+  version    = var.argo_cd_config.version
   namespace  = kubernetes_namespace.argocd.metadata[0].name
 
   # Basic configuration
@@ -128,42 +128,42 @@ resource "helm_release" "argocd" {
     yamlencode({
       server = {
         service = {
-          type = var.ingress_enabled ? "ClusterIP" : "LoadBalancer"
+          type = var.argo_cd_config.ingress.enabled ? "ClusterIP" : "LoadBalancer"
         }
         ingress = {
-          enabled = var.ingress_enabled
-          hosts   = var.ingress_enabled ? [var.ingress_host] : []
+          enabled = var.argo_cd_config.ingress.enabled
+          hosts   = var.argo_cd_config.ingress.enabled ? [var.argo_cd_config.ingress.host] : []
           ingressClassName = "traefik"
         }
         extraArgs = [
           "--insecure"  # Remove in strict production environments
         ]
-        resources = var.resource_limits.server
-        secretKey = random_password.argocd_server_secretkey.result
+        resources = var.argo_cd_config.resource_limits.server
+        secretKey = var.argo_cd_sensitive.admin_pw
       }
 
       repoServer = {
-        resources = var.resource_limits.repo_server
+        resources = var.argo_cd_config.resource_limits.repo_server
       }
 
       controller = {
-        resources = var.resource_limits.application_controller
+        resources = var.argo_cd_config.resource_limits.application_controller
       }
 
       dex = {
-        enabled = var.enable_dex
+        enabled = var.argo_cd_config.enable_dex
       }
 
       ha = {
-        enabled = var.enable_ha
+        enabled = var.argo_cd_config.enable_ha
       }
 
       configs = {
         secret = {
-          argocdServerAdminPassword = bcrypt(var.argocd_admin_password)
+          argocdServerAdminPassword = bcrypt(var.argo_cd_sensitive.admin_pw)
         }
         repositories = {
-          for name, repo in var.git_repositories : name => {
+          for name, repo in var.argo_cd_config.git_repositories : name => {
             url      = repo.url
             username = repo.username
             password = repo.password
@@ -176,7 +176,7 @@ resource "helm_release" "argocd" {
 
   # Add any extra configurations
   dynamic "set" {
-    for_each = var.extra_configs
+    for_each = var.argo_cd_config.extra_configs
     content {
       name  = set.key
       value = set.value

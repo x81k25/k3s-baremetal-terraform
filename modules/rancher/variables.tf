@@ -1,4 +1,7 @@
+################################################################################
 # global vars
+################################################################################
+
 variable "server_ip" {
   type        = string
   description = "Server IP address"
@@ -8,7 +11,10 @@ variable "kubeconfig_path" {
   type = string
 }
 
+################################################################################
 # rancher vars
+################################################################################
+
 variable "rancher_config" {
   description = "rancher config"
   type = object({
@@ -29,11 +35,13 @@ variable "rancher_sensitive" {
   sensitive = true
 }
 
-# cert manager vars
 variable "cert_manager_config" {
   type = object({
     version = string
   })
 }
 
+################################################################################
+# end of variables.tf
+################################################################################
 

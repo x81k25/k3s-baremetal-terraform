@@ -6,8 +6,8 @@ locals {
   }
 
   # Server URL construction
-  server_url = var.ingress_enabled ? (
-    "https://${var.ingress_host}"
+  server_url = var.argo_cd_config.ingress.enabled ? (
+    "https://${var.argo_cd_config.ingress.host}"
   ) : null
 
   # Resource limits with defaults merged
@@ -15,22 +15,22 @@ locals {
     server = merge({
       cpu    = "500m"
       memory = "512Mi"
-    }, try(var.resource_limits.server, {}))
+    }, try(var.argo_cd_config.resource_limits.server, {}))
     
     repo_server = merge({
       cpu    = "500m"
       memory = "512Mi"
-    }, try(var.resource_limits.repo_server, {}))
+    }, try(var.argo_cd_config.resource_limits.repo_server, {}))
     
     application_controller = merge({
       cpu    = "500m"
       memory = "512Mi"
-    }, try(var.resource_limits.application_controller, {}))
+    }, try(var.argo_cd_config.resource_limits.application_controller, {}))
   }
 
   # Git repository configuration formatting
   formatted_repositories = {
-    for name, repo in var.git_repositories : name => {
+    for name, repo in var.argo_cd_config.git_repositories : name => {
       url      = repo.url
       username = try(repo.username, null)
       password = try(repo.password, null)
