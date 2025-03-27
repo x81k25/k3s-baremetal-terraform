@@ -29,6 +29,7 @@ variable "github_config" {
     email            = string
     k8s_manifests_repo = string
     argo_cd_pull_k8s_manifests_token = string
+    argo_cd_pull_image_token = string
   })
   sensitive = true
 }

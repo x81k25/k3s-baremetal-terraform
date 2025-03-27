@@ -42,10 +42,10 @@ resource "kubernetes_secret" "argocd_repo_k8s_manifests" {
   depends_on = [kubernetes_namespace.argocd]
 }
 
-resource "kubernetes_secret" "ghcr_argocd" {
+resource "kubernetes_secret" "ghcr_credentials" {
   metadata {
     name      = "ghcr-pull-image-token"
-    namespace = "argocd"
+    namespace = kubernetes_namespace.argocd.metadata[0].name
     labels = {
       "argocd.argoproj.io/secret-type" = "repository"
     }
@@ -58,31 +58,13 @@ resource "kubernetes_secret" "ghcr_argocd" {
       auths = {
         "ghcr.io" = {
           username = var.github_config.username
-          password = var.github_config.argo_cd_pull_k8s_manifests_token
+          password = var.github_config.argo_cd_pull_image_token
         }
       }
     })
   }
-}
 
-resource "kubernetes_secret" "ghcr_automatic_transmission" {
-  metadata {
-    name      = "ghcr-pull-image-token"
-    namespace = "automatic-transmission"
-  }
-
-  type = "kubernetes.io/dockerconfigjson"
-
-  data = {
-    ".dockerconfigjson" = jsonencode({
-      auths = {
-        "ghcr.io" = {
-          username = var.github_config.username
-          password = var.github_config.argo_cd_pull_k8s_manifests_token
-        }
-      }
-    })
-  }
+  depends_on = [kubernetes_namespace.argocd]
 }
 
 # Install Kustomize CRD
@@ -176,6 +158,11 @@ resource "helm_release" "argocd" {
         secret = {
           argocdServerAdminPassword = bcrypt(var.argo_cd_sensitive.admin_pw)
         }
+        repositories = {}
+        params = {
+          "dockercredentials.enableAutoCredentialsPlugin" = "true"
+          "dockercredentials.pullSecrets" = "[ghcr-pull-image-token]"
+        }
       }
     })
   ]
@@ -206,6 +193,53 @@ resource "null_resource" "wait_for_argo" {
         -n ${kubernetes_namespace.argocd.metadata[0].name} \
         deployment/argocd-server
     EOF
+  }
+
+  depends_on = [helm_release.argocd]
+}
+
+# add specific repo manifest to argo_cd configuration
+resource "kubernetes_manifest" "applications_from_git" {
+  manifest = {
+    apiVersion = "argoproj.io/v1alpha1"
+    kind       = "ApplicationSet"
+    metadata = {
+      name      = "apps-from-git"
+      namespace = kubernetes_namespace.argocd.metadata[0].name
+    }
+    spec = {
+      generators = [{
+        git = {
+          repoURL    = var.github_config.k8s_manifests_repo
+          revision   = "HEAD"
+          directories = [{
+            path = "*-app"
+          }]
+        }
+      }]
+      template = {
+        metadata = {
+          name = "{{path.basename}}"
+        }
+        spec = {
+          project = "default"
+          source = {
+            repoURL        = var.github_config.k8s_manifests_repo
+            targetRevision = "HEAD"
+            path           = "{{path}}"
+          }
+          destination = {
+            server = "https://kubernetes.default.svc"
+          }
+          syncPolicy = {
+            automated = {
+              prune     = true
+              selfHeal  = true
+            }
+          }
+        }
+      }
+    }
   }
 
   depends_on = [helm_release.argocd]
