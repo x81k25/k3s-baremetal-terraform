@@ -23,9 +23,23 @@ resource "kubernetes_secret" "argocd_admin_password" {
   depends_on = [kubernetes_namespace.argocd]
 }
 
-resource "random_password" "argo_cd_server_secretkey" {
-  length  = 32
-  special = false
+resource "kubernetes_secret" "argocd_repo_k8s_manifests" {
+  metadata {
+    name      = "repo-k8s-manifests"
+    namespace = kubernetes_namespace.argocd.metadata[0].name
+    labels = {
+      "argocd.argoproj.io/secret-type" = "repository"
+    }
+  }
+
+  data = {
+    type     = "git"
+    url      = var.github_config.k8s_manifests_repo
+    username = var.github_config.username
+    password = var.github_config.argo_cd_pull_k8s_manifests_token
+  }
+
+  depends_on = [kubernetes_namespace.argocd]
 }
 
 resource "kubernetes_secret" "ghcr_argocd" {
@@ -44,7 +58,7 @@ resource "kubernetes_secret" "ghcr_argocd" {
       auths = {
         "ghcr.io" = {
           username = var.github_config.username
-          password = var.github_config.pull_image_token
+          password = var.github_config.argo_cd_pull_k8s_manifests_token
         }
       }
     })
@@ -64,7 +78,7 @@ resource "kubernetes_secret" "ghcr_automatic_transmission" {
       auths = {
         "ghcr.io" = {
           username = var.github_config.username
-          password = var.github_config.pull_image_token
+          password = var.github_config.argo_cd_pull_k8s_manifests_token
         }
       }
     })
@@ -162,14 +176,6 @@ resource "helm_release" "argocd" {
         secret = {
           argocdServerAdminPassword = bcrypt(var.argo_cd_sensitive.admin_pw)
         }
-        repositories = {
-          for name, repo in var.argo_cd_config.git_repositories : name => {
-            url      = repo.url
-            username = repo.username
-            password = repo.password
-            sshKey   = repo.ssh_key
-          } if repo != null
-        }
       }
     })
   ]
@@ -186,7 +192,8 @@ resource "helm_release" "argocd" {
   depends_on = [
     kubernetes_namespace.argocd,
     kubernetes_secret.argocd_admin_password,
-    kubernetes_manifest.kustomize_crd
+    kubernetes_manifest.kustomize_crd,
+    kubernetes_secret.argocd_repo_k8s_manifests 
   ]
 }
 

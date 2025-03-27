@@ -27,7 +27,8 @@ variable "github_config" {
   type = object({
     username         = string
     email            = string
-    pull_image_token = string
+    k8s_manifests_repo = string
+    argo_cd_pull_k8s_manifests_token = string
   })
   sensitive = true
 }
@@ -119,7 +120,12 @@ variable "argo_cd_config" {
         memory = string
       })
     })
-    git_repositories = map(any)
+    git_repositories = map(object({
+      url = string
+      name = string
+      username = optional(string)
+      password_secret_key = optional(string)
+    }))
     enable_ha = bool
     enable_dex = bool
     extra_configs = map(any)
