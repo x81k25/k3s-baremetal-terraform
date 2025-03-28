@@ -144,6 +144,9 @@ resource "helm_release" "argocd" {
 
       controller = {
         resources = var.argo_cd_config.resource_limits.application_controller
+        args = {
+          "controller.image-pull-secret-propagation.enabled" = "true"
+        }
       }
 
       dex = {

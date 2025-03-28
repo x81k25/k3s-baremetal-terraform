@@ -10,6 +10,8 @@ module "k3s" {
 module "kubernetes" {
   source = "./modules/kubernetes"
   
+  github_config = var.github_config
+
   providers = {
     kubernetes = kubernetes
   }
