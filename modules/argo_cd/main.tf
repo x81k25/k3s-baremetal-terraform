@@ -245,5 +245,9 @@ resource "kubernetes_manifest" "applications_from_git" {
     }
   }
 
+  field_manager {
+    force_conflicts = true
+  }
+
   depends_on = [helm_release.argocd]
 }
