@@ -1,3 +1,16 @@
+################################################################################
+# namespaces.tf
+#
+# creates all namespaces not explictly created by othere modules
+# handles dependancies and variables for namespaces without their own exlicit
+# modules
+#
+################################################################################
+
+################################################################################
+# ArgoCD namesapces
+################################################################################
+
 resource "kubernetes_namespace" "argocd_test" {
   metadata {
     name = "argocd-test"
@@ -27,6 +40,10 @@ resource "kubernetes_secret" "ghcr_argocd_test" {
   }
 }
 
+################################################################################
+# postgres namespace
+################################################################################
+
 resource "kubernetes_namespace" "postgres" {
   metadata {
     name = "postgres"
@@ -36,6 +53,10 @@ resource "kubernetes_namespace" "postgres" {
   }
 }
 
+################################################################################
+# automatic transmission name_space
+################################################################################
+
 resource "kubernetes_namespace" "automatic_transmission" {
   metadata {
     name = "automatic-transmission"
@@ -44,3 +65,38 @@ resource "kubernetes_namespace" "automatic_transmission" {
     }
   }
 }
+
+################################################################################
+# media namespaces
+################################################################################
+
+resource "kubernetes_namespace" "media-prod" {
+  metadata {
+    name = "media-prod"
+    labels = {
+      managed-by = "terraform"
+    }
+  }
+}
+
+resource "kubernetes_namespace" "media-stg" {
+  metadata {
+    name = "media-stg"
+    labels = {
+      managed-by = "terraform"
+    }
+  }
+}
+
+resource "kubernetes_namespace" "media-dev" {
+  metadata {
+    name = "media-dev"
+    labels = {
+      managed-by = "terraform"
+    }
+  }
+}
+
+################################################################################
+# end of namespaces.tf
+################################################################################
