@@ -67,36 +67,5 @@ resource "kubernetes_namespace" "automatic_transmission" {
 }
 
 ################################################################################
-# media namespaces
-################################################################################
-
-resource "kubernetes_namespace" "media-prod" {
-  metadata {
-    name = "media-prod"
-    labels = {
-      managed-by = "terraform"
-    }
-  }
-}
-
-resource "kubernetes_namespace" "media-stg" {
-  metadata {
-    name = "media-stg"
-    labels = {
-      managed-by = "terraform"
-    }
-  }
-}
-
-resource "kubernetes_namespace" "media-dev" {
-  metadata {
-    name = "media-dev"
-    labels = {
-      managed-by = "terraform"
-    }
-  }
-}
-
-################################################################################
 # end of namespaces.tf
 ################################################################################

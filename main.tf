@@ -20,8 +20,6 @@ module "kubernetes" {
   
   server_ip =  var.server_ip
   github_config = var.github_config
-  ssh_config = var.ssh_config
-  media_sensitive = var.media_sensitive
 
   providers = {
     kubernetes = kubernetes
@@ -61,6 +59,19 @@ module "argo_cd" {
   github_config = var.github_config
   argo_cd_config = var.argo_cd_config
   argo_cd_sensitive = var.argo_cd_sensitive
+}
+
+################################################################################
+# media module
+################################################################################
+
+module "media" {
+  source = "./modules/media"
+  depends_on = [module.argo_cd]
+  
+  server_ip =  var.server_ip
+  ssh_config = var.ssh_config
+  media_sensitive = var.media_sensitive
 }
 
 ################################################################################
