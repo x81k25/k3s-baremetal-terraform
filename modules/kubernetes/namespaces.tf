@@ -46,20 +46,7 @@ resource "kubernetes_secret" "ghcr_argocd_test" {
 
 resource "kubernetes_namespace" "postgres" {
   metadata {
-    name = "postgres"
-    labels = {
-      managed-by = "terraform"
-    }
-  }
-}
-
-################################################################################
-# automatic transmission name_space
-################################################################################
-
-resource "kubernetes_namespace" "automatic_transmission" {
-  metadata {
-    name = "automatic-transmission"
+    name = "pgsql"
     labels = {
       managed-by = "terraform"
     }
