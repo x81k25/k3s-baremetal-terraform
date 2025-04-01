@@ -1,38 +1,78 @@
 # k3s-baremetal-terraform
 
-A Terraform project for deploying and managing a K3s Kubernetes cluster on bare metal servers.
+A comprehensive Terraform project for deploying and managing a K3s Kubernetes cluster on bare metal servers with integrated Rancher, ArgoCD, and media services.
 
 ## Overview
 
-This project contains Terraform configurations to automate the deployment of a K3s cluster on local bare metal infrastructure. It uses the Rancher provider to manage K3s, along with configurations for Kubernetes resources like namespaces and providers.
+This project contains Terraform configurations to automate the deployment of a full-featured K3s cluster on local bare metal infrastructure. It uses modular design to manage each component independently, including K3s installation, Rancher management, Kubernetes resources, ArgoCD for GitOps, and specialized media services.
 
 ## Repository Structure
 
 ```
 .
 ├── .terraform           # Terraform working directory (gitignored)
-├── modules
-│   ├── argcd            # ArgoCD module
-│   ├── k3s              # K3s cluster configuration 
-│   ├── kubernetes       # Kubernetes resources
-│   └── rancher          # Rancher provider configuration
+├── modules/
+│   ├── argo_cd/         # ArgoCD GitOps deployment
+│   ├── k3s/             # K3s cluster installation and configuration
+│   ├── kubernetes/      # Core Kubernetes resources
+│   ├── rancher/         # Rancher management layer
+│   └── media/           # Media services (Plex, etc.)
+├── .gitignore           # Git ignore patterns
 ├── providers.tf         # Provider configurations
 ├── main.tf              # Main Terraform configuration
 ├── variables.tf         # Variable declarations
 └── outputs.tf           # Output definitions
 ```
 
+## Features
+
+- **Automated K3s Installation**: Single-node K3s deployment with customizable configuration
+- **Rancher Integration**: Automated deployment of Rancher for cluster management
+- **GitOps Ready**: Integrated ArgoCD for continuous deployment from Git repositories
+- **Media Services**: Pre-configured media stack with GPU support for services like Plex
+- **Namespace Management**: Structured namespace provisioning with proper RBAC
+- **Container Registry Integration**: GitHub Container Registry authentication
+- **Backup Configuration**: Built-in etcd snapshot backups
+- **Network Customization**: Flexible network configuration options
+
 ## Prerequisites
 
-- Terraform >= 1.0.0
-- A bare metal server or local machine capable of running K3s
-- Network connectivity between your deployment machine and target servers
+- Terraform >= 1.5.0
+- A bare metal server with sufficient CPU, RAM, and storage
+- Network connectivity between deployment machine and target servers
+- (Optional) NVIDIA GPU for hardware acceleration in media services
 
 ## Configuration
 
-This project uses variable files for configuration. You'll need to create your own variable files based on the structure in the `variables.tf` files throughout the project. All variables should be assigned in the `terraform.tfvars` file in the root directory. Global variables are defined in only the root `variables.tf`. Module variables are defined in the root `variables.tf` and in the module `variables.tf` files, and passed within the root `main.tf`.
+This project uses variable files for configuration. You'll need to create a `terraform.tfvars` file based on the variables defined in `variables.tf`. Key configuration sections include:
 
-## Usage
+### Global Configuration
+- Server IP
+- Mount points for persistent data
+- Kubeconfig path
+
+### K3s Configuration
+- Version
+- Resource limits
+- Network settings
+- Backup configuration
+
+### Rancher Configuration
+- Version
+- Hostname
+- Ingress settings
+
+### ArgoCD Configuration
+- Version
+- Repository access
+- Resource limits
+- Authentication settings
+
+### Media Services
+- Plex claim token
+- GPU resource allocation
+
+## Deployment Instructions
 
 1. Clone this repository
 2. Create a `terraform.tfvars` file with your specific configurations
@@ -54,70 +94,85 @@ terraform plan
 terraform apply
 ```
 
-## Modules
+6. Access the deployed services:
+   - Rancher UI: https://[your-server-ip]
+   - ArgoCD: https://[argocd-ingress-host] (if configured)
 
-#### Modularity and Customization
-This project follows a highly modular design philosophy. Each module is self-contained with its own:
+## Module Details
 
-- main.tf - Core resources and logic
-- variables.tf - Module-specific input variables
-- outputs.tf - Exposed outputs for other modules
-- providers.tf - Provider configurations (where applicable)
+### K3s Module
 
-This modular approach provides several benefits:
+The K3s module handles the installation and configuration of a K3s Kubernetes cluster:
 
-- Independent Development: Each module can be developed, tested, and maintained independently
-- Clean Organization: Resources are logically grouped, making the codebase easier to navigate
-- Reusability: Modules can be reused across different environments or projects
-- Customization: Users can easily replace or modify individual modules without affecting others
-- Simplified Maintenance: Updates to one module don't require changes to others
+- Configures node resources (CPU, memory)
+- Sets up networking with Flannel
+- Configures storage
+- Implements backup routines for etcd
+- Manages kubeconfig generation
 
-#### Customizing for Your Environment
-To customize this project:
+### Kubernetes Module
 
-1. Review all variables.tf files to understand required inputs
-2. Create a terraform.tfvars file with your specific values
-3. Modify or extend modules as needed for your specific infrastructure
-4. Add or remove modules based on your requirements
+Handles core Kubernetes resources:
 
-### Current Modules
+- Creates namespaces
+- Configures GHCR registry access
+- Sets up database namespaces
 
-#### K3s
+### Rancher Module
 
-The K3s module (`modules/k3s`) manages the deployment and configuration of a K3s cluster on bare metal. It handles:
+Manages the Rancher installation:
 
-- Node configuration
-- Networking setup
-- Storage configuration
+- Deploys cert-manager
+- Installs Rancher server
+- Configures ingress
+- Handles host file registration
 
-#### Kubernetes
+### ArgoCD Module
 
-The Kubernetes module (`modules/kubernetes`) creates and manages Kubernetes resources, including:
+Configures GitOps with ArgoCD:
 
-- Namespaces
-- Provider configurations
+- Installs ArgoCD server
+- Sets up repository access
+- Configures application auto-deployment
+- Implements security settings
 
-#### Rancher
+### Media Module
 
-The Rancher module (`modules/rancher`) configures the interaction with K3s through the Rancher provider.
+Sets up media services infrastructure:
 
-#### ArgoCD
-
-The ArgoCD module (`modules/argcd`) sets up and configures ArgoCD for GitOps workflows.
+- Creates dedicated namespaces (dev/staging/prod)
+- Configures GPU access
+- Sets up Plex configuration
+- Implements resource quotas
 
 ## Customization
 
-To customize this project for your environment:
+To adapt this project for your environment:
 
 1. Review all `variables.tf` files to understand required inputs
 2. Create a `terraform.tfvars` file with your specific values
-3. Modify or extend modules as needed for your specific infrastructure
+3. Modify specific modules as needed:
+   - Adjust resource limits based on your hardware
+   - Customize network settings for your environment
+   - Configure ingress settings and hostnames
+
+## Troubleshooting
+
+- **Namespace Deletion Issues**: The repository includes handlers for stuck namespace termination
+- **Certificate Problems**: Check cert-manager deployment and validate TLS settings
+- **Network Connectivity**: Verify interface settings and firewall rules
+- **GPU Integration**: Ensure proper NVIDIA drivers are installed on the host
 
 ## Notes
 
-- This repository doesn't include sensitive data or state files
+- This project is designed for single-node deployment but can be extended
 - All Terraform state is managed locally by default and excluded from git
-- Custom mount points configuration is required for proper operation
+- Sensitive information should be stored in `terraform.tfvars` (gitignored)
+- The media module requires GPU drivers pre-installed on the host system
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
