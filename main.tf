@@ -1,3 +1,7 @@
+################################################################################
+# k3s module
+################################################################################
+
 module "k3s" {
   source = "./modules/k3s"
   
@@ -7,15 +11,24 @@ module "k3s" {
   k3s_config = var.k3s_config
 }
 
+################################################################################
+# kuburnetes module
+################################################################################
+
 module "kubernetes" {
   source = "./modules/kubernetes"
   
+  server_ip =  var.server_ip
   github_config = var.github_config
 
   providers = {
     kubernetes = kubernetes
   }
 }
+
+################################################################################
+# rancher module
+################################################################################
 
 module "rancher" {
   source = "./modules/rancher"
@@ -35,6 +48,10 @@ module "rancher" {
   }
 }
 
+################################################################################
+# argocd module
+################################################################################
+
 module "argo_cd" {
   source = "./modules/argo_cd"
   depends_on = [module.rancher]
@@ -43,3 +60,20 @@ module "argo_cd" {
   argo_cd_config = var.argo_cd_config
   argo_cd_sensitive = var.argo_cd_sensitive
 }
+
+################################################################################
+# media module
+################################################################################
+
+module "media" {
+  source = "./modules/media"
+  depends_on = [module.argo_cd]
+  
+  server_ip =  var.server_ip
+  ssh_config = var.ssh_config
+  media_sensitive = var.media_sensitive
+}
+
+################################################################################
+# end of main.tf
+################################################################################

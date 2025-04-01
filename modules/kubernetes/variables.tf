@@ -2,6 +2,10 @@
 # global vars
 ################################################################################
 
+variable "server_ip" {
+  type = string
+}
+
 variable "github_config" {
   description = "GitHub and GitHub Container Registry configuration"
   type = object({

@@ -34,6 +34,14 @@ variable "github_config" {
   sensitive = true
 }
 
+variable "ssh_config" {
+  type = object({
+    user = string
+    private_key_path = string
+  })
+  sensitive = true
+}
+
 ################################################################################
 # k3s vars
 ################################################################################
@@ -137,6 +145,17 @@ variable "argo_cd_sensitive" {
   type = object({
     admin_pw = string
   })
+}
+
+################################################################################
+# plex vars
+################################################################################
+
+variable "media_sensitive" {
+  type = object({
+    plex_claim = string
+  })
+  sensitive = true
 }
 
 ################################################################################
