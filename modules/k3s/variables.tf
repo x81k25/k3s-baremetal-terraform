@@ -5,7 +5,6 @@ variable "server_ip" {
 variable "mounts" {
   type = object({
     k3s_root = string
-    postgres = string
     media_cache = string
   })
 }

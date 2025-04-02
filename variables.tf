@@ -3,13 +3,14 @@
 ################################################################################
 
 variable "server_ip" {
+  description = "interal ip address of servers hosts cluster"
   type = string
 }
 
 variable "mounts" {
+  description = "mounts used by primary services"
   type = object({
     k3s_root = string
-    postgres = string
     media_cache = string
   })
 }
@@ -17,10 +18,6 @@ variable "mounts" {
 variable "kubeconfig_path" {
   description = "Path to kubeconfig file"
 }
-
-################################################################################
-# secure vars
-################################################################################
 
 variable "github_config" {
   description = "GitHub and GitHub Container Registry configuration"
@@ -35,9 +32,71 @@ variable "github_config" {
 }
 
 variable "ssh_config" {
+  description = "ssh connection paramters used to run null_resources"
   type = object({
     user = string
     private_key_path = string
+  })
+  sensitive = true
+}
+
+variable "pgsql_config" {
+  description = "parameters to insantiate and connect the pgsql databases within the cluster"
+  type = object({
+    prod = object({
+      port = number
+      user = string
+      password = string
+      database = string
+      mount = string
+      performance = object({
+        shared_buffers = number
+        work_mem = number
+        maintenance_work_mem = number
+        max_connections = number
+        effective_cache_size = number
+      })
+      security = object({
+        UID = number
+        GID = number 
+      })
+    })
+    stg = object({
+      port = number
+      user = string
+      password = string
+      database = string
+      mount = string
+      performance = object({
+        shared_buffers = number
+        work_mem = number
+        maintenance_work_mem = number
+        max_connections = number
+        effective_cache_size = number
+      })
+      security = object({
+        UID = number
+        GID = number 
+      })
+    })
+    dev = object({
+      port = number
+      user = string
+      password = string
+      database = string
+      mount = string
+      performance = object({
+        shared_buffers = number
+        work_mem = number
+        maintenance_work_mem = number
+        max_connections = number
+        effective_cache_size = number
+      })
+      security = object({
+        UID = number
+        GID = number 
+      })
+    })
   })
   sensitive = true
 }
