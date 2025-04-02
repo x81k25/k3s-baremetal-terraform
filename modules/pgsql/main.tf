@@ -279,9 +279,9 @@ resource "kubernetes_secret" "pgadmin4_servers" {
 # Global Configuration Secret
 ################################################################################
 
-resource "kubernetes_secret" "global_config" {
+resource "kubernetes_config_map" "server_ip_config" {
   metadata {
-    name      = "global-config"
+    name      = "server-ip-config"
     namespace = kubernetes_namespace.pgsql.metadata[0].name
     labels = {
       managed-by = "terraform"
@@ -289,10 +289,8 @@ resource "kubernetes_secret" "global_config" {
   }
 
   data = {
-    server_ip = var.server_ip
+    SERVER_IP = var.server_ip
   }
-
-  type = "Opaque"
 }
 
 ################################################################################
