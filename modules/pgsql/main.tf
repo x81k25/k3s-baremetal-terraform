@@ -1,68 +1,87 @@
-# PVC for pgAdmin data
-resource "kubernetes_persistent_volume_claim" "pgadmin_data" {
+################################################################################
+# namespace 
+################################################################################
+
+resource "kubernetes_namespace" "pgsql" {
   metadata {
-    name      = "pgadmin-data"
-    namespace = "pgsql"
-  }
-  spec {
-    access_modes = ["ReadWriteOnce"]
-    resources {
-      requests = {
-        storage = "1Gi"
-      }
+    name = "pgsql"
+    labels = {
+      managed-by = "terraform"
     }
   }
 }
 
-# Create ArgoCD Application as a Kubernetes manifest
-resource "kubernetes_manifest" "pgadmin_application" {
-  manifest = {
-    apiVersion = "argoproj.io/v1alpha1"
-    kind       = "Application"
-    metadata = {
-      name      = "pgadmin"
-      namespace = "argocd"
-    }
-    spec = {
-      project = "default"
-      source = {
-        repoURL        = "https://helm.dpage.org/charts"
-        chart          = "pgadmin4"
-        targetRevision = "1.x.x"
-        helm = {
-          values = <<-EOT
-          env:
-            PGADMIN_DEFAULT_EMAIL: "${var.pgadmin4_config.email}"
-            PGADMIN_DEFAULT_PASSWORD: "${var.pgadmin4_config.password}"
-            PGADMIN_LISTEN_PORT: ${var.pgadmin4_config.listen_port}
-            PGADMIN_LISTEN_ADDRESS: "${var.pgadmin4_config.listen_address}"
-            PGADMIN_SERVER_MODE: ${var.pgadmin4_config.server_mode}
-          
-          securityContext:
-            runAsUser: ${var.pgadmin4_config.UID}
-            runAsGroup: ${var.pgadmin4_config.GID}
-            fsGroup: ${var.pgadmin4_config.fs_group}
-          
-          persistentVolume:
-            existingClaim: "pgadmin-data"
-            mountPath: "${var.pgadmin4_config.mount}"
-          
-          service:
-            port: ${var.pgadmin4_config.port}
-          EOT
-        }
-      }
-      destination = {
-        server    = "https://kubernetes.default.svc"
-        namespace = "pgsql"
-      }
-      syncPolicy = {
-        automated = {
-          prune    = true
-          selfHeal = true
-        }
-      }
-    }
+################################################################################
+# pgsql config pass
+################################################################################
+
+resource "kubernetes_secret" "pgsql_prod_config" {
+  metadata {
+    name      = "pgsql-prod-config"
+    namespace = kubernetes_namespace.pgsql.metadata[0].name
   }
-  depends_on = [kubernetes_persistent_volume_claim.pgadmin_data]
+
+  data = {
+    pgsql_prod_user = var.pgsql_config.prod.user
+    pgsql_prod_password = var.pgsql_config.prod.password
+    pgsql_prod_database = var.pgsql_config.prod.database
+    pgsql_prod_mount = var.pgsql_config.prod.mount
+  }
+
+  type = "Opaque"
 }
+
+resource "kubernetes_secret" "pgsql_stg_config" {
+  metadata {
+    name      = "pgsql-stg-config"
+    namespace = kubernetes_namespace.pgsql.metadata[0].name
+  }
+
+  data = {
+    pgsql_stg_user = var.pgsql_config.stg.user
+    pgsql_stg_password = var.pgsql_config.stg.password
+    pgsql_stg_database = var.pgsql_config.stg.database
+    pgsql_stg_mount = var.pgsql_config.stg.mount
+  }
+
+  type = "Opaque"
+}
+
+resource "kubernetes_secret" "pgsql_dev_config" {
+  metadata {
+    name      = "pgsql-dev-config"
+    namespace = kubernetes_namespace.pgsql.metadata[0].name
+  }
+
+  data = {
+    pgsql_dev_user = var.pgsql_config.dev.user
+    pgsql_dev_password = var.pgsql_config.dev.password
+    pgsql_dev_database = var.pgsql_config.dev.database
+    pgsql_dev_mount = var.pgsql_config.dev.mount
+  }
+
+  type = "Opaque"
+}
+
+################################################################################
+# pgadmin config pass
+################################################################################
+
+resource "kubernetes_secret" "pgadmin_credentials" {
+  metadata {
+    name      = "pgadmin-credentials"
+    namespace = kubernetes_namespace.pgsql.metadata[0].name
+  }
+
+  data = {
+    pgadmin_email    = var.pgadmin4_config.email
+    pgadmin_password = var.pgadmin4_config.password
+    pgadmin_mount    = var.pgadmin4_config.mount
+  }
+
+  type = "Opaque"
+}
+
+################################################################################
+# end of main.tf
+################################################################################
