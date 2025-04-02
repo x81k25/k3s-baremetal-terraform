@@ -8,6 +8,16 @@ resource "kubernetes_namespace" "argocd" {
   }
 }
 
+# create namespace for testing ArgoCD apps
+resource "kubernetes_namespace" "argocd_test" {
+  metadata {
+    name = "argocd-test"
+    labels = {
+      managed-by = "terraform"
+    }
+  }
+}
+
 # Create secret for ArgoCD admin password
 resource "kubernetes_secret" "argocd_admin_password" {
   metadata {
@@ -65,6 +75,29 @@ resource "kubernetes_secret" "ghcr_credentials" {
   }
 
   depends_on = [kubernetes_namespace.argocd]
+}
+
+# pass image pull secret to ArgoCD test namespace
+resource "kubernetes_secret" "ghcr_argocd_test" {
+  metadata {
+    name      = "ghcr-pull-image-token"
+    namespace = "argocd-test"
+  }
+
+  type = "kubernetes.io/dockerconfigjson"
+
+  data = {
+    ".dockerconfigjson" = jsonencode({
+      auths = {
+        "ghcr.io" = {
+          username = var.github_config.username
+          password = var.github_config.argo_cd_pull_image_token
+        }
+      }
+    })
+  }
+
+  depends_on = [kubernetes_namespace.argocd_test]
 }
 
 # Install Kustomize CRD

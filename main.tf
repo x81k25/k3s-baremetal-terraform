@@ -12,21 +12,6 @@ module "k3s" {
 }
 
 ################################################################################
-# kuburnetes module
-################################################################################
-
-module "kubernetes" {
-  source = "./modules/kubernetes"
-  
-  server_ip =  var.server_ip
-  github_config = var.github_config
-
-  providers = {
-    kubernetes = kubernetes
-  }
-}
-
-################################################################################
 # rancher module
 ################################################################################
 
@@ -67,7 +52,7 @@ module "argo_cd" {
 
 module "pgsql" {
   source = "./modules/pgsql"
-  depends_on = [module.kubernetes]
+  depends_on = [module.k3s]
 
   pgsql_config = var.pgsql_config
 }
