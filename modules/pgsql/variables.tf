@@ -58,3 +58,20 @@ variable "pgsql_config" {
   })
   sensitive = true
 }
+
+variable "pgadmin4_config" {
+  description = "config vars for the pgadmin4 web app"
+  type = object({
+    email = string
+    password = string
+    UID = number
+    GID = number
+    fs_grounp = number
+    mount = string
+    port = number
+    server_mode = bool
+    listen_address = string
+    listen_port = number
+  })
+  sensitive = true
+}
