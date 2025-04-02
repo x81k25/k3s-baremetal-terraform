@@ -32,6 +32,7 @@ resource "kubernetes_secret" "pgsql_dev_secrets" {
     database = var.pgsql_config.dev.database
     port     = tostring(var.pgsql_config.dev.port)
     server_ip = var.server_ip
+    mount    = var.pgsql_config.dev.mount
   }
 
   type = "Opaque"
@@ -58,6 +59,7 @@ resource "kubernetes_secret" "pgsql_stg_secrets" {
     database = var.pgsql_config.stg.database
     port     = tostring(var.pgsql_config.stg.port)
     server_ip = var.server_ip
+    mount    = var.pgsql_config.stg.mount
   }
 
   type = "Opaque"
@@ -84,6 +86,7 @@ resource "kubernetes_secret" "pgsql_prod_secrets" {
     database = var.pgsql_config.prod.database
     port     = tostring(var.pgsql_config.prod.port)
     server_ip = var.server_ip
+    mount    = var.pgsql_config.prod.mount
   }
 
   type = "Opaque"
@@ -216,6 +219,8 @@ resource "kubernetes_secret" "pgadmin4_secrets" {
     listen_port    = tostring(var.pgadmin4_config.listen_port)
     server_mode    = tostring(var.pgadmin4_config.server_mode)
     server_ip      = var.server_ip
+    mount          = var.pgadmin4_config.mount
+    port           = tostring(var.pgadmin4_config.port)
   }
 
   type = "Opaque"
