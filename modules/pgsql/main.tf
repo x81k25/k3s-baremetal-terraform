@@ -214,7 +214,7 @@ resource "kubernetes_secret" "pgadmin4_secrets" {
     password      = var.pgadmin4_config.password
     uid           = tostring(var.pgadmin4_config.UID)
     gid           = tostring(var.pgadmin4_config.GID)
-    fs_group      = tostring(var.pgadmin4_config.fs_grounp)
+    fs_group      = tostring(var.pgadmin4_config.fs_group)
     listen_address = var.pgadmin4_config.listen_address
     listen_port    = tostring(var.pgadmin4_config.listen_port)
     server_mode    = tostring(var.pgadmin4_config.server_mode)

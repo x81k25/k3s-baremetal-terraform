@@ -71,7 +71,7 @@ variable "pgadmin4_config" {
     password = string
     UID = number
     GID = number
-    fs_grounp = number
+    fs_group = number
     mount = string
     port = number
     server_mode = bool
