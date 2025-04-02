@@ -67,7 +67,8 @@ module "argo_cd" {
 
 module "pgsql" {
   source = "./modules/pgsql"
-  
+  depends_on = [module.kubernetes]
+
   pgsql_config = var.pgsql_config
 }
 
