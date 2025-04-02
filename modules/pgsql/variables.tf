@@ -1,3 +1,8 @@
+variable "server_ip" {
+  description = "interal ip address of servers hosts cluster"
+  type = string
+}
+
 variable "pgsql_config" {
   description = "parameters to insantiate and connect the pgsql databases within the cluster"
   type = object({

@@ -54,6 +54,7 @@ module "pgsql" {
   source = "./modules/pgsql"
   depends_on = [module.k3s]
 
+  server_ip = var.server_ip
   pgsql_config = var.pgsql_config
   pgadmin4_config = var.pgadmin4_config
 }
