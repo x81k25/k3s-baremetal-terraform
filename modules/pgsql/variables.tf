@@ -7,7 +7,6 @@ variable "pgsql_config" {
   description = "parameters to insantiate and connect the pgsql databases within the cluster"
   type = object({
     prod = object({
-      port = number
       user = string
       password = string
       database = string
@@ -25,7 +24,6 @@ variable "pgsql_config" {
       })
     })
     stg = object({
-      port = number
       user = string
       password = string
       database = string
@@ -43,7 +41,6 @@ variable "pgsql_config" {
       })
     })
     dev = object({
-      port = number
       user = string
       password = string
       database = string

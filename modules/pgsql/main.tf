@@ -25,7 +25,6 @@ resource "kubernetes_secret" "pgsql_prod_config" {
     pgsql_prod_user = var.pgsql_config.prod.user
     pgsql_prod_password = var.pgsql_config.prod.password
     pgsql_prod_database = var.pgsql_config.prod.database
-    pgsql_prod_mount = var.pgsql_config.prod.mount
   }
 
   type = "Opaque"
@@ -41,7 +40,6 @@ resource "kubernetes_secret" "pgsql_stg_config" {
     pgsql_stg_user = var.pgsql_config.stg.user
     pgsql_stg_password = var.pgsql_config.stg.password
     pgsql_stg_database = var.pgsql_config.stg.database
-    pgsql_stg_mount = var.pgsql_config.stg.mount
   }
 
   type = "Opaque"
@@ -57,7 +55,6 @@ resource "kubernetes_secret" "pgsql_dev_config" {
     pgsql_dev_user = var.pgsql_config.dev.user
     pgsql_dev_password = var.pgsql_config.dev.password
     pgsql_dev_database = var.pgsql_config.dev.database
-    pgsql_dev_mount = var.pgsql_config.dev.mount
   }
 
   type = "Opaque"
@@ -76,7 +73,6 @@ resource "kubernetes_secret" "pgadmin_credentials" {
   data = {
     pgadmin_email    = var.pgadmin4_config.email
     pgadmin_password = var.pgadmin4_config.password
-    pgadmin_mount    = var.pgadmin4_config.mount
   }
 
   type = "Opaque"
