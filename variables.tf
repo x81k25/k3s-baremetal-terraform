@@ -47,52 +47,16 @@ variable "pgsql_config" {
       user = string
       password = string
       database = string
-      mount = string
-      performance = object({
-        shared_buffers = number
-        work_mem = number
-        maintenance_work_mem = number
-        max_connections = number
-        effective_cache_size = number
-      })
-      security = object({
-        UID = number
-        GID = number 
-      })
     })
     stg = object({
       user = string
       password = string
       database = string
-      mount = string
-      performance = object({
-        shared_buffers = number
-        work_mem = number
-        maintenance_work_mem = number
-        max_connections = number
-        effective_cache_size = number
-      })
-      security = object({
-        UID = number
-        GID = number 
-      })
     })
     dev = object({
       user = string
       password = string
       database = string
-      mount = string
-      performance = object({
-        shared_buffers = number
-        work_mem = number
-        maintenance_work_mem = number
-        max_connections = number
-        effective_cache_size = number
-      })
-      security = object({
-        UID = number
-        GID = number 
-      })
     })
   })
   sensitive = true
@@ -212,14 +176,6 @@ variable "pgadmin4_config" {
   type = object({
     email = string
     password = string
-    UID = number
-    GID = number
-    fs_group = number
-    mount = string
-    port = number
-    server_mode = bool
-    listen_address = string
-    listen_port = number
   })
   sensitive = true
 }
@@ -231,6 +187,50 @@ variable "pgadmin4_config" {
 variable "media_sensitive" {
   type = object({
     plex_claim = string
+  })
+  sensitive = true
+}
+
+################################################################################
+# ai-ml vars
+################################################################################
+
+variable "ai_ml_sensitive" {
+  description = "ai-ml config"
+  type = object({
+    kubeflow = object({     
+      user = string
+      password = string
+      service_account_token = string
+      metadata_grpc_token = string
+      pipeline_api_token = string
+      pipeline_runner_token = string
+      artifact_fetcher_token = string
+      db = object({
+        prod = object({
+          user = string
+          password = string
+          host = string
+          port = string
+        })
+        stg = object({
+          user = string
+          password = string
+          host = string
+          port = string
+        })
+        dev = object({
+          user = string
+          password = string
+          host = string
+          port = string
+        })
+      })
+    })
+    minio = object({
+      access_key = string
+      secret_key = string
+    })
   })
   sensitive = true
 }
