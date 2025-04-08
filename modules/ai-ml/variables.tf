@@ -3,35 +3,37 @@
 ################################################################################
 
 variable "ai_ml_sensitive" {
-  description = "ai-ml config"
+  description = "credentials needed for the ai-ml namespace"
   type = object({
-    kubeflow = object({     
+    mlflow = object({     
       user = string
       password = string
-      service_account_token = string
-      metadata_grpc_token = string
-      pipeline_api_token = string
-      pipeline_runner_token = string
-      artifact_fetcher_token = string
       db = object({
         prod = object({
           user = string
           password = string
-          host = string
+          name = string
           port = string
+          database = string
         })
         stg = object({
           user = string
           password = string
-          host = string
+          name = string
           port = string
+          database = string
         })
         dev = object({
           user = string
           password = string
-          host = string
+          name = string
           port = string
+          database = string
         })
+        
+      })
+      artifact_store = object({
+        bucket_name = string
       })
     })
     minio = object({

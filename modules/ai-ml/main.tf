@@ -15,68 +15,79 @@ resource "kubernetes_namespace" "ai_ml" {
 # secrets
 ################################################################################
 
-resource "kubernetes_secret" "kubeflow_secret" {
+resource "kubernetes_secret" "mlflow_secret" {
   metadata {
-    name      = "kubeflow-secret"
+    name      = "mlflow-secret"
     namespace = kubernetes_namespace.ai_ml.metadata[0].name
   }
 
   data = {
-    kubeflow_user                   = var.ai_ml_sensitive.kubeflow.user
-    kubeflow_password               = var.ai_ml_sensitive.kubeflow.password
-    kubeflow_service_account_token  = var.ai_ml_sensitive.kubeflow.service_account_token
-    kubeflow_metadata_grpc_token    = var.ai_ml_sensitive.kubeflow.metadata_grpc_token
-    kubeflow_pipeline_api_token     = var.ai_ml_sensitive.kubeflow.pipeline_api_token
-    kubeflow_pipeline_runner_token  = var.ai_ml_sensitive.kubeflow.pipeline_runner_token
-    kubeflow_artifact_fetcher_token = var.ai_ml_sensitive.kubeflow.artifact_fetcher_token
+    mlflow_user     = var.ai_ml_sensitive.mlflow.user
+    mlflow_password = var.ai_ml_sensitive.mlflow.password
   }
 
   type = "Opaque"
 }
 
-resource "kubernetes_secret" "kubeflow_prod_secret" {
+resource "kubernetes_secret" "mlflow_prod_secret" {
   metadata {
-    name      = "kubeflow-prod-secret"
+    name      = "mlflow-prod-secret"
     namespace = kubernetes_namespace.ai_ml.metadata[0].name
   }
 
   data = {
-    kubeflow_prod_user     = var.ai_ml_sensitive.kubeflow.db.prod.user
-    kubeflow_prod_password = var.ai_ml_sensitive.kubeflow.db.prod.password
-    kubeflow_prod_host     = var.ai_ml_sensitive.kubeflow.db.prod.host
-    kubeflow_prod_port     = var.ai_ml_sensitive.kubeflow.db.prod.port
+    mlflow_prod_user     = var.ai_ml_sensitive.mlflow.db.prod.user
+    mlflow_prod_password = var.ai_ml_sensitive.mlflow.db.prod.password
+    mlflow_prod_name     = var.ai_ml_sensitive.mlflow.db.prod.name
+    mlflow_prod_port     = var.ai_ml_sensitive.mlflow.db.prod.port
+    mlflow_prod_database = var.ai_ml_sensitive.mlflow.db.prod.database
   }
 
   type = "Opaque"
 }
 
-resource "kubernetes_secret" "kubeflow_stg_secret" {
+resource "kubernetes_secret" "mlflow_stg_secret" {
   metadata {
-    name      = "kubeflow-stg-secret"
+    name      = "mlflow-stg-secret"
     namespace = kubernetes_namespace.ai_ml.metadata[0].name
   }
 
   data = {
-    kubeflow_stg_user     = var.ai_ml_sensitive.kubeflow.db.stg.user
-    kubeflow_stg_password = var.ai_ml_sensitive.kubeflow.db.stg.password
-    kubeflow_stg_host     = var.ai_ml_sensitive.kubeflow.db.stg.host
-    kubeflow_stg_port     = var.ai_ml_sensitive.kubeflow.db.stg.port
+    mlflow_stg_user     = var.ai_ml_sensitive.mlflow.db.stg.user
+    mlflow_stg_password = var.ai_ml_sensitive.mlflow.db.stg.password
+    mlflow_stg_name     = var.ai_ml_sensitive.mlflow.db.stg.name
+    mlflow_stg_port     = var.ai_ml_sensitive.mlflow.db.stg.port
+    mlflow_stg_database = var.ai_ml_sensitive.mlflow.db.stg.database
   }
 
   type = "Opaque"
 }
 
-resource "kubernetes_secret" "kubeflow_dev_secret" {
+resource "kubernetes_secret" "mlflow_dev_secret" {
   metadata {
-    name      = "kubeflow-dev-secret"
+    name      = "mlflow-dev-secret"
     namespace = kubernetes_namespace.ai_ml.metadata[0].name
   }
 
   data = {
-    kubeflow_dev_user     = var.ai_ml_sensitive.kubeflow.db.dev.user
-    kubeflow_dev_password = var.ai_ml_sensitive.kubeflow.db.dev.password
-    kubeflow_dev_host     = var.ai_ml_sensitive.kubeflow.db.dev.host
-    kubeflow_dev_port     = var.ai_ml_sensitive.kubeflow.db.dev.port
+    mlflow_dev_user     = var.ai_ml_sensitive.mlflow.db.dev.user
+    mlflow_dev_password = var.ai_ml_sensitive.mlflow.db.dev.password
+    mlflow_dev_name     = var.ai_ml_sensitive.mlflow.db.dev.name
+    mlflow_dev_port     = var.ai_ml_sensitive.mlflow.db.dev.port
+    mlflow_dev_database = var.ai_ml_sensitive.mlflow.db.dev.database
+  }
+ 
+  type = "Opaque"
+}
+
+resource "kubernetes_secret" "mlflow_artifact_store_secret" {
+  metadata {
+    name      = "mlflow-artifact-store-secret"
+    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+  }
+
+  data = {
+    bucket_name = var.ai_ml_sensitive.mlflow.artifact_store.bucket_name
   }
  
   type = "Opaque"
@@ -94,7 +105,6 @@ resource "kubernetes_secret" "minio_secret" {
   }
  
   type = "Opaque"
-
 }
 
 ################################################################################
