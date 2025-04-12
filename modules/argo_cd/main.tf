@@ -226,60 +226,10 @@ resource "null_resource" "wait_for_argo" {
     command = <<EOF
       kubectl wait --for=condition=available \
         --timeout=300s \
+        --kubeconfig=${var.kubeconfig_path} \
         -n ${kubernetes_namespace.argocd.metadata[0].name} \
         deployment/argocd-server
     EOF
-  }
-
-  depends_on = [helm_release.argocd]
-}
-
-# add specific repo manifest to argo_cd configuration
-resource "kubernetes_manifest" "applications_from_git" {
-  manifest = {
-    apiVersion = "argoproj.io/v1alpha1"
-    kind       = "ApplicationSet"
-    metadata = {
-      name      = "apps-from-git"
-      namespace = kubernetes_namespace.argocd.metadata[0].name
-    }
-    spec = {
-      generators = [{
-        git = {
-          repoURL    = var.github_config.k8s_manifests_repo
-          revision   = "HEAD"
-          directories = [{
-            path = "*-app"
-          }]
-        }
-      }]
-      template = {
-        metadata = {
-          name = "{{path.basename}}"
-        }
-        spec = {
-          project = "default"
-          source = {
-            repoURL        = var.github_config.k8s_manifests_repo
-            targetRevision = "HEAD"
-            path           = "{{path}}"
-          }
-          destination = {
-            server = "https://kubernetes.default.svc"
-          }
-          syncPolicy = {
-            automated = {
-              prune     = true
-              selfHeal  = true
-            }
-          }
-        }
-      }
-    }
-  }
-
-  field_manager {
-    force_conflicts = true
   }
 
   depends_on = [helm_release.argocd]

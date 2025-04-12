@@ -35,12 +35,59 @@ This project contains Terraform configurations to automate the deployment of a f
 - **Backup Configuration**: Built-in etcd snapshot backups
 - **Network Customization**: Flexible network configuration options
 
-## Prerequisites
+## Dependancies
 
-- Terraform >= 1.5.0
 - A bare metal server with sufficient CPU, RAM, and storage
-- Network connectivity between deployment machine and target servers
 - (Optional) NVIDIA GPU for hardware acceleration in media services
+
+### Terraform
+
+``` bash
+# Install required dependencies
+sudo apt-get update && sudo apt-get install -y gnupg software-properties-common curl
+
+# Add HashiCorp GPG key
+wget -O- https://apt.releases.hashicorp.com/gpg | \
+gpg --dearmor | \
+sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg > /dev/null
+
+# Add HashiCorp repository
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] \
+https://apt.releases.hashicorp.com $(lsb_release -cs) main" | \
+sudo tee /etc/apt/sources.list.d/hashicorp.list
+
+# Update repository list and install Terraform
+sudo apt update && sudo apt install terraform
+```
+
+### kubectl
+
+```bash
+# Install prerequisites
+sudo apt-get update
+sudo apt-get install -y apt-transport-https ca-certificates curl
+
+# Download the latest stable kubectl binary
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+
+# Make the kubectl binary executable
+chmod +x kubectl
+
+# Move the binary to the default location
+sudo mv kubectl /usr/local/bin/
+
+source ~/.bashrc
+
+# Verify installation
+kubectl version --client
+```
+
+### kubeconfig
+
+```bash
+# Add KUBECONFIG to .bashrc for persistence
+echo 'export KUBECONFIG=/d/k8s/k3s.yaml' >> ~/.bashrc
+```
 
 ## Configuration
 
@@ -82,19 +129,29 @@ This project uses variable files for configuration. You'll need to create a `ter
 terraform init
 ```
 
-4. Plan your deployment:
+4. plan k3s before installing other modules
+```bash
+sudo terraform plan -target=module.k3
+```
+
+5. install k3s
+```bash
+sudo terraform apply -target=module.k3s
+```
+
+6. plan all other modules
 
 ```bash
 terraform plan
 ```
 
-5. Apply the configuration:
+7. apply all other modules
 
 ```bash
 terraform apply
 ```
 
-6. Access the deployed services:
+8. Access the deployed services:
    - Rancher UI: https://[your-server-ip]
    - ArgoCD: https://[argocd-ingress-host] (if configured)
 

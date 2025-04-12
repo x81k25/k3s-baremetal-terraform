@@ -44,6 +44,7 @@ module "argo_cd" {
   github_config = var.github_config
   argo_cd_config = var.argo_cd_config
   argo_cd_sensitive = var.argo_cd_sensitive
+  kubeconfig_path = var.kubeconfig_path
 }
 
 ################################################################################

@@ -2,6 +2,10 @@
 # global vars
 ################################################################################
 
+variable "kubeconfig_path" {
+  description = "Path to kubeconfig file"
+}
+
 variable "github_config" {
   description = "GitHub and GitHub Container Registry configuration"
   type = object({
