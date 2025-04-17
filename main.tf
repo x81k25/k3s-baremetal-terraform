@@ -80,8 +80,10 @@ module "media" {
   depends_on = [module.argo_cd]
   
   server_ip =  var.server_ip
+  github_config = var.github_config
   ssh_config = var.ssh_config
   media_sensitive = var.media_sensitive
+  vpn_config = var.vpn_config
 }
 
 ################################################################################

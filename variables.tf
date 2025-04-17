@@ -62,6 +62,15 @@ variable "pgsql_config" {
   sensitive = true
 }
 
+variable "vpn_config" {
+  description = "vpn credendtials"
+  type = object({
+    username = string
+    password = string
+    config = string
+  })
+}
+
 ################################################################################
 # k3s vars
 ################################################################################

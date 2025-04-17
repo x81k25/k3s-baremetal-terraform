@@ -29,6 +29,45 @@ resource "kubernetes_namespace" "media-dev" {
   }
 }
 
+resource "kubernetes_secret" "ghcr_credentials" {
+  for_each = toset(["media-dev", "media-stg", "media-prod"])
+  
+  metadata {
+    name      = "ghcr-pull-image-token"
+    namespace = each.key
+  }
+
+  type = "kubernetes.io/dockerconfigjson"
+
+  data = {
+    ".dockerconfigjson" = jsonencode({
+      auths = {
+        "ghcr.io" = {
+          username = var.github_config.username
+          password = var.github_config.argo_cd_pull_image_token
+        }
+      }
+    })
+  }
+}
+
+resource "kubernetes_secret" "vpn_config" {
+  for_each = toset(["media-dev", "media-stg", "media-prod"])
+  
+  metadata {
+    name      = "vpn-config"
+    namespace = each.key
+  }
+
+  data = {
+    VPN_USERNAME = var.vpn_config.username
+    VPN_PASSWORD = var.vpn_config.password
+    VPN_CONFIG = var.vpn_config.config
+  }
+
+  type = "Opaque"
+}
+
 resource "kubernetes_secret" "plex_secret" {
   metadata {
     name = "plex-config"
