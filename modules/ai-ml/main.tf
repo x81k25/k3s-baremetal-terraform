@@ -107,6 +107,29 @@ resource "kubernetes_secret" "minio_secret" {
   type = "Opaque"
 }
 
+# pass image pull secret to ai-ml namespace
+resource "kubernetes_secret" "ghcr_ai_ml" {
+  metadata {
+    name      = "ghcr-pull-image-token"
+    namespace = "ai-ml"
+  }
+
+  type = "kubernetes.io/dockerconfigjson"
+
+  data = {
+    ".dockerconfigjson" = jsonencode({
+      auths = {
+        "ghcr.io" = {
+          username = var.github_config.username
+          password = var.github_config.argo_cd_pull_image_token
+        }
+      }
+    })
+  }
+
+  depends_on = [kubernetes_namespace.ai_ml]
+}
+
 ################################################################################
 # end of main.tf
 ################################################################################

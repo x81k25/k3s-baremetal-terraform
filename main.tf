@@ -69,6 +69,7 @@ module "ai_ml" {
   depends_on = [module.k3s]
 
   ai_ml_sensitive = var.ai_ml_sensitive
+  github_config = var.github_config
 }
 
 ################################################################################
