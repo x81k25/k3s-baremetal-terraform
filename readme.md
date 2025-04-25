@@ -1,10 +1,10 @@
 # k3s-baremetal-terraform
 
-A comprehensive Terraform project for deploying and managing a K3s Kubernetes cluster on bare metal servers with integrated Rancher, ArgoCD, and media services.
+A comprehensive Terraform project for deploying and managing a K3s Kubernetes cluster on bare metal servers with integrated Rancher, ArgoCD, PostgreSQL, MLflow, and media services.
 
 ## Overview
 
-This project contains Terraform configurations to automate the deployment of a full-featured K3s cluster on local bare metal infrastructure. It uses modular design to manage each component independently, including K3s installation, Rancher management, Kubernetes resources, ArgoCD for GitOps, and specialized media services.
+This project contains Terraform configurations to automate the deployment of a full-featured K3s cluster on local bare metal infrastructure. It uses modular design to manage each component independently, including K3s installation, Rancher management, ArgoCD for GitOps, PostgreSQL databases, AI/ML tools, and specialized media services.
 
 ## Repository Structure
 
@@ -12,11 +12,12 @@ This project contains Terraform configurations to automate the deployment of a f
 .
 ├── .terraform           # Terraform working directory (gitignored)
 ├── modules/
+│   ├── ai-ml/           # AI/ML tools including MLflow
 │   ├── argo_cd/         # ArgoCD GitOps deployment
 │   ├── k3s/             # K3s cluster installation and configuration
-│   ├── kubernetes/      # Core Kubernetes resources
-│   ├── rancher/         # Rancher management layer
-│   └── media/           # Media services (Plex, etc.)
+│   ├── media/           # Media services (Plex, etc.)
+│   ├── pgsql/           # PostgreSQL databases
+│   └── rancher/         # Rancher management layer
 ├── .gitignore           # Git ignore patterns
 ├── providers.tf         # Provider configurations
 ├── main.tf              # Main Terraform configuration
@@ -29,13 +30,16 @@ This project contains Terraform configurations to automate the deployment of a f
 - **Automated K3s Installation**: Single-node K3s deployment with customizable configuration
 - **Rancher Integration**: Automated deployment of Rancher for cluster management
 - **GitOps Ready**: Integrated ArgoCD for continuous deployment from Git repositories
+- **Database Infrastructure**: PostgreSQL databases with pgAdmin4 web interface
+- **AI/ML Platform**: MLflow tracking server with MinIO artifact store
 - **Media Services**: Pre-configured media stack with GPU support for services like Plex
 - **Namespace Management**: Structured namespace provisioning with proper RBAC
 - **Container Registry Integration**: GitHub Container Registry authentication
 - **Backup Configuration**: Built-in etcd snapshot backups
 - **Network Customization**: Flexible network configuration options
+- **Multi-environment Support**: Development, staging, and production environments for media and database services
 
-## Dependancies
+## Dependencies
 
 - A bare metal server with sufficient CPU, RAM, and storage
 - (Optional) NVIDIA GPU for hardware acceleration in media services
@@ -97,6 +101,8 @@ This project uses variable files for configuration. You'll need to create a `ter
 - Server IP
 - Mount points for persistent data
 - Kubeconfig path
+- GitHub credentials for container registry
+- SSH configuration
 
 ### K3s Configuration
 - Version
@@ -115,8 +121,18 @@ This project uses variable files for configuration. You'll need to create a `ter
 - Resource limits
 - Authentication settings
 
+### PostgreSQL Configuration
+- Database credentials for dev/staging/prod environments
+- pgAdmin4 configuration
+
+### AI/ML Configuration
+- MLflow server credentials
+- Database connections
+- MinIO artifact store configuration
+
 ### Media Services
 - Plex claim token
+- VPN configuration
 - GPU resource allocation
 
 ## Deployment Instructions
@@ -129,24 +145,22 @@ This project uses variable files for configuration. You'll need to create a `ter
 terraform init
 ```
 
-4. plan k3s before installing other modules
+4. Plan K3s before installing other modules:
 ```bash
-sudo terraform plan -target=module.k3
+sudo terraform plan -target=module.k3s
 ```
 
-5. install k3s
+5. Install K3s (this step must be completed before the rest of the Terraform modules will work):
 ```bash
 sudo terraform apply -target=module.k3s
 ```
 
-6. plan all other modules
-
+6. Plan all other modules:
 ```bash
 terraform plan
 ```
 
-7. apply all other modules
-
+7. Apply all other modules:
 ```bash
 terraform apply
 ```
@@ -154,6 +168,9 @@ terraform apply
 8. Access the deployed services:
    - Rancher UI: https://[your-server-ip]
    - ArgoCD: https://[argocd-ingress-host] (if configured)
+   - pgAdmin4: http://[your-server-ip]:port
+   - MLflow: http://[your-server-ip]:port
+   - Plex: http://[your-server-ip]:32400/web
 
 ## Module Details
 
@@ -163,17 +180,8 @@ The K3s module handles the installation and configuration of a K3s Kubernetes cl
 
 - Configures node resources (CPU, memory)
 - Sets up networking with Flannel
-- Configures storage
-- Implements backup routines for etcd
 - Manages kubeconfig generation
-
-### Kubernetes Module
-
-Handles core Kubernetes resources:
-
-- Creates namespaces
-- Configures GHCR registry access
-- Sets up database namespaces
+- Implements backup routines for etcd
 
 ### Rancher Module
 
@@ -193,14 +201,32 @@ Configures GitOps with ArgoCD:
 - Configures application auto-deployment
 - Implements security settings
 
+### PostgreSQL Module
+
+Manages PostgreSQL database infrastructure:
+
+- Creates dedicated namespace
+- Sets up database credentials for dev/staging/prod environments
+- Configures pgAdmin4 web interface
+
+### AI/ML Module
+
+Sets up machine learning infrastructure:
+
+- Deploys MLflow tracking server
+- Configures database connections
+- Sets up MinIO artifact storage
+- Manages secrets for authentication
+
 ### Media Module
 
 Sets up media services infrastructure:
 
 - Creates dedicated namespaces (dev/staging/prod)
-- Configures GPU access
+- Configures GPU access with NVIDIA runtime
 - Sets up Plex configuration
-- Implements resource quotas
+- Implements VPN integration
+- Manages resource quotas for GPU usage
 
 ## Customization
 
@@ -215,6 +241,7 @@ To adapt this project for your environment:
 
 ## Troubleshooting
 
+- **K3s Installation Issues**: Ensure you have sufficient permissions and run with sudo
 - **Namespace Deletion Issues**: The repository includes handlers for stuck namespace termination
 - **Certificate Problems**: Check cert-manager deployment and validate TLS settings
 - **Network Connectivity**: Verify interface settings and firewall rules
@@ -226,6 +253,7 @@ To adapt this project for your environment:
 - All Terraform state is managed locally by default and excluded from git
 - Sensitive information should be stored in `terraform.tfvars` (gitignored)
 - The media module requires GPU drivers pre-installed on the host system
+- MLflow requires PostgreSQL databases to be properly initialized
 
 ## Contributing
 
