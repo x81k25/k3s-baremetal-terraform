@@ -9,16 +9,22 @@ variable "pgsql_config" {
     prod = object({
       user = string
       password = string
+      host = string
+      port = number
       database = string
     })
     stg = object({
       user = string
       password = string
+      host = string
+      port = number
       database = string
     })
     dev = object({
       user = string
       password = string
+      host = string
+      port = number
       database = string
     })
   })

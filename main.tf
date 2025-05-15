@@ -85,6 +85,7 @@ module "media" {
   ssh_config = var.ssh_config
   media_sensitive = var.media_sensitive
   vpn_config = var.vpn_config
+  pgsql_config = var.pgsql_config
 }
 
 ################################################################################

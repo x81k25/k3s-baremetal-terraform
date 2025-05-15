@@ -30,8 +30,8 @@ resource "local_file" "k3s_config" {
       "kube-api-qps=50",
       "kube-api-burst=100",
       "cpu-manager-policy=static",
-      "system-reserved=cpu=${var.k3s_config.resource_limits.cpu_threads/4},memory=${var.k3s_config.resource_limits.memory_gb/4}Gi",
-      "kube-reserved=cpu=${var.k3s_config.resource_limits.cpu_threads/4},memory=${var.k3s_config.resource_limits.memory_gb/4}Gi"
+      "system-reserved=cpu=2,memory=2Gi",
+      "kube-reserved=cpu=2,memory=2Gi"
     ]
   })
 }

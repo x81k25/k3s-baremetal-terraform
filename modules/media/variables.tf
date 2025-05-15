@@ -37,3 +37,31 @@ variable "vpn_config" {
     config = string
   })
 }
+
+variable "pgsql_config" {
+  description = "parameters to connect to pgsql in the database"
+  type = object({
+    prod = object({
+      user = string
+      password = string
+      host = string
+      port = number
+      database = string
+    })
+    stg = object({
+      user = string
+      password = string
+      host = string
+      port = number
+      database = string
+    })
+    dev = object({
+      user = string
+      password = string
+      host = string
+      port = number
+      database = string
+    })
+  })
+  sensitive = true
+}

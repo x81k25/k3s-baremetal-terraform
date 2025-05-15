@@ -79,6 +79,58 @@ resource "kubernetes_secret" "plex_secret" {
   }
 }
 
+# handle database secrets
+resource "kubernetes_secret" "pgsql_config_prod" {
+  metadata {
+    name      = "pgsql-config"
+    namespace = "media-prod"
+  }
+
+  data = {
+    PGSQL_USER     = var.pgsql_config.prod.user
+    PGSQL_PASSWORD = var.pgsql_config.prod.password
+    PGSQL_HOST     = var.pgsql_config.prod.host
+    PGSQL_PORT     = tostring(var.pgsql_config.prod.port)
+    PGSQL_DATABASE = var.pgsql_config.prod.database
+  }
+
+  type = "Opaque"
+}
+
+resource "kubernetes_secret" "pgsql_config_stg" {
+  metadata {
+    name      = "pgsql-config"
+    namespace = "media-stg"
+  }
+
+  data = {
+    PGSQL_USER     = var.pgsql_config.stg.user
+    PGSQL_PASSWORD = var.pgsql_config.stg.password
+    PGSQL_HOST     = var.pgsql_config.stg.host
+    PGSQL_PORT     = tostring(var.pgsql_config.stg.port)
+    PGSQL_DATABASE = var.pgsql_config.stg.database
+  }
+
+  type = "Opaque"
+}
+
+resource "kubernetes_secret" "pgsql_config_dev" {
+  metadata {
+    name      = "pgsql-config"
+    namespace = "media-dev"
+  }
+
+  data = {
+    PGSQL_USER     = var.pgsql_config.dev.user
+    PGSQL_PASSWORD = var.pgsql_config.dev.password
+    PGSQL_HOST     = var.pgsql_config.dev.host
+    PGSQL_PORT     = tostring(var.pgsql_config.dev.port)
+    PGSQL_DATABASE = var.pgsql_config.dev.database
+  }
+
+  type = "Opaque"
+}
+
 # Create a RuntimeClass for NVIDIA
 data "kubernetes_resource" "nvidia_runtime_class" {
   api_version = "node.k8s.io/v1"
