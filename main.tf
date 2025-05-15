@@ -61,15 +61,12 @@ module "pgsql" {
 }
 
 ################################################################################
-# ai-ml module
+# orchestration module
 ################################################################################
 
-module "ai_ml" {
-  source = "./modules/ai-ml"
-  depends_on = [module.k3s]
-
-  ai_ml_sensitive = var.ai_ml_sensitive
-  github_config = var.github_config
+module "orchestration" {
+  source = "./modules/orchestration"
+  depends_on = [module.argo_cd]
 }
 
 ################################################################################
@@ -86,6 +83,18 @@ module "media" {
   media_sensitive = var.media_sensitive
   vpn_config = var.vpn_config
   pgsql_config = var.pgsql_config
+}
+
+################################################################################
+# ai-ml module
+################################################################################
+
+module "ai_ml" {
+  source = "./modules/ai-ml"
+  depends_on = [module.k3s]
+
+  ai_ml_sensitive = var.ai_ml_sensitive
+  github_config = var.github_config
 }
 
 ################################################################################
