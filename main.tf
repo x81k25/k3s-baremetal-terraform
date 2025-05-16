@@ -66,7 +66,10 @@ module "pgsql" {
 
 module "orchestration" {
   source = "./modules/orchestration"
-  depends_on = [module.argo_cd]
+  depends_on = [module.pgsql]
+
+  dagster_config = var.dagster_config
+  dagster_pgsql_config = var.dagster_pgsql_config
 }
 
 ################################################################################
@@ -91,7 +94,7 @@ module "media" {
 
 module "ai_ml" {
   source = "./modules/ai-ml"
-  depends_on = [module.k3s]
+  depends_on = [module.pgsql]
 
   ai_ml_sensitive = var.ai_ml_sensitive
   github_config = var.github_config
