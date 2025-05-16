@@ -58,6 +58,41 @@ resource "kubernetes_config_map" "dagster_paths_dev" {
 # secrets
 ################################################################################
 
+# Pass GitHub Container Registry pull token to orchestration namespace
+resource "kubernetes_secret" "ghcr_orchestration" {
+  metadata {
+    name      = "ghcr-pull-image-token"
+    namespace = "orchestration"
+  }
+
+  type = "kubernetes.io/dockerconfigjson"
+
+  data = {
+    ".dockerconfigjson" = jsonencode({
+      auths = {
+        "ghcr.io" = {
+          username = var.github_config.username
+          password = var.github_config.argo_cd_pull_image_token
+        }
+      }
+    })
+  }
+}
+
+# Also create a regular secret with just the token for environment variable use
+resource "kubernetes_secret" "ghcr_token_orchestration" {
+  metadata {
+    name      = "ghcr-token"
+    namespace = "orchestration"
+  }
+
+  data = {
+    GHCR_PULL_IMAGE_TOKEN = var.github_config.argo_cd_pull_image_token
+  }
+
+  type = "Opaque"
+}
+
 # handle database secrets
 resource "kubernetes_secret" "pgsql_config_prod" {
   metadata {

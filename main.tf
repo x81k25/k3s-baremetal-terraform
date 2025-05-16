@@ -70,6 +70,7 @@ module "orchestration" {
 
   dagster_config = var.dagster_config
   dagster_pgsql_config = var.dagster_pgsql_config
+  github_config = var.github_config
 }
 
 ################################################################################

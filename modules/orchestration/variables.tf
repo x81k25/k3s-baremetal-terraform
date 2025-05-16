@@ -16,6 +16,18 @@ variable "dagster_config" {
   })
 }
 
+variable "github_config" {
+  description = "GitHub and GitHub Container Registry configuration"
+  type = object({
+    username         = string
+    email            = string
+    k8s_manifests_repo = string
+    argo_cd_pull_k8s_manifests_token = string
+    argo_cd_pull_image_token = string
+  })
+  sensitive = true
+}
+
 variable "dagster_pgsql_config" {
   description = "parameters to insantiate and connect the pgsql databases within the cluster"
   type = object({
