@@ -91,11 +91,11 @@ resource "kubernetes_secret" "rear_diff_pgsql_config_prod" {
   }
 
   data = {
-    REAR_DIFF_PGSQL_USER     = var.rear_diff_pgsql_config.prod.user
-    REAR_DIFF_PGSQL_PASSWORD = var.rear_diff_pgsql_config.prod.password
-    REAR_DIFF_PGSQL_HOST     = var.rear_diff_pgsql_config.prod.host
-    REAR_DIFF_PGSQL_PORT     = tostring(var.rear_diff_pgsql_config.prod.port)
-    REAR_DIFF_PGSQL_DATABASE = var.rear_diff_pgsql_config.prod.database
+    PGSQL_USER     = var.rear_diff_pgsql_config.prod.user
+    PGSQL_PASSWORD = var.rear_diff_pgsql_config.prod.password
+    PGSQL_HOST     = var.rear_diff_pgsql_config.prod.host
+    PGSQL_PORT     = tostring(var.rear_diff_pgsql_config.prod.port)
+    PGSQL_DATABASE = var.rear_diff_pgsql_config.prod.database
   }
 
   type = "Opaque"
@@ -108,11 +108,11 @@ resource "kubernetes_secret" "rear_diff_pgsql_config_stg" {
   }
 
   data = {
-    REAR_DIFF_PGSQL_USER     = var.rear_diff_pgsql_config.stg.user
-    REAR_DIFF_PGSQL_PASSWORD = var.rear_diff_pgsql_config.stg.password
-    REAR_DIFF_PGSQL_HOST     = var.rear_diff_pgsql_config.stg.host
-    REAR_DIFF_PGSQL_PORT     = tostring(var.rear_diff_pgsql_config.stg.port)
-    REAR_DIFF_PGSQL_DATABASE = var.rear_diff_pgsql_config.stg.database
+    PGSQL_USER     = var.rear_diff_pgsql_config.stg.user
+    PGSQL_PASSWORD = var.rear_diff_pgsql_config.stg.password
+    PGSQL_HOST     = var.rear_diff_pgsql_config.stg.host
+    PGSQL_PORT     = tostring(var.rear_diff_pgsql_config.stg.port)
+    PGSQL_DATABASE = var.rear_diff_pgsql_config.stg.database
   }
 
   type = "Opaque"
@@ -125,11 +125,11 @@ resource "kubernetes_secret" "rear_diff_pgsql_config_dev" {
   }
 
   data = {
-    REAR_DIFF_PGSQL_USER     = var.rear_diff_pgsql_config.dev.user
-    REAR_DIFF_PGSQL_PASSWORD = var.rear_diff_pgsql_config.dev.password
-    REAR_DIFF_PGSQL_HOST     = var.rear_diff_pgsql_config.dev.host
-    REAR_DIFF_PGSQL_PORT     = tostring(var.rear_diff_pgsql_config.dev.port)
-    REAR_DIFF_PGSQL_DATABASE = var.rear_diff_pgsql_config.dev.database
+    PGSQL_USER     = var.rear_diff_pgsql_config.dev.user
+    PGSQL_PASSWORD = var.rear_diff_pgsql_config.dev.password
+    PGSQL_HOST     = var.rear_diff_pgsql_config.dev.host
+    PGSQL_PORT     = tostring(var.rear_diff_pgsql_config.dev.port)
+    PGSQL_DATABASE = var.rear_diff_pgsql_config.dev.database
   }
 
   type = "Opaque"
