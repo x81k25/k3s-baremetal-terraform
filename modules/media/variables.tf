@@ -38,8 +38,8 @@ variable "vpn_config" {
   })
 }
 
-variable "pgsql_config" {
-  description = "parameters to connect to pgsql in the database"
+variable "rear_diff_pgsql_config" {
+  description = "parameters to connect rear differential API to DB"
   type = object({
     prod = object({
       user = string

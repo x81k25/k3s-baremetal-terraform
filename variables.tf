@@ -246,12 +246,40 @@ variable "dagster_pgsql_config" {
 }
 
 ################################################################################
-# plex vars
+# media vars
 ################################################################################
 
 variable "media_sensitive" {
   type = object({
     plex_claim = string
+  })
+  sensitive = true
+}
+
+variable "rear_diff_pgsql_config" {
+  description = "parameters to connect rear differential API to DB"
+  type = object({
+    prod = object({
+      user = string
+      password = string
+      host = string
+      port = number
+      database = string
+    })
+    stg = object({
+      user = string
+      password = string
+      host = string
+      port = number
+      database = string
+    })
+    dev = object({
+      user = string
+      password = string
+      host = string
+      port = number
+      database = string
+    })
   })
   sensitive = true
 }
