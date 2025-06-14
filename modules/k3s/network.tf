@@ -4,16 +4,16 @@
 resource "local_file" "k3s_network_config" {
   depends_on = [null_resource.k3s_install_dir]
   filename   = "${var.mounts.k3s_root}/network.yaml"
-  content    = yamlencode({
-    flannel-backend = "vxlan"  # Default networking mode
+  content = yamlencode({
+    flannel-backend = "vxlan"                                      # Default networking mode
     flannel-iface   = var.k3s_config.network_config.interface_name # Network interface for Flannel
     node-ip         = var.k3s_config.network_config.host_ip
     cluster-cidr    = var.k3s_config.network_config.network_subnet
     service-cidr    = var.k3s_config.network_config.service_subnet
     cluster-dns     = var.k3s_config.network_config.cluster_dns
     # Additional network security policies
-    flannel-ipv6-masq = true  # Enable IPv6 masquerading if needed
-    disable-network-policy = false  # Enable network policies by default
+    flannel-ipv6-masq      = true  # Enable IPv6 masquerading if needed
+    disable-network-policy = false # Enable network policies by default
   })
 }
 

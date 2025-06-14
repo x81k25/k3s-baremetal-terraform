@@ -18,7 +18,7 @@ variable "kubeconfig_path" {
 variable "rancher_config" {
   description = "rancher config"
   type = object({
-    version = string
+    version  = string
     hostname = string
     ingress_config = object({
       http_enabled     = bool

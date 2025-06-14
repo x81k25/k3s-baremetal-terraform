@@ -1,30 +1,30 @@
 variable "server_ip" {
   description = "interal ip address of servers hosts cluster"
-  type = string
+  type        = string
 }
 
 variable "pgsql_config" {
   description = "parameters to insantiate and connect the pgsql databases within the cluster"
   type = object({
     prod = object({
-      user = string
+      user     = string
       password = string
-      host = string
-      port = number
+      host     = string
+      port     = number
       database = string
     })
     stg = object({
-      user = string
+      user     = string
       password = string
-      host = string
-      port = number
+      host     = string
+      port     = number
       database = string
     })
     dev = object({
-      user = string
+      user     = string
       password = string
-      host = string
-      port = number
+      host     = string
+      port     = number
       database = string
     })
   })
@@ -34,7 +34,7 @@ variable "pgsql_config" {
 variable "pgadmin4_config" {
   description = "config vars for the pgadmin4 web app"
   type = object({
-    email = string
+    email    = string
     password = string
   })
   sensitive = true

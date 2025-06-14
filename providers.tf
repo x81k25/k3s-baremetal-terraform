@@ -25,7 +25,7 @@ terraform {
     # rancher provider    
     rancher2 = {
       source  = "rancher/rancher2"
-      version = "~> 3.0.0"  
+      version = "~> 3.0.0"
     }
   }
 }
@@ -45,7 +45,7 @@ provider "helm" {
 ################################################################################
 
 provider "kubernetes" {
-  config_path = var.kubeconfig_path
+  config_path    = var.kubeconfig_path
   config_context = "default"
 }
 
@@ -56,7 +56,7 @@ provider "kubernetes" {
 provider "rancher2" {
   api_url   = "https://${var.server_ip}"
   bootstrap = true
-  insecure  = true  # For initial setup only
+  insecure  = true # For initial setup only
 }
 
 ################################################################################

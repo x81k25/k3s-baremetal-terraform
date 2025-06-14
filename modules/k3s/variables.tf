@@ -4,7 +4,7 @@ variable "server_ip" {
 
 variable "mounts" {
   type = object({
-    k3s_root = string
+    k3s_root    = string
     media_cache = string
   })
 }
@@ -16,7 +16,7 @@ variable "kubeconfig_path" {
 variable "k3s_config" {
   description = "K3s Kubernetes configuration settings"
   type = object({
-    version       = string
+    version = string
     resource_limits = object({
       cpu_threads = number
       memory_gb   = number

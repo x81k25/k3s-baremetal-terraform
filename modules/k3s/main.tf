@@ -13,13 +13,13 @@ resource "null_resource" "k3s_install_dir" {
 resource "local_file" "k3s_config" {
   depends_on = [null_resource.k3s_install_dir]
   filename   = "${var.mounts.k3s_root}/config.yaml"
-  content    = yamlencode({
-    data-dir  = var.mounts.k3s_root
-    node-label      = []
-    node-taint     = []
-    write-kubeconfig = "${var.kubeconfig_path}"
+  content = yamlencode({
+    data-dir              = var.mounts.k3s_root
+    node-label            = []
+    node-taint            = []
+    write-kubeconfig      = "${var.kubeconfig_path}"
     write-kubeconfig-mode = "644"
-    kube-apiserver-arg  = []
+    kube-apiserver-arg    = []
     kubelet-arg = [
       "max-pods=150",
       "cpu-manager-policy=static",

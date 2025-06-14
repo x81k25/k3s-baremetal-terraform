@@ -3,7 +3,7 @@ resource "kubernetes_namespace" "argocd" {
   metadata {
     name = var.argo_cd_config.namespace
     labels = {
-      managed-by  = "terraform"
+      managed-by = "terraform"
     }
   }
 }
@@ -160,12 +160,12 @@ resource "helm_release" "argocd" {
           type = var.argo_cd_config.ingress.enabled ? "ClusterIP" : "LoadBalancer"
         }
         ingress = {
-          enabled = var.argo_cd_config.ingress.enabled
-          hosts   = var.argo_cd_config.ingress.enabled ? [var.argo_cd_config.ingress.host] : []
+          enabled          = var.argo_cd_config.ingress.enabled
+          hosts            = var.argo_cd_config.ingress.enabled ? [var.argo_cd_config.ingress.host] : []
           ingressClassName = "traefik"
         }
         extraArgs = [
-          "--insecure"  # Remove in strict production environments
+          "--insecure" # Remove in strict production environments
         ]
         resources = var.argo_cd_config.resource_limits.server
         secretKey = var.argo_cd_sensitive.admin_pw
@@ -197,7 +197,7 @@ resource "helm_release" "argocd" {
         repositories = {}
         params = {
           "dockercredentials.enableAutoCredentialsPlugin" = "true"
-          "dockercredentials.pullSecrets" = "[ghcr-pull-image-token]"
+          "dockercredentials.pullSecrets"                 = "[ghcr-pull-image-token]"
         }
       }
     })
@@ -216,7 +216,7 @@ resource "helm_release" "argocd" {
     kubernetes_namespace.argocd,
     kubernetes_secret.argocd_admin_password,
     kubernetes_manifest.kustomize_crd,
-    kubernetes_secret.argocd_repo_k8s_manifests 
+    kubernetes_secret.argocd_repo_k8s_manifests
   ]
 }
 

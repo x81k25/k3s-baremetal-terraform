@@ -4,7 +4,7 @@ A comprehensive Terraform project for deploying and managing a K3s Kubernetes cl
 
 ## Overview
 
-This project contains Terraform configurations to automate the deployment of a full-featured K3s cluster on local bare metal infrastructure. It uses modular design to manage each component independently, including K3s installation, Rancher management, ArgoCD for GitOps, PostgreSQL databases, AI/ML tools, and specialized media services.
+This project contains Terraform configurations to automate the deployment of a full-featured K3s cluster on local bare metal infrastructure. It uses modular design to manage each component independently, including K3s installation, Rancher management, ArgoCD for GitOps, PostgreSQL databases, AI/ML tools, data orchestration with Dagster, and specialized media services including rear differential monitoring.
 
 ## Repository Structure
 
@@ -15,7 +15,7 @@ This project contains Terraform configurations to automate the deployment of a f
 │   ├── ai-ml/           # AI/ML tools including MLflow
 │   ├── argo_cd/         # ArgoCD GitOps deployment
 │   ├── k3s/             # K3s cluster installation and configuration
-│   ├── media/           # Media services (Plex, etc.)
+│   ├── media/           # Media services (Plex, Dagster orchestration, rear_diff service)
 │   ├── pgsql/           # PostgreSQL databases
 │   └── rancher/         # Rancher management layer
 ├── .gitignore           # Git ignore patterns
@@ -32,7 +32,9 @@ This project contains Terraform configurations to automate the deployment of a f
 - **GitOps Ready**: Integrated ArgoCD for continuous deployment from Git repositories
 - **Database Infrastructure**: PostgreSQL databases with pgAdmin4 web interface
 - **AI/ML Platform**: MLflow tracking server with MinIO artifact store
-- **Media Services**: Pre-configured media stack with GPU support for services like Plex
+- **Data Orchestration**: Dagster platform for data pipeline management and scheduling
+- **Media Services**: Pre-configured media stack with GPU support including Plex media server
+- **Automotive Services**: Rear differential monitoring and analysis service
 - **Namespace Management**: Structured namespace provisioning with proper RBAC
 - **Container Registry Integration**: GitHub Container Registry authentication
 - **Backup Configuration**: Built-in etcd snapshot backups
@@ -131,9 +133,12 @@ This project uses variable files for configuration. You'll need to create a `ter
 - MinIO artifact store configuration
 
 ### Media Services
-- Plex claim token
+- Plex claim token and configuration
+- Dagster workspace and database configuration
+- Rear differential service database connections
 - VPN configuration
 - GPU resource allocation
+- Multi-environment settings (dev/staging/prod)
 
 ## Deployment Instructions
 
@@ -171,6 +176,8 @@ terraform apply
    - pgAdmin4: http://[your-server-ip]:port
    - MLflow: http://[your-server-ip]:port
    - Plex: http://[your-server-ip]:32400/web
+   - Dagster: http://[your-server-ip]:port (data orchestration UI)
+   - Rear Diff Service: http://[your-server-ip]:port (API service)
 
 ## Module Details
 
@@ -220,13 +227,15 @@ Sets up machine learning infrastructure:
 
 ### Media Module
 
-Sets up media services infrastructure:
+Sets up comprehensive media and data services infrastructure:
 
-- Creates dedicated namespaces (dev/staging/prod)
-- Configures GPU access with NVIDIA runtime
-- Sets up Plex configuration
-- Implements VPN integration
-- Manages resource quotas for GPU usage
+- Creates dedicated namespaces (media-dev/media-stg/media-prod)
+- **Plex Media Server**: Configures GPU access with NVIDIA runtime for hardware acceleration
+- **Dagster Orchestration**: Data pipeline platform with workspace configuration and PostgreSQL backend
+- **Rear Diff Service**: Automotive monitoring service with dedicated database connections
+- Implements VPN integration for secure external access
+- Manages resource quotas for GPU usage across services
+- Multi-environment database connectivity for all services
 
 ## Customization
 
@@ -252,8 +261,10 @@ To adapt this project for your environment:
 - This project is designed for single-node deployment but can be extended
 - All Terraform state is managed locally by default and excluded from git
 - Sensitive information should be stored in `terraform.tfvars` (gitignored)
-- The media module requires GPU drivers pre-installed on the host system
-- MLflow requires PostgreSQL databases to be properly initialized
+- The media module requires GPU drivers pre-installed on the host system for Plex hardware acceleration
+- MLflow and Dagster require PostgreSQL databases to be properly initialized
+- Dagster orchestration has been integrated into the media module for tighter coupling with media processing workflows
+- Each service (Dagster, Rear Diff) maintains separate database credentials for dev/staging/prod environments
 
 ## Contributing
 

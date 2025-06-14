@@ -13,7 +13,7 @@ resource "helm_release" "cert_manager" {
 }
 
 resource "time_sleep" "wait_for_cert_manager" {
-  depends_on = [helm_release.cert_manager]
+  depends_on      = [helm_release.cert_manager]
   create_duration = "30s"
 }
 
@@ -45,7 +45,7 @@ resource "helm_release" "rancher" {
 
   set {
     name  = "hostname"
-    value = var.rancher_config.hostname  
+    value = var.rancher_config.hostname
   }
 
   set {
@@ -67,7 +67,7 @@ resource "helm_release" "rancher" {
     name  = "tls"
     value = "external"
   }
-  
+
   # Add these new settings
   set {
     name  = "ingress.enabled"
@@ -98,7 +98,7 @@ resource "helm_release" "rancher" {
 }
 
 resource "time_sleep" "wait_for_rancher" {
-  depends_on = [helm_release.rancher]
+  depends_on      = [helm_release.rancher]
   create_duration = "90s"
 }
 

@@ -76,7 +76,7 @@ resource "kubernetes_secret" "mlflow_dev_secret" {
     mlflow_dev_port     = var.ai_ml_sensitive.mlflow.db.dev.port
     mlflow_dev_database = var.ai_ml_sensitive.mlflow.db.dev.database
   }
- 
+
   type = "Opaque"
 }
 
@@ -89,10 +89,10 @@ resource "kubernetes_secret" "mlflow_artifact_store_secret" {
   data = {
     bucket_name = var.ai_ml_sensitive.mlflow.artifact_store.bucket_name
   }
- 
+
   type = "Opaque"
 }
- 
+
 resource "kubernetes_secret" "minio_secret" {
   metadata {
     name      = "minio-secret"
@@ -103,7 +103,7 @@ resource "kubernetes_secret" "minio_secret" {
     minio_access_key = var.ai_ml_sensitive.minio.access_key
     minio_secret_key = var.ai_ml_sensitive.minio.secret_key
   }
- 
+
   type = "Opaque"
 }
 

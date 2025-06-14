@@ -1,6 +1,6 @@
 resource "null_resource" "backup_directory" {
   count = var.k3s_config.backup_config.enabled ? 1 : 0
-  
+
   provisioner "local-exec" {
     command = "mkdir -p ${var.k3s_config.backup_config.backup_location}"
   }

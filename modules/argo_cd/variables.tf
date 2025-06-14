@@ -9,11 +9,11 @@ variable "kubeconfig_path" {
 variable "github_config" {
   description = "GitHub and GitHub Container Registry configuration"
   type = object({
-    username           = string
-    email              = string
-    k8s_manifests_repo = string
+    username                         = string
+    email                            = string
+    k8s_manifests_repo               = string
     argo_cd_pull_k8s_manifests_token = string
-    argo_cd_pull_image_token = string
+    argo_cd_pull_image_token         = string
   })
   sensitive = true
 }
@@ -25,33 +25,33 @@ variable "github_config" {
 variable "argo_cd_config" {
   type = object({
     namespace = string
-    version = string
+    version   = string
     ingress = object({
       enabled = bool
-      host = string
+      host    = string
     })
     resource_limits = object({
-      server =  object({
-        cpu = string
+      server = object({
+        cpu    = string
         memory = string
       })
-      repo_server =  object({
-        cpu = string
+      repo_server = object({
+        cpu    = string
         memory = string
       })
-      application_controller =  object({
-        cpu = string
+      application_controller = object({
+        cpu    = string
         memory = string
       })
     })
     git_repositories = map(object({
-      url = string
-      name = string
-      username = optional(string)
+      url                 = string
+      name                = string
+      username            = optional(string)
       password_secret_key = optional(string)
     }))
-    enable_ha = bool
-    enable_dex = bool
+    enable_ha     = bool
+    enable_dex    = bool
     extra_configs = map(any)
   })
 }

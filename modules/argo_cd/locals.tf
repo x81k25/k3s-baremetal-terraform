@@ -16,12 +16,12 @@ locals {
       cpu    = "500m"
       memory = "512Mi"
     }, try(var.argo_cd_config.resource_limits.server, {}))
-    
+
     repo_server = merge({
       cpu    = "500m"
       memory = "512Mi"
     }, try(var.argo_cd_config.resource_limits.repo_server, {}))
-    
+
     application_controller = merge({
       cpu    = "500m"
       memory = "512Mi"

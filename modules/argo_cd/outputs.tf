@@ -36,8 +36,8 @@ output "is_ready" {
 output "config_status" {
   description = "Configuration status of key ArgoCD features"
   value = {
-    ha_enabled     = var.argo_cd_config.enable_ha
-    dex_enabled    = var.argo_cd_config.enable_dex
+    ha_enabled      = var.argo_cd_config.enable_ha
+    dex_enabled     = var.argo_cd_config.enable_dex
     ingress_enabled = var.argo_cd_config.ingress.enabled
   }
 }

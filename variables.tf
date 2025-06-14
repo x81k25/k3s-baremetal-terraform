@@ -4,13 +4,13 @@
 
 variable "server_ip" {
   description = "interal ip address of servers hosts cluster"
-  type = string
+  type        = string
 }
 
 variable "mounts" {
   description = "mounts used by primary services"
   type = object({
-    k3s_root = string
+    k3s_root    = string
     media_cache = string
   })
 }
@@ -22,11 +22,11 @@ variable "kubeconfig_path" {
 variable "github_config" {
   description = "GitHub and GitHub Container Registry configuration"
   type = object({
-    username         = string
-    email            = string
-    k8s_manifests_repo = string
+    username                         = string
+    email                            = string
+    k8s_manifests_repo               = string
     argo_cd_pull_k8s_manifests_token = string
-    argo_cd_pull_image_token = string
+    argo_cd_pull_image_token         = string
   })
   sensitive = true
 }
@@ -34,7 +34,7 @@ variable "github_config" {
 variable "ssh_config" {
   description = "ssh connection paramters used to run null_resources"
   type = object({
-    user = string
+    user             = string
     private_key_path = string
   })
   sensitive = true
@@ -45,7 +45,7 @@ variable "vpn_config" {
   type = object({
     username = string
     password = string
-    config = string
+    config   = string
   })
 }
 
@@ -56,7 +56,7 @@ variable "vpn_config" {
 variable "k3s_config" {
   description = "K3s Kubernetes configuration settings"
   type = object({
-    version        = string
+    version = string
     resource_limits = object({
       cpu_threads = number
       memory_gb   = number
@@ -86,7 +86,7 @@ variable "k3s_config" {
 variable "rancher_config" {
   description = "rancher config"
   type = object({
-    version = string
+    version  = string
     hostname = string
     ingress_config = object({
       http_enabled     = bool
@@ -117,33 +117,33 @@ variable "cert_manager_config" {
 variable "argo_cd_config" {
   type = object({
     namespace = string
-    version = string
+    version   = string
     ingress = object({
       enabled = bool
-      host = string
+      host    = string
     })
     resource_limits = object({
-      server =  object({
-        cpu = string
+      server = object({
+        cpu    = string
         memory = string
       })
-      repo_server =  object({
-        cpu = string
+      repo_server = object({
+        cpu    = string
         memory = string
       })
-      application_controller =  object({
-        cpu = string
+      application_controller = object({
+        cpu    = string
         memory = string
       })
     })
     git_repositories = map(object({
-      url = string
-      name = string
-      username = optional(string)
+      url                 = string
+      name                = string
+      username            = optional(string)
       password_secret_key = optional(string)
     }))
-    enable_ha = bool
-    enable_dex = bool
+    enable_ha     = bool
+    enable_dex    = bool
     extra_configs = map(any)
   })
 }
@@ -161,7 +161,7 @@ variable "argo_cd_sensitive" {
 variable "pgadmin4_config" {
   description = "config vars for the pgadmin4 web app"
   type = object({
-    email = string
+    email    = string
     password = string
   })
   sensitive = true
@@ -171,24 +171,24 @@ variable "pgsql_config" {
   description = "parameters to insantiate and connect the pgsql databases within the cluster"
   type = object({
     prod = object({
-      user = string
+      user     = string
       password = string
-      host = string
-      port = number
+      host     = string
+      port     = number
       database = string
     })
     stg = object({
-      user = string
+      user     = string
       password = string
-      host = string
-      port = number
+      host     = string
+      port     = number
       database = string
     })
     dev = object({
-      user = string
+      user     = string
       password = string
-      host = string
-      port = number
+      host     = string
+      port     = number
       database = string
     })
   })
@@ -203,15 +203,15 @@ variable "dagster_config" {
   description = "parameters to insantiate and connect the pgsql databases within the cluster"
   type = object({
     prod = object({
-      home_path = string
+      home_path      = string
       workspace_path = string
     })
     stg = object({
-      home_path = string
+      home_path      = string
       workspace_path = string
     })
     dev = object({
-      home_path = string
+      home_path      = string
       workspace_path = string
     })
   })
@@ -221,24 +221,24 @@ variable "dagster_pgsql_config" {
   description = "parameters to insantiate and connect the pgsql databases within the cluster"
   type = object({
     prod = object({
-      user = string
+      user     = string
       password = string
-      host = string
-      port = number
+      host     = string
+      port     = number
       database = string
     })
     stg = object({
-      user = string
+      user     = string
       password = string
-      host = string
-      port = number
+      host     = string
+      port     = number
       database = string
     })
     dev = object({
-      user = string
+      user     = string
       password = string
-      host = string
-      port = number
+      host     = string
+      port     = number
       database = string
     })
   })
@@ -260,24 +260,24 @@ variable "rear_diff_pgsql_config" {
   description = "parameters to connect rear differential API to DB"
   type = object({
     prod = object({
-      user = string
+      user     = string
       password = string
-      host = string
-      port = number
+      host     = string
+      port     = number
       database = string
     })
     stg = object({
-      user = string
+      user     = string
       password = string
-      host = string
-      port = number
+      host     = string
+      port     = number
       database = string
     })
     dev = object({
-      user = string
+      user     = string
       password = string
-      host = string
-      port = number
+      host     = string
+      port     = number
       database = string
     })
   })
@@ -291,32 +291,32 @@ variable "rear_diff_pgsql_config" {
 variable "ai_ml_sensitive" {
   description = "credentials needed for the ai-ml namespace"
   type = object({
-    mlflow = object({     
-      user = string
+    mlflow = object({
+      user     = string
       password = string
       db = object({
         prod = object({
-          user = string
+          user     = string
           password = string
-          name = string
-          port = string
+          name     = string
+          port     = string
           database = string
         })
         stg = object({
-          user = string
+          user     = string
           password = string
-          name = string
-          port = string
+          name     = string
+          port     = string
           database = string
         })
         dev = object({
-          user = string
+          user     = string
           password = string
-          name = string
-          port = string
+          name     = string
+          port     = string
           database = string
         })
-        
+
       })
       artifact_store = object({
         bucket_name = string

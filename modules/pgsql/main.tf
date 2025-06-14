@@ -22,7 +22,7 @@ resource "kubernetes_secret" "pgsql_prod_config" {
   }
 
   data = {
-    pgsql_prod_user = var.pgsql_config.prod.user
+    pgsql_prod_user     = var.pgsql_config.prod.user
     pgsql_prod_password = var.pgsql_config.prod.password
     pgsql_prod_database = var.pgsql_config.prod.database
   }
@@ -37,7 +37,7 @@ resource "kubernetes_secret" "pgsql_stg_config" {
   }
 
   data = {
-    pgsql_stg_user = var.pgsql_config.stg.user
+    pgsql_stg_user     = var.pgsql_config.stg.user
     pgsql_stg_password = var.pgsql_config.stg.password
     pgsql_stg_database = var.pgsql_config.stg.database
   }
@@ -52,7 +52,7 @@ resource "kubernetes_secret" "pgsql_dev_config" {
   }
 
   data = {
-    pgsql_dev_user = var.pgsql_config.dev.user
+    pgsql_dev_user     = var.pgsql_config.dev.user
     pgsql_dev_password = var.pgsql_config.dev.password
     pgsql_dev_database = var.pgsql_config.dev.database
   }
