@@ -249,6 +249,15 @@ variable "dagster_pgsql_config" {
 # media vars
 ################################################################################
 
+variable "environment" {
+  description = "Map of environment names"
+  type = object({
+    dev  = string
+    stg  = string
+    prod = string
+  })
+}
+
 variable "media_sensitive" {
   type = object({
     plex_claim = string
@@ -280,6 +289,25 @@ variable "rear_diff_pgsql_config" {
       port     = number
       database = string
     })
+  })
+  sensitive = true
+}
+
+variable "at_config" {
+  description = "Configuration variables for at-pipeline"
+  type = object({
+    prod = map(string)
+    stg  = map(string)
+    dev  = map(string)
+  })
+}
+
+variable "at_sensitive" {
+  description = "Sensitive configuration variables for at-pipeline"
+  type = object({
+    prod = map(string)
+    stg  = map(string)
+    dev  = map(string)
   })
   sensitive = true
 }

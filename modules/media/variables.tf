@@ -111,3 +111,31 @@ variable "dagster_pgsql_config" {
   })
   sensitive = true
 }
+
+variable "at_config" {
+  description = "Configuration variables for at-pipeline"
+  type = object({
+    prod = map(string)
+    stg  = map(string)
+    dev  = map(string)
+  })
+}
+
+variable "at_sensitive" {
+  description = "Sensitive configuration variables for at-pipeline"
+  type = object({
+    prod = map(string)
+    stg  = map(string)
+    dev  = map(string)
+  })
+  sensitive = true
+}
+
+variable "environment" {
+  description = "Map of environment names"
+  type = object({
+    dev  = string
+    stg  = string
+    prod = string
+  })
+}

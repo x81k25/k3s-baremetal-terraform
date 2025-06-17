@@ -76,6 +76,9 @@ module "media" {
   rear_diff_pgsql_config = var.rear_diff_pgsql_config
   dagster_config         = var.dagster_config
   dagster_pgsql_config   = var.dagster_pgsql_config
+  at_config              = var.at_config
+  at_sensitive           = var.at_sensitive
+  environment            = var.environment
 }
 
 ################################################################################

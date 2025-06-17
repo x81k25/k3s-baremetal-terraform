@@ -249,6 +249,116 @@ resource "kubernetes_secret" "ghcr_token" {
 }
 
 ################################################################################
+# Environment configuration
+################################################################################
+
+# Create ConfigMap for environment variables - prod
+resource "kubernetes_config_map" "environment_prod" {
+  metadata {
+    name      = "environment"
+    namespace = "media-prod"
+  }
+
+  data = {
+    ENVIRONMENT = var.environment.prod
+  }
+}
+
+# Create ConfigMap for environment variables - stg
+resource "kubernetes_config_map" "environment_stg" {
+  metadata {
+    name      = "environment"
+    namespace = "media-stg"
+  }
+
+  data = {
+    ENVIRONMENT = var.environment.stg
+  }
+}
+
+# Create ConfigMap for environment variables - dev
+resource "kubernetes_config_map" "environment_dev" {
+  metadata {
+    name      = "environment"
+    namespace = "media-dev"
+  }
+
+  data = {
+    ENVIRONMENT = var.environment.dev
+  }
+}
+
+################################################################################
+# AT Pipeline configuration
+################################################################################
+
+# Create ConfigMap for AT pipeline config - prod
+resource "kubernetes_config_map" "at_config_prod" {
+  metadata {
+    name      = "at-config"
+    namespace = "media-prod"
+  }
+
+  data = var.at_config.prod
+}
+
+# Create ConfigMap for AT pipeline config - stg
+resource "kubernetes_config_map" "at_config_stg" {
+  metadata {
+    name      = "at-config"
+    namespace = "media-stg"
+  }
+
+  data = var.at_config.stg
+}
+
+# Create ConfigMap for AT pipeline config - dev
+resource "kubernetes_config_map" "at_config_dev" {
+  metadata {
+    name      = "at-config"
+    namespace = "media-dev"
+  }
+
+  data = var.at_config.dev
+}
+
+# Create Secret for AT pipeline sensitive config - prod
+resource "kubernetes_secret" "at_sensitive_prod" {
+  metadata {
+    name      = "at-sensitive"
+    namespace = "media-prod"
+  }
+
+  data = var.at_sensitive.prod
+
+  type = "Opaque"
+}
+
+# Create Secret for AT pipeline sensitive config - stg
+resource "kubernetes_secret" "at_sensitive_stg" {
+  metadata {
+    name      = "at-sensitive"
+    namespace = "media-stg"
+  }
+
+  data = var.at_sensitive.stg
+
+  type = "Opaque"
+}
+
+# Create Secret for AT pipeline sensitive config - dev
+resource "kubernetes_secret" "at_sensitive_dev" {
+  metadata {
+    name      = "at-sensitive"
+    namespace = "media-dev"
+  }
+
+  data = var.at_sensitive.dev
+
+  type = "Opaque"
+}
+
+################################################################################
 # configure GPU for media use
 ################################################################################
 
