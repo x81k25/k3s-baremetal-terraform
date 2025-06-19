@@ -94,5 +94,17 @@ module "ai_ml" {
 }
 
 ################################################################################
+# observability module
+################################################################################
+
+module "observability" {
+  source     = "./modules/observability"
+  depends_on = [module.k3s]
+
+  loki_sensitive    = var.loki_sensitive
+  grafana_sensitive = var.grafana_sensitive
+}
+
+################################################################################
 # end of main.tf
 ################################################################################
