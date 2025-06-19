@@ -27,8 +27,8 @@ resource "kubernetes_secret" "loki_credentials" {
   type = "Opaque"
 
   data = {
-    username = base64encode(var.loki_sensitive.user)
-    password = base64encode(var.loki_sensitive.password)
+    username = var.loki_sensitive.user
+    password = var.loki_sensitive.password
   }
 }
 
@@ -46,8 +46,8 @@ resource "kubernetes_secret" "grafana_credentials" {
   type = "Opaque"
 
   data = {
-    username = base64encode(var.grafana_sensitive.user)
-    password = base64encode(var.grafana_sensitive.password)
+    username = var.grafana_sensitive.user
+    password = var.grafana_sensitive.password
   }
 }
 
