@@ -36,39 +36,17 @@ resource "kubernetes_namespace" "media-dev" {
 # - no other env vars are set here
 ################################################################################
 
-# Create ConfigMap for environment variables - prod
-resource "kubernetes_config_map" "environment_prod" {
+# Create ConfigMap to hold the environment value
+resource "kubernetes_config_map" "environment" {
+  for_each = var.environment
+
   metadata {
     name      = "environment"
-    namespace = "media-prod"
+    namespace = "media-${each.key}"
   }
 
   data = {
-    ENVIRONMENT = var.environment.prod
-  }
-}
-
-# Create ConfigMap for environment variables - stg
-resource "kubernetes_config_map" "environment_stg" {
-  metadata {
-    name      = "environment"
-    namespace = "media-stg"
-  }
-
-  data = {
-    ENVIRONMENT = var.environment.stg
-  }
-}
-
-# Create ConfigMap for environment variables - dev
-resource "kubernetes_config_map" "environment_dev" {
-  metadata {
-    name      = "environment"
-    namespace = "media-dev"
-  }
-
-  data = {
-    ENVIRONMENT = var.environment.dev
+    ENVIRONMENT = each.value
   }
 }
 
