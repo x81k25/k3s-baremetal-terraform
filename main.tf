@@ -69,6 +69,7 @@ module "media" {
   depends_on = [module.argo_cd, module.pgsql]
 
   server_ip              = var.server_ip
+  environment            = var.environment
   github_config          = var.github_config
   ssh_config             = var.ssh_config
   media_sensitive        = var.media_sensitive
@@ -78,7 +79,8 @@ module "media" {
   dagster_pgsql_config   = var.dagster_pgsql_config
   at_config              = var.at_config
   at_sensitive           = var.at_sensitive
-  environment            = var.environment
+  wst_config             = local.wst_config
+  wst_secrets            = var.wst_secrets 
 }
 
 ################################################################################

@@ -31,6 +31,22 @@ variable "github_config" {
   sensitive = true
 }
 
+variable "pgsql_default_config" {
+  description = "global pgsql env vars used for mutliple operations"
+  type = object({
+    database = string
+    prod = object({
+      port = string
+    })
+    stg = object({
+      port = string
+    })
+    dev = object({
+      port = string
+    })
+  })
+}
+
 variable "ssh_config" {
   description = "ssh connection paramters used to run null_resources"
   type = object({
@@ -311,6 +327,28 @@ variable "at_sensitive" {
   })
   sensitive = true
 }
+
+variable "wst_secrets" {
+  description = "contains secrest for wst services running in dagster"
+  type = object({
+    pgsql = object({
+      prod = object({
+        username = string
+        password = string
+      })
+      stg = object({
+        username = string
+        password = string
+      })
+      dev = object({
+        username = string
+        password = string
+      })
+    })
+  })
+  sensitive = true
+}
+
 
 ################################################################################
 # ai-ml vars

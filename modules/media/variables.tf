@@ -131,6 +131,50 @@ variable "at_sensitive" {
   sensitive = true
 }
 
+variable "wst_config" {
+  description = "env vars for wst services running in dagster"
+  type = object({
+    pgsql = object({
+      prod = object({
+        host = string
+        port = string
+        database = string
+      })
+      stg = object({
+        host = string
+        port = string
+        database = string
+      })
+      dev = object({
+        host = string
+        port = string
+        database = string
+      })
+    })
+  })
+}
+
+variable "wst_secrets" {
+  description = "contains secrest for wst services running in dagster"
+  type = object({
+    pgsql = object({
+      prod = object({
+        username = string
+        password = string
+      })
+      stg = object({
+        username = string
+        password = string
+      })
+      dev = object({
+        username = string
+        password = string
+      })
+    })
+  })
+  sensitive = true
+}
+
 variable "environment" {
   description = "Map of environment names"
   type = object({
