@@ -35,6 +35,7 @@ variable "pgsql_default_config" {
   description = "global pgsql env vars used for mutliple operations"
   type = object({
     database = string
+    schema   = string
     prod = object({
       port = string
     })
@@ -212,59 +213,10 @@ variable "pgsql_config" {
 }
 
 ################################################################################
-# orchestration vars
-################################################################################
-
-variable "dagster_config" {
-  description = "parameters to insantiate and connect the pgsql databases within the cluster"
-  type = object({
-    prod = object({
-      home_path      = string
-      workspace_path = string
-    })
-    stg = object({
-      home_path      = string
-      workspace_path = string
-    })
-    dev = object({
-      home_path      = string
-      workspace_path = string
-    })
-  })
-}
-
-variable "dagster_pgsql_config" {
-  description = "parameters to insantiate and connect the pgsql databases within the cluster"
-  type = object({
-    prod = object({
-      user     = string
-      password = string
-      host     = string
-      port     = number
-      database = string
-    })
-    stg = object({
-      user     = string
-      password = string
-      host     = string
-      port     = number
-      database = string
-    })
-    dev = object({
-      user     = string
-      password = string
-      host     = string
-      port     = number
-      database = string
-    })
-  })
-  sensitive = true
-}
-
-################################################################################
 # media vars
 ################################################################################
 
+# media vars
 variable "environment" {
   description = "Map of environment names"
   type = object({
@@ -274,6 +226,45 @@ variable "environment" {
   })
 }
 
+# dagster vars
+variable "dagster_path_config" {
+  description = "parameters to insantiate and connect the pgsql databases within the cluster"
+  type = object({
+    prod = object({
+      home      = string
+      workspace = string
+    })
+    stg = object({
+      home      = string
+      workspace = string
+    })
+    dev = object({
+      home      = string
+      workspace = string
+    })
+  })
+}
+
+variable "dagster_secrets" {
+  description = "parameters to insantiate and connect the pgsql databases within the cluster"
+  type = object({
+    prod = object({
+      username = string
+      password = string
+    })
+    stg = object({
+      username = string
+      password = string
+    })
+    dev = object({
+      username = string
+      password = string
+    })
+  })
+  sensitive = true
+}
+
+# plex vars
 variable "media_sensitive" {
   type = object({
     plex_claim = string
@@ -281,53 +272,149 @@ variable "media_sensitive" {
   sensitive = true
 }
 
-variable "rear_diff_pgsql_config" {
+# rear diff vars
+variable "rear_diff_secrets" {
   description = "parameters to connect rear differential API to DB"
   type = object({
     prod = object({
-      user     = string
+      username = string
       password = string
-      host     = string
-      port     = number
-      database = string
     })
     stg = object({
-      user     = string
+      username = string
       password = string
-      host     = string
-      port     = number
-      database = string
     })
     dev = object({
-      user     = string
+      username = string
       password = string
-      host     = string
-      port     = number
-      database = string
     })
   })
   sensitive = true
 }
 
-variable "at_config" {
-  description = "Configuration variables for at-pipeline"
+# transmission env-vars
+variable "transmission_vars" {
+  description = "Transmission configuration settings per environment"
   type = object({
-    prod = map(string)
-    stg  = map(string)
-    dev  = map(string)
+    prod = object({
+      port = string
+    })
+    stg = object({
+      port = string
+    })
+    dev = object({
+      port = string
+    })
   })
 }
 
-variable "at_sensitive" {
-  description = "Sensitive configuration variables for at-pipeline"
+variable "transmission_secrets" {
+  description = "Transmission authentication credentials per environment"
   type = object({
-    prod = map(string)
-    stg  = map(string)
-    dev  = map(string)
+    prod = object({
+      username = string
+      password = string
+    })
+    stg = object({
+      username = string
+      password = string
+    })
+    dev = object({
+      username = string
+      password = string
+    })
   })
   sensitive = true
 }
 
+# reel-driver vars
+variable "reel_driver_vars" {
+  description = "Reel driver configuration variables"
+  type = object({
+    prefix = string
+    prod = object({
+      port = string
+    })
+    stg = object({
+      port = string
+    })
+    dev = object({
+      port = string
+    })
+  })
+}
+
+# automatic transmission vars
+variable "at_vars" {
+  description = "Automatic transmission application variables and environment-specific configuration"
+  type = object({
+    movie_search_api_base_url  = string
+    movie_details_api_base_url = string
+    movie_ratings_api_base_url = string
+    tv_search_api_base_utl     = string
+    tv_details_api_base_url    = string
+    tv_ratings_api_base_url    = string
+    rss_sources                = string
+    rss_urls                   = string
+    uid                        = string
+    gid                        = string
+    prod = object({
+      batch_size                     = string
+      log_level                      = string
+      stale_metadata_threshold       = string
+      reel_driver_threshold          = string
+      target_active_items            = string
+      transferred_item_cleanup_delay = string
+      hung_item_cleanup_delay        = string
+      download_dir                   = string
+      movie_dir                      = string
+      tv_show_dir                    = string
+    })
+    stg = object({
+      batch_size                     = string
+      log_level                      = string
+      stale_metadata_threshold       = string
+      reel_driver_threshold          = string
+      target_active_items            = string
+      transferred_item_cleanup_delay = string
+      hung_item_cleanup_delay        = string
+      uid                            = string
+      gid                            = string
+      download_dir                   = string
+      movie_dir                      = string
+      tv_show_dir                    = string
+    })
+    dev = object({
+      batch_size                     = string
+      log_level                      = string
+      stale_metadata_threshold       = string
+      reel_driver_threshold          = string
+      target_active_items            = string
+      transferred_item_cleanup_delay = string
+      hung_item_cleanup_delay        = string
+      uid                            = string
+      gid                            = string
+      download_dir                   = string
+      movie_dir                      = string
+      tv_show_dir                    = string
+    })
+  })
+}
+
+variable "at_secret_vars" {
+  description = "API keys and sensitive configuration for automatic transmission"
+  type = object({
+    movie_search_api_key  = string
+    movie_details_api_key = string
+    movie_ratings_api_key = string
+    tv_search_api_key     = string
+    tv_details_api_key    = string
+    tv_ratings_api_key    = string
+  })
+  sensitive = true
+}
+
+# wst vars
 variable "wst_secrets" {
   description = "contains secrest for wst services running in dagster"
   type = object({
@@ -348,7 +435,6 @@ variable "wst_secrets" {
   })
   sensitive = true
 }
-
 
 ################################################################################
 # ai-ml vars

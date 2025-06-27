@@ -68,19 +68,31 @@ module "media" {
   source     = "./modules/media"
   depends_on = [module.argo_cd, module.pgsql]
 
-  server_ip              = var.server_ip
-  environment            = var.environment
-  github_config          = var.github_config
-  ssh_config             = var.ssh_config
-  media_sensitive        = var.media_sensitive
-  vpn_config             = var.vpn_config
-  rear_diff_pgsql_config = var.rear_diff_pgsql_config
-  dagster_config         = var.dagster_config
-  dagster_pgsql_config   = var.dagster_pgsql_config
-  at_config              = var.at_config
-  at_sensitive           = var.at_sensitive
-  wst_config             = local.wst_config
-  wst_secrets            = var.wst_secrets 
+  # global vars
+  server_ip     = var.server_ip
+  environment   = var.environment
+  github_config = var.github_config
+  ssh_config    = var.ssh_config
+  # plex vars
+  media_sensitive = var.media_sensitive
+  # atd vars
+  vpn_config          = var.vpn_config
+  transmission_config = local.transmission_config
+  transmission_secrets = var.transmission_secrets
+  # read diff vars
+  rear_diff_config  = local.rear_diff_config
+  rear_diff_secrets = var.rear_diff_secrets
+  # reel-driver vars
+  reel_driver_config = local.reel_driver_config
+  # dagster vars
+  dagster_config  = local.dagster_config
+  dagster_secrets = var.dagster_secrets
+  # at vars
+  at_config  = local.at_config
+  at_secrets = local.at_secrets
+  # wst vars
+  wst_config  = local.wst_config
+  wst_secrets = var.wst_secrets
 }
 
 ################################################################################

@@ -3,6 +3,10 @@
 # - creates k8s namespaces 
 ################################################################################
 
+locals {
+  environments = ["dev", "stg", "prod"]
+}
+
 resource "kubernetes_namespace" "media-prod" {
   metadata {
     name = "media-prod"
@@ -81,97 +85,38 @@ resource "kubernetes_secret" "ghcr_credentials" {
 # Dagster configuration 
 ################################################################################
 
-# Create ConfigMap for Dagster host paths - prod
-resource "kubernetes_config_map" "dagster_paths_prod" {
+resource "kubernetes_config_map" "dagster_config" {
+  for_each = var.dagster_config.path
+
   metadata {
-    name      = "dagster-paths"
-    namespace = "media-prod"
+    name      = "dagster-config"
+    namespace = "media-${each.key}"
   }
 
   data = {
-    DAGSTER_HOME_PATH      = var.dagster_config.prod.home_path
-    DAGSTER_WORKSPACE_PATH = var.dagster_config.prod.workspace_path
+    HOME_PATH       = each.value.home
+    WORKSPACE_PATH  = each.value.workspace
+    DAGSTER_PG_HOST = var.dagster_config.pgsql[each.key].host
+    DAGSTER_PG_PORT = var.dagster_config.pgsql[each.key].port
+    DAGSTER_PG_DB   = var.dagster_config.pgsql[each.key].database
   }
-}
-
-# Create ConfigMap for Dagster host paths - stg
-resource "kubernetes_config_map" "dagster_paths_stg" {
-  metadata {
-    name      = "dagster-paths"
-    namespace = "media-stg"
-  }
-
-  data = {
-    DAGSTER_HOME_PATH      = var.dagster_config.stg.home_path
-    DAGSTER_WORKSPACE_PATH = var.dagster_config.stg.workspace_path
-  }
-}
-
-# Create ConfigMap for Dagster host paths - dev
-resource "kubernetes_config_map" "dagster_paths_dev" {
-  metadata {
-    name      = "dagster-paths"
-    namespace = "media-dev"
-  }
-
-  data = {
-    DAGSTER_HOME_PATH      = var.dagster_config.dev.home_path
-    DAGSTER_WORKSPACE_PATH = var.dagster_config.dev.workspace_path
-  }
-}
-
-# Dagster database secrets - prod
-resource "kubernetes_secret" "dagster_pgsql_config_prod" {
-  metadata {
-    name      = "dagster-pgsql-config"
-    namespace = "media-prod"
-  }
-
-  data = {
-    PGSQL_USER     = var.dagster_pgsql_config.prod.user
-    PGSQL_PASSWORD = var.dagster_pgsql_config.prod.password
-    PGSQL_HOST     = var.dagster_pgsql_config.prod.host
-    PGSQL_PORT     = tostring(var.dagster_pgsql_config.prod.port)
-    PGSQL_DATABASE = var.dagster_pgsql_config.prod.database
-  }
-
-  type = "Opaque"
-}
-
-# Dagster database secrets - stg
-resource "kubernetes_secret" "dagster_pgsql_config_stg" {
-  metadata {
-    name      = "dagster-pgsql-config"
-    namespace = "media-stg"
-  }
-
-  data = {
-    PGSQL_USER     = var.dagster_pgsql_config.stg.user
-    PGSQL_PASSWORD = var.dagster_pgsql_config.stg.password
-    PGSQL_HOST     = var.dagster_pgsql_config.stg.host
-    PGSQL_PORT     = tostring(var.dagster_pgsql_config.stg.port)
-    PGSQL_DATABASE = var.dagster_pgsql_config.stg.database
-  }
-
-  type = "Opaque"
 }
 
 # Dagster database secrets - dev
-resource "kubernetes_secret" "dagster_pgsql_config_dev" {
-  metadata {
-    name      = "dagster-pgsql-config"
-    namespace = "media-dev"
-  }
+resource "kubernetes_secret" "dagster_secrets" {
+  for_each = toset(local.environments)
 
-  data = {
-    PGSQL_USER     = var.dagster_pgsql_config.dev.user
-    PGSQL_PASSWORD = var.dagster_pgsql_config.dev.password
-    PGSQL_HOST     = var.dagster_pgsql_config.dev.host
-    PGSQL_PORT     = tostring(var.dagster_pgsql_config.dev.port)
-    PGSQL_DATABASE = var.dagster_pgsql_config.dev.database
+  metadata {
+    name      = "dagster-secrets"
+    namespace = "media-${each.key}"
   }
 
   type = "Opaque"
+
+  data = {
+    DAGSTER_PG_USERNAME = var.dagster_secrets[each.key].username
+    DAGSTER_PG_PASSWORD = var.dagster_secrets[each.key].password
+  }
 }
 
 # Also create GHCR token secret for environment variable use
@@ -196,68 +141,117 @@ resource "kubernetes_secret" "ghcr_token" {
 #   which are handled by dagster
 ################################################################################
 
-# Create ConfigMap for AT pipeline config - prod
-resource "kubernetes_config_map" "at_config_prod" {
+# Create ConfigMap for AT config - all environments
+resource "kubernetes_config_map" "at_config" {
+  for_each = toset(local.environments)
+
   metadata {
     name      = "at-config"
-    namespace = "media-prod"
+    namespace = "media-${each.key}"
   }
 
-  data = var.at_config.prod
+  data = {
+    AT_BATCH_SIZE                     = var.at_config[each.key].batch_size
+    AT_LOG_LEVEL                      = var.at_config[each.key].log_level
+    AT_STALE_METADATA_THRESHOLD       = var.at_config[each.key].stale_metadata_threshold
+    AT_REEL_DRIVER_THRESHOLD          = var.at_config[each.key].reel_driver_threshold
+    AT_TARGET_ACTIVE_ITEMS            = var.at_config[each.key].target_active_items
+    AT_TRANSFERRED_ITEM_CLEANUP_DELAY = var.at_config[each.key].transferred_item_cleanup_delay
+    AT_HUNG_ITEM_CLEANUP_DELAY        = var.at_config[each.key].hung_item_cleanup_delay
+    
+    AT_PGSQL_ENDPOINT = var.at_config[each.key].pgsql.host
+    AT_PGSQL_PORT     = var.at_config[each.key].pgsql.port
+    AT_PGSQL_DATABASE = var.at_config[each.key].pgsql.database
+    AT_PGSQL_SCHEMA   = var.at_config[each.key].pgsql.schema
+    
+    AT_MOVIE_SEARCH_API_BASE_URL = var.at_config[each.key].movie_search_api_base_url
+    AT_MOVIE_DETAILS_API_BASE_URL = var.at_config[each.key].movie_details_api_base_url
+    AT_MOVIE_RATINGS_API_BASE_URL = var.at_config[each.key].movie_ratings_api_base_url
+    
+    AT_TV_SEARCH_API_BASE_URL = var.at_config[each.key].tv_search_api_base_utl
+    AT_TV_DETAILS_API_BASE_URL = var.at_config[each.key].tv_details_api_base_url
+    AT_TV_RATINGS_API_BASE_URL = var.at_config[each.key].tv_ratings_api_base_url
+    
+    AT_RSS_SOURCES = var.at_config[each.key].rss_sources
+    AT_RSS_URLS    = var.at_config[each.key].rss_urls
+    
+    AT_UID          = var.at_config[each.key].uid
+    AT_GID          = var.at_config[each.key].gid
+    AT_DOWNLOAD_DIR = var.at_config[each.key].download_dir
+    AT_MOVIE_DIR    = var.at_config[each.key].movie_dir
+    AT_TV_SHOW_DIR  = var.at_config[each.key].tv_show_dir
+  }
 }
 
-# Create ConfigMap for AT pipeline config - stg
-resource "kubernetes_config_map" "at_config_stg" {
+# Create ConfigMap for transmission config - all environments
+resource "kubernetes_config_map" "transmission_config" {
+  for_each = toset(local.environments)
+
   metadata {
-    name      = "at-config"
-    namespace = "media-stg"
+    name      = "transmission-config"
+    namespace = "media-${each.key}"
   }
 
-  data = var.at_config.stg
+  data = {
+    TRANSMISSION_HOST = var.transmission_config[each.key].host
+    TRANSMISSION_PORT = var.transmission_config[each.key].port
+  }
 }
 
-# Create ConfigMap for AT pipeline config - dev
-resource "kubernetes_config_map" "at_config_dev" {
+# Create ConfigMap for reel-driver config - all environments
+resource "kubernetes_config_map" "reel_driver_config" {
+  for_each = toset(local.environments)
+
   metadata {
-    name      = "at-config"
-    namespace = "media-dev"
+    name      = "reel-driver-config"
+    namespace = "media-${each.key}"
   }
 
-  data = var.at_config.dev
+  data = {
+    REEL_DRIVER_HOST   = var.reel_driver_config[each.key].host
+    REEL_DRIVER_PORT   = var.reel_driver_config[each.key].port
+    REEL_DRIVER_PREFIX = var.reel_driver_config[each.key].prefix
+  }
 }
 
-# Create Secret for AT pipeline sensitive config - prod
-resource "kubernetes_secret" "at_sensitive_prod" {
+# Create Secret for AT sensitive config - all environments
+resource "kubernetes_secret" "at_secrets" {
+  for_each = toset(local.environments)
+
   metadata {
-    name      = "at-sensitive"
-    namespace = "media-prod"
+    name      = "at-secrets"
+    namespace = "media-${each.key}"
   }
 
-  data = var.at_sensitive.prod
+  data = {
+    AT_PGSQL_USERNAME = var.at_secrets[each.key].pgsql.username
+    AT_PGSQL_PASSWORD = var.at_secrets[each.key].pgsql.password
+    
+    AT_MOVIE_SEARCH_API_KEY  = var.at_secrets[each.key].movie_search_api_key
+    AT_MOVIE_DETAILS_API_KEY = var.at_secrets[each.key].movie_details_api_key
+    AT_MOVIE_RATINGS_API_KEY = var.at_secrets[each.key].movie_ratings_api_key
+    
+    AT_TV_SEARCH_API_KEY  = var.at_secrets[each.key].tv_search_api_key
+    AT_TV_DETAILS_API_KEY = var.at_secrets[each.key].tv_details_api_key
+    AT_TV_RATINGS_API_KEY = var.at_secrets[each.key].tv_ratings_api_key
+  }
 
   type = "Opaque"
 }
 
-# Create Secret for AT pipeline sensitive config - stg
-resource "kubernetes_secret" "at_sensitive_stg" {
+# Create Secret for transmission credentials - all environments
+resource "kubernetes_secret" "transmission_secrets" {
+  for_each = toset(local.environments)
+
   metadata {
-    name      = "at-sensitive"
-    namespace = "media-stg"
+    name      = "transmission-secrets"
+    namespace = "media-${each.key}"
   }
 
-  data = var.at_sensitive.stg
-
-  type = "Opaque"
-}
-
-# Create Secret for AT pipeline sensitive config - dev
-resource "kubernetes_secret" "at_sensitive_dev" {
-  metadata {
-    name      = "at-sensitive"
-    namespace = "media-dev"
+  data = {
+    TRANSMISSION_USERNAME = var.transmission_secrets[each.key].username
+    TRANSMISSION_PASSWORD = var.transmission_secrets[each.key].password
   }
-
-  data = var.at_sensitive.dev
 
   type = "Opaque"
 }
@@ -286,7 +280,7 @@ resource "kubernetes_config_map" "wst_config" {
 
 # Create Secrets for sensitive env vars - use toset() to iterate over environments
 resource "kubernetes_secret" "wst_secrets" {
-  for_each = toset(["prod", "stg", "dev"])  # <- Use non-sensitive list
+  for_each = toset(local.environments)
 
   metadata {
     name      = "wst-secrets"
@@ -302,7 +296,7 @@ resource "kubernetes_secret" "wst_secrets" {
 }
 
 ################################################################################
-# atd conifg
+# atd config
 # - sets env vars and secrets for all atd pods
 ################################################################################
 
@@ -343,53 +337,34 @@ resource "kubernetes_secret" "plex_secret" {
 # - set config and secrets for the rear-differntial API services
 ################################################################################
 
-# handle database secrets
-resource "kubernetes_secret" "rear_diff_pgsql_config_prod" {
+# Create ConfigMaps for non-sensitive env vars
+resource "kubernetes_config_map" "rear_diff_config" {
+  for_each = var.wst_config.pgsql
+
   metadata {
-    name      = "rear-diff-pgsql-config"
-    namespace = "media-prod"
+    name      = "rear-diff-config"
+    namespace = "media-${each.key}"
   }
 
   data = {
-    PGSQL_USER     = var.rear_diff_pgsql_config.prod.user
-    PGSQL_PASSWORD = var.rear_diff_pgsql_config.prod.password
-    PGSQL_HOST     = var.rear_diff_pgsql_config.prod.host
-    PGSQL_PORT     = tostring(var.rear_diff_pgsql_config.prod.port)
-    PGSQL_DATABASE = var.rear_diff_pgsql_config.prod.database
+    REAR_DIFF_PGSQL_HOST     = each.value.host
+    REAR_DIFF_PGSQL_PORT     = each.value.port
+    REAR_DIFF_PGSQL_DATABASE = each.value.database
   }
-
-  type = "Opaque"
 }
 
-resource "kubernetes_secret" "rear_diff_pgsql_config_stg" {
+# Create Secrets for sensitive env vars - use toset() to iterate over environments
+resource "kubernetes_secret" "rear_diff_secrets" {
+  for_each = toset(local.environments)
+
   metadata {
-    name      = "rear-diff-pgsql-config"
-    namespace = "media-stg"
+    name      = "rear-diff-secrets"
+    namespace = "media-${each.key}"
   }
 
   data = {
-    PGSQL_USER     = var.rear_diff_pgsql_config.stg.user
-    PGSQL_PASSWORD = var.rear_diff_pgsql_config.stg.password
-    PGSQL_HOST     = var.rear_diff_pgsql_config.stg.host
-    PGSQL_PORT     = tostring(var.rear_diff_pgsql_config.stg.port)
-    PGSQL_DATABASE = var.rear_diff_pgsql_config.stg.database
-  }
-
-  type = "Opaque"
-}
-
-resource "kubernetes_secret" "rear_diff_pgsql_config_dev" {
-  metadata {
-    name      = "rear-diff-pgsql-config"
-    namespace = "media-dev"
-  }
-
-  data = {
-    PGSQL_USER     = var.rear_diff_pgsql_config.dev.user
-    PGSQL_PASSWORD = var.rear_diff_pgsql_config.dev.password
-    PGSQL_HOST     = var.rear_diff_pgsql_config.dev.host
-    PGSQL_PORT     = tostring(var.rear_diff_pgsql_config.dev.port)
-    PGSQL_DATABASE = var.rear_diff_pgsql_config.dev.database
+    REAR_DIFF_PGSQL_USERNAME = var.rear_diff_secrets[each.key].username
+    REAR_DIFF_PGSQL_PASSWORD = var.rear_diff_secrets[each.key].password
   }
 
   type = "Opaque"
