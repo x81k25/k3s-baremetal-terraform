@@ -178,14 +178,17 @@ variable "dagster_config" {
       prod = object({
         home      = string
         workspace = string
+        timezone  = string
       })
       stg = object({
         home      = string
         workspace = string
+        timezone  = string
       })
       dev = object({
         home      = string
         workspace = string
+        timezone  = string
       })
     })
     pgsql = object({

@@ -230,20 +230,23 @@ variable "environment" {
 }
 
 # dagster vars
-variable "dagster_path_config" {
+variable "dagster_vars" {
   description = "parameters to insantiate and connect the pgsql databases within the cluster"
   type = object({
-    prod = object({
-      home      = string
-      workspace = string
-    })
-    stg = object({
-      home      = string
-      workspace = string
-    })
-    dev = object({
-      home      = string
-      workspace = string
+    timezone = string
+    path = object({
+      prod = object({
+        home      = string
+        workspace = string
+      })
+      stg = object({
+        home      = string
+        workspace = string
+      })
+      dev = object({
+        home      = string
+        workspace = string
+      })
     })
   })
 }

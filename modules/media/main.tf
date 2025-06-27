@@ -94,11 +94,12 @@ resource "kubernetes_config_map" "dagster_config" {
   }
 
   data = {
-    HOME_PATH       = each.value.home
-    WORKSPACE_PATH  = each.value.workspace
-    DAGSTER_PG_HOST = var.dagster_config.pgsql[each.key].host
-    DAGSTER_PG_PORT = var.dagster_config.pgsql[each.key].port
-    DAGSTER_PG_DB   = var.dagster_config.pgsql[each.key].database
+    HOME_PATH         = each.value.home
+    WORKSPACE_PATH    = each.value.workspace
+    DAGSTER_TIMEZONE  = each.value.timezone
+    DAGSTER_PG_HOST   = var.dagster_config.pgsql[each.key].host
+    DAGSTER_PG_PORT   = var.dagster_config.pgsql[each.key].port
+    DAGSTER_PG_DB     = var.dagster_config.pgsql[each.key].database
   }
 }
 

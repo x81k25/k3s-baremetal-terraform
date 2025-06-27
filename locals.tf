@@ -7,16 +7,19 @@ locals {
   dagster_config = {
     path = {
       prod = {
-        home      = var.dagster_path_config.prod.home
-        workspace = var.dagster_path_config.prod.workspace
+        home      = var.dagster_vars.path.prod.home
+        workspace = var.dagster_vars.path.prod.workspace
+        timezone  = var.dagster_vars.timezone
       }
       stg = {
-        home      = var.dagster_path_config.stg.home
-        workspace = var.dagster_path_config.stg.workspace
+        home      = var.dagster_vars.path.stg.home
+        workspace = var.dagster_vars.path.stg.workspace
+        timezone  = var.dagster_vars.timezone
       }
       dev = {
-        home      = var.dagster_path_config.dev.home
-        workspace = var.dagster_path_config.dev.workspace
+        home      = var.dagster_vars.path.dev.home
+        workspace = var.dagster_vars.path.dev.workspace
+        timezone  = var.dagster_vars.timezone
       }
     }
     pgsql = {
