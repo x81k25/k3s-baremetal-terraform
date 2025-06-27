@@ -37,12 +37,15 @@ variable "pgsql_default_config" {
     database = string
     schema   = string
     prod = object({
+      host = string
       port = string
     })
     stg = object({
+      host = string
       port = string
     })
     dev = object({
+      host = string
       port = string
     })
   })

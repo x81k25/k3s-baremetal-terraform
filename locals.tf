@@ -21,7 +21,7 @@ locals {
     }
     pgsql = {
       for env in ["prod", "stg", "dev"] : env => {
-        host     = var.server_ip
+        host     = var.pgsql_default_config[env].host
         port     = var.pgsql_default_config[env].port
         database = "dagster"
       }
@@ -84,7 +84,7 @@ locals {
       movie_dir                      = var.at_vars.prod.movie_dir
       tv_show_dir                    = var.at_vars.prod.tv_show_dir
       pgsql = {
-        host     = var.server_ip
+        host     = var.pgsql_default_config.prod.host
         port     = var.pgsql_default_config.prod.port
         database = var.pgsql_default_config.database
         schema   = var.pgsql_default_config.schema
@@ -112,7 +112,7 @@ locals {
       movie_dir                      = var.at_vars.stg.movie_dir
       tv_show_dir                    = var.at_vars.stg.tv_show_dir
       pgsql = {
-        host     = var.server_ip
+        host     = var.pgsql_default_config.stg.host
         port     = var.pgsql_default_config.stg.port
         database = var.pgsql_default_config.database
         schema   = var.pgsql_default_config.schema
@@ -140,7 +140,7 @@ locals {
       movie_dir                      = var.at_vars.dev.movie_dir
       tv_show_dir                    = var.at_vars.dev.tv_show_dir
       pgsql = {
-        host     = var.server_ip
+        host     = var.pgsql_default_config.dev.host
         port     = var.pgsql_default_config.dev.port
         database = var.pgsql_default_config.database
         schema   = var.pgsql_default_config.schema
@@ -190,7 +190,7 @@ locals {
   rear_diff_config = {
     pgsql = {
       for env in ["prod", "stg", "dev"] : env => {
-        host     = var.server_ip
+        host     = var.pgsql_default_config[env].host
         port     = var.pgsql_default_config[env].port
         database = var.pgsql_default_config.database
       }
@@ -200,7 +200,7 @@ locals {
   wst_config = {
     pgsql = {
       for env in ["prod", "stg", "dev"] : env => {
-        host     = var.server_ip
+        host     = var.pgsql_default_config[env].host
         port     = var.pgsql_default_config[env].port
         database = var.pgsql_default_config.database
       }
