@@ -2,6 +2,10 @@
 # namespace 
 ################################################################################
 
+locals {
+  environments = ["dev", "stg", "prod"]
+}
+
 resource "kubernetes_namespace" "pgsql" {
   metadata {
     name = "pgsql"
@@ -10,6 +14,20 @@ resource "kubernetes_namespace" "pgsql" {
     }
   }
 }
+
+resource "kubernetes_secret" "github_secrets" {
+  metadata {
+    name      = "github-secrets"
+    namespace = "pgsql"
+  }
+
+  data = {
+    GHCR_PULL_IMAGE_TOKEN = var.github_config.argo_cd_pull_image_token
+  }
+
+  type = "Opaque"
+}
+
 
 ################################################################################
 # pgsql config pass
@@ -55,6 +73,98 @@ resource "kubernetes_secret" "pgsql_dev_config" {
     pgsql_dev_user     = var.pgsql_config.dev.user
     pgsql_dev_password = var.pgsql_config.dev.password
     pgsql_dev_database = var.pgsql_config.dev.database
+  }
+
+  type = "Opaque"
+}
+
+################################################################################
+# set flywat env vars and secrets
+################################################################################
+
+# env vars
+resource "kubernetes_config_map" "flway_config_prod" {
+
+  metadata {
+    name      = "flyway-config-prod"
+    namespace = "pgsql"
+  }
+
+  data = {
+    FLYWAY_PGSQL_HOST     = var.flyway_config.prod.pgsql.host
+    FLYWAY_PGSQL_PORT     = var.flyway_config.prod.pgsql.port
+    FLYWAY_PGSQL_DATABASE = var.flyway_config.prod.pgsql.database
+  }
+}
+
+resource "kubernetes_config_map" "flway_config_stg" {
+
+  metadata {
+    name      = "flyway-config-stg"
+    namespace = "pgsql"
+  }
+
+  data = {
+    FLYWAY_PGSQL_HOST     = var.flyway_config.stg.pgsql.host
+    FLYWAY_PGSQL_PORT     = var.flyway_config.stg.pgsql.port
+    FLYWAY_PGSQL_DATABASE = var.flyway_config.stg.pgsql.database
+  }
+}
+
+resource "kubernetes_config_map" "flway_config_dev" {
+
+  metadata {
+    name      = "flyway-config-dev"
+    namespace = "pgsql"
+  }
+
+  data = {
+    FLYWAY_PGSQL_HOST     = var.flyway_config.dev.pgsql.host
+    FLYWAY_PGSQL_PORT     = var.flyway_config.dev.pgsql.port
+    FLYWAY_PGSQL_DATABASE = var.flyway_config.dev.pgsql.database
+  }
+}
+
+# secrets for flyway
+resource "kubernetes_secret" "flyway_secrets_prod" {
+
+  metadata {
+    name      = "flyway-secrets-prod"
+    namespace = "pgsql"
+  }
+
+  type = "Opaque"
+
+  data = {
+    FLYWAY_PGSQL_USERNAME = var.flyway_secrets.prod.pgsql.username
+    FLYWAY_PGSQL_PASSWORD = var.flyway_secrets.prod.pgsql.password
+  }
+}
+
+resource "kubernetes_secret" "flyway_secrets_stg" {
+
+  metadata {
+    name      = "flyway-secrets-stg"
+    namespace = "pgsql"
+  }
+
+  type = "Opaque"
+
+  data = {
+    FLYWAY_PGSQL_USERNAME = var.flyway_secrets.stg.pgsql.username
+    FLYWAY_PGSQL_PASSWORD = var.flyway_secrets.stg.pgsql.password
+  }
+}
+
+resource "kubernetes_secret" "flyway_secrets_dev" {
+  metadata {
+    name      = "flyway-secrets-dev"
+    namespace = kubernetes_namespace.pgsql.metadata[0].name
+  }
+
+  data = {
+    FLYWAY_PGSQL_USERNAME = var.flyway_secrets.dev.pgsql.username
+    FLYWAY_PGSQL_PASSWORD = var.flyway_secrets.dev.pgsql.password
   }
 
   type = "Opaque"

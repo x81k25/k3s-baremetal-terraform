@@ -57,6 +57,9 @@ module "pgsql" {
 
   server_ip       = var.server_ip
   pgsql_config    = var.pgsql_config
+  github_config   = var.github_config
+  flyway_config   = local.flyway_config
+  flyway_secrets  = local.flyway_secrets
   pgadmin4_config = var.pgadmin4_config
 }
 

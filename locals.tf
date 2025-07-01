@@ -1,8 +1,58 @@
 ################################################################################
+# pgsql module
+################################################################################
+
+locals {
+  flyway_config = {
+    prod = {
+      pgsql = {
+        host     = var.pgsql_default_config.prod.host
+        port     = var.pgsql_default_config.prod.port
+        database = var.pgsql_default_config.database
+      }
+    }
+    stg = {
+      pgsql = {
+        host     = var.pgsql_default_config.stg.host
+        port     = var.pgsql_default_config.stg.port
+        database = var.pgsql_default_config.database
+      }
+    }
+    dev = {
+      pgsql = {
+        host     = var.pgsql_default_config.dev.host
+        port     = var.pgsql_default_config.dev.port
+        database = var.pgsql_default_config.database
+      }
+    }
+  }
+
+  flyway_secrets = {
+    prod = {
+      pgsql = {
+        username = var.pgsql_config.prod.user
+        password = var.pgsql_config.prod.password
+      }
+    }
+    stg = {
+      pgsql = {
+        username = var.pgsql_config.stg.user
+        password = var.pgsql_config.stg.password
+      }
+    }
+    dev = {
+      pgsql = {
+        username = var.pgsql_config.dev.user
+        password = var.pgsql_config.dev.password
+      }
+    }
+  }
+}
+
+################################################################################
 # media module
 ################################################################################
 
-# create locals that will be passed to media as vars
 locals {
   dagster_config = {
     path = {
