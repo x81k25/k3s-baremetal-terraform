@@ -22,10 +22,16 @@ resource "kubernetes_secret" "github_secrets" {
   }
 
   data = {
-    GHCR_PULL_IMAGE_TOKEN = var.github_config.argo_cd_pull_image_token
+    ".dockerconfigjson" = jsonencode({
+      auths = {
+        "ghcr.io" = {
+          auth = base64encode("${var.github_config.username}:${var.github_config.argo_cd_pull_image_token}")
+        }
+      }
+    })
   }
 
-  type = "Opaque"
+  type = "kubernetes.io/dockerconfigjson"
 }
 
 

@@ -364,8 +364,8 @@ resource "kubernetes_secret" "rear_diff_secrets" {
   }
 
   data = {
-    REAR_DIFF_PGSQL_USERNAME = var.rear_diff_secrets[each.key].username
-    REAR_DIFF_PGSQL_PASSWORD = var.rear_diff_secrets[each.key].password
+    REAR_DIFF_PGSQL_USERNAME = var.rear_diff_secrets[each.key].pgsql.username
+    REAR_DIFF_PGSQL_PASSWORD = var.rear_diff_secrets[each.key].pgsql.password
   }
 
   type = "Opaque"

@@ -241,11 +241,25 @@ locals {
   }
 
   rear_diff_config = {
-    pgsql = {
-      for env in ["prod", "stg", "dev"] : env => {
-        host     = var.pgsql_default_config[env].host
-        port     = var.pgsql_default_config[env].port
+    prod = {
+      pgsql = {
+        host     = var.pgsql_default_config.prod.host
+        port     = var.pgsql_default_config.prod.port
         database = var.pgsql_default_config.database
+      }
+    }
+    stg = {
+      pgsql = {
+        host     = var.pgsql_default_config.stg.host
+        port     = var.pgsql_default_config.stg.port
+        database = var.pgsql_default_config.database
+      }
+    }
+    dev = {
+      pgsql = {
+        host     = var.pgsql_default_config.dev.host
+        port     = var.pgsql_default_config.dev.port
+        database = var.pgsql_default_config.database        
       }
     }
   }

@@ -103,18 +103,22 @@ variable "transmission_secrets" {
 variable "rear_diff_config" {
   description = "parameters to connect rear differential API to DB"
   type = object({
-    pgsql = object({
-      prod = object({
+    prod = object({
+      pgsql = object({
         host     = string
         port     = string
         database = string
       })
-      stg = object({
+    })
+    stg = object({
+      pgsql = object({
         host     = string
         port     = string
         database = string
       })
-      dev = object({
+    })
+    dev = object({
+      pgsql = object({
         host     = string
         port     = string
         database = string
@@ -127,23 +131,29 @@ variable "rear_diff_secrets" {
   description = "parameters to connect rear differential API to DB"
   type = object({
     prod = object({
-      username = string
-      password = string
+      pgsql = object({
+          username = string
+          password = string
+      })
     })
     stg = object({
-      username = string
-      password = string
+      pgsql = object({
+        username = string
+        password = string
+      })
     })
     dev = object({
-      username = string
-      password = string
+      pgsql = object({
+        username = string
+        password = string
+      })
     })
   })
   sensitive = true
 }
 
 ################################################################################
-# rear diff vars
+# reel-driver vars
 ################################################################################
 
 variable "reel_driver_config" {

@@ -283,16 +283,22 @@ variable "rear_diff_secrets" {
   description = "parameters to connect rear differential API to DB"
   type = object({
     prod = object({
-      username = string
-      password = string
+      pgsql = object({
+          username = string
+          password = string
+      })
     })
     stg = object({
-      username = string
-      password = string
+      pgsql = object({
+        username = string
+        password = string
+      })
     })
     dev = object({
-      username = string
-      password = string
+      pgsql = object({
+        username = string
+        password = string
+      })
     })
   })
   sensitive = true
