@@ -335,12 +335,11 @@ resource "kubernetes_secret" "plex_secret" {
 
 ################################################################################
 # rear differential config
-# - set config and secrets for the rear-differntial API services
 ################################################################################
 
 # Create ConfigMaps for non-sensitive env vars
 resource "kubernetes_config_map" "rear_diff_config" {
-  for_each = var.wst_config.pgsql
+  for_each = var.rear_diff_config
 
   metadata {
     name      = "rear-diff-config"
@@ -348,9 +347,11 @@ resource "kubernetes_config_map" "rear_diff_config" {
   }
 
   data = {
-    REAR_DIFF_PGSQL_HOST     = each.value.host
-    REAR_DIFF_PGSQL_PORT     = each.value.port
-    REAR_DIFF_PGSQL_DATABASE = each.value.database
+    REAR_DIFF_PREFIX         = each.value.prefix
+    REAR_DIFF_PORT_EXTERNAL  = each.value.port_external
+    REAR_DIFF_PGSQL_HOST     = each.value.pgsql.host
+    REAR_DIFF_PGSQL_PORT     = each.value.pgsql.port
+    REAR_DIFF_PGSQL_DATABASE = each.value.pgsql.database
   }
 }
 
@@ -369,6 +370,25 @@ resource "kubernetes_secret" "rear_diff_secrets" {
   }
 
   type = "Opaque"
+}
+
+################################################################################
+# center-conseole config
+################################################################################
+
+# Create ConfigMaps for non-sensitive env vars
+resource "kubernetes_config_map" "center_console_config" {
+  for_each = var.center_console_config
+
+  metadata {
+    name      = "center-console-config"
+    namespace = "media-${each.key}"
+  }
+
+  data = {
+    CENTER_CONSOLE_API_TIMEOUT   = each.value.api_timeout
+    CENTER_CONSOLE_PORT_EXTERNAL = each.value.port_external
+  }
 }
 
 ################################################################################

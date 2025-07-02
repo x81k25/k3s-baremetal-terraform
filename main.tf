@@ -85,6 +85,8 @@ module "media" {
   # read diff vars
   rear_diff_config  = local.rear_diff_config
   rear_diff_secrets = var.rear_diff_secrets
+  # center-console vars
+  center_console_config = var.center_console_config
   # reel-driver vars
   reel_driver_config = local.reel_driver_config
   # dagster vars

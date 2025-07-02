@@ -104,6 +104,8 @@ variable "rear_diff_config" {
   description = "parameters to connect rear differential API to DB"
   type = object({
     prod = object({
+      prefix = string
+      port_external = string
       pgsql = object({
         host     = string
         port     = string
@@ -111,6 +113,8 @@ variable "rear_diff_config" {
       })
     })
     stg = object({
+      prefix = string
+      port_external = string
       pgsql = object({
         host     = string
         port     = string
@@ -118,6 +122,8 @@ variable "rear_diff_config" {
       })
     })
     dev = object({
+      prefix = string
+      port_external = string
       pgsql = object({
         host     = string
         port     = string
@@ -150,6 +156,28 @@ variable "rear_diff_secrets" {
     })
   })
   sensitive = true
+}
+
+################################################################################
+# center console vars
+################################################################################
+
+variable "center_console_config" {
+  description = "env var for center-console UI tool"
+  type = object({
+    prod = object({
+      port_external = string
+      api_timeout = string
+    })
+    stg = object({
+      port_external = string
+      api_timeout = string
+    })
+    dev = object({
+      port_external = string
+      api_timeout = string
+    })
+  })
 }
 
 ################################################################################
