@@ -298,7 +298,6 @@ resource "kubernetes_secret" "wst_secrets" {
 
 ################################################################################
 # atd config
-# - sets env vars and secrets for all atd pods
 ################################################################################
 
 resource "kubernetes_secret" "vpn_config" {
