@@ -346,8 +346,9 @@ resource "kubernetes_config_map" "rear_diff_config" {
   }
 
   data = {
-    REAR_DIFF_PREFIX         = each.value.prefix
+    REAR_DIFF_HOST           = each.value.host
     REAR_DIFF_PORT_EXTERNAL  = each.value.port_external
+    REAR_DIFF_PREFIX         = each.value.prefix
     REAR_DIFF_PGSQL_HOST     = each.value.pgsql.host
     REAR_DIFF_PGSQL_PORT     = each.value.pgsql.port
     REAR_DIFF_PGSQL_DATABASE = each.value.pgsql.database

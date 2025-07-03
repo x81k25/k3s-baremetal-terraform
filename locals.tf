@@ -242,8 +242,9 @@ locals {
 
   rear_diff_config = {
     prod = {
-      prefix = var.rear_diff_vars.prefix
+      host          = var.server_ip
       port_external = var.rear_diff_vars.prod.port_external
+      prefix        = var.rear_diff_vars.prefix
       pgsql = {
         host     = var.pgsql_default_config.prod.host
         port     = var.pgsql_default_config.prod.port
@@ -251,8 +252,9 @@ locals {
       }
     }
     stg = {
-      prefix = var.rear_diff_vars.prefix
+      host          = var.server_ip
       port_external = var.rear_diff_vars.stg.port_external
+      prefix        = var.rear_diff_vars.prefix
       pgsql = {
         host     = var.pgsql_default_config.stg.host
         port     = var.pgsql_default_config.stg.port
@@ -260,8 +262,9 @@ locals {
       }
     }
     dev = {
-      prefix = var.rear_diff_vars.prefix
+      host          = var.server_ip
       port_external = var.rear_diff_vars.dev.port_external
+      prefix        = var.rear_diff_vars.prefix
       pgsql = {
         host     = var.pgsql_default_config.dev.host
         port     = var.pgsql_default_config.dev.port

@@ -104,8 +104,9 @@ variable "rear_diff_config" {
   description = "parameters to connect rear differential API to DB"
   type = object({
     prod = object({
-      prefix = string
+      host = string
       port_external = string
+      prefix = string
       pgsql = object({
         host     = string
         port     = string
@@ -113,8 +114,9 @@ variable "rear_diff_config" {
       })
     })
     stg = object({
-      prefix = string
+      host = string
       port_external = string
+      prefix = string
       pgsql = object({
         host     = string
         port     = string
@@ -122,8 +124,9 @@ variable "rear_diff_config" {
       })
     })
     dev = object({
-      prefix = string
+      host = string
       port_external = string
+      prefix = string
       pgsql = object({
         host     = string
         port     = string
