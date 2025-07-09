@@ -31,6 +31,14 @@ variable "github_config" {
   sensitive = true
 }
 
+variable "github_secrets" {
+  description = "github credentials"
+  type = object({
+    ghcr_pull_image_token = string
+  })
+  sensitive = true
+}
+
 variable "pgsql_default_config" {
   description = "global pgsql env vars used for mutliple operations"
   type = object({
@@ -210,6 +218,82 @@ variable "pgsql_config" {
       host     = string
       port     = number
       database = string
+    })
+  })
+  sensitive = true
+}
+
+variable "minio_config" {
+  description = "credentials for minio service"
+  type = object({
+    uid = string    
+    gid = string
+    region = string
+    path = object({
+      root = string
+      directories = object({
+        data = string
+      })
+    })
+    prod = object({
+      port = object({
+        external = object({
+          console = string
+          api     = string
+        })
+        internal = object({
+          api = string
+        })
+      })
+      endpoint = object({
+        internal = string
+      })
+    })
+    stg = object({
+      port = object({
+        external = object({
+          console = string
+          api     = string
+        })
+        internal = object({
+          api = string
+        })
+      })
+      endpoint = object({
+        internal = string
+      })
+    })
+    dev = object({
+      port = object({
+        external = object({
+          console = string
+          api     = string
+        })
+        internal = object({
+          api = string
+        })
+      })
+      endpoint = object({
+        internal = string
+      })
+    })
+  })
+}
+
+variable "minio_secrets" {
+  description = "credentials for minio service"
+  type = object({
+    prod = object({
+      access_key = string
+      secret_key = string
+    })
+    stg = object({
+      access_key = string
+      secret_key = string
+    })
+    dev = object({
+      access_key = string
+      secret_key = string
     })
   })
   sensitive = true
@@ -487,43 +571,62 @@ variable "wst_secrets" {
 # ai-ml vars
 ################################################################################
 
-variable "ai_ml_sensitive" {
-  description = "credentials needed for the ai-ml namespace"
+variable "mlflow_vars" {
+  description = "env vars for mflow deployment"
   type = object({
-    mlflow = object({
-      user     = string
-      password = string
-      db = object({
-        prod = object({
-          user     = string
-          password = string
-          name     = string
-          port     = string
-          database = string
-        })
-        stg = object({
-          user     = string
-          password = string
-          name     = string
-          port     = string
-          database = string
-        })
-        dev = object({
-          user     = string
-          password = string
-          name     = string
-          port     = string
-          database = string
-        })
-
-      })
-      artifact_store = object({
-        bucket_name = string
+    uid = string
+    gid = string
+    path = object({
+      root = string
+      directories = object({
+        logs = string
+        packages = string
       })
     })
     minio = object({
-      access_key = string
-      secret_key = string
+      default_artifact_root = string
+    })
+    pgsql = object ({
+      database = string
+    })
+    prod = object ({
+      port_external = string
+    })
+    stg = object ({
+      port_external = string
+    })
+    dev = object ({
+      port_external = string
+    })
+  })
+}
+
+variable "mlflow_secrets" {
+  description = "credentials for mlflow instances"
+  type = object({
+    prod = object({
+      username = string
+      password = string
+      pgsql = object({
+        username = string
+        password = string
+      })
+    })
+    stg = object({
+      username = string
+      password = string
+      pgsql = object({
+        username = string
+        password = string
+      })
+    })
+    dev = object({
+      username = string
+      password = string
+      pgsql = object({
+        username = string
+        password = string
+      })
     })
   })
   sensitive = true

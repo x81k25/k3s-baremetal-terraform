@@ -63,5 +63,31 @@ variable "argo_cd_sensitive" {
 }
 
 ################################################################################
+# argocd image updater vars
+################################################################################
+
+variable "enable_image_updater" {
+  description = "Enable ArgoCD Image Updater"
+  type        = bool
+  default     = true
+}
+
+variable "image_updater_log_level" {
+  description = "Log level for ArgoCD Image Updater"
+  type        = string
+  default     = "info"
+  validation {
+    condition     = contains(["debug", "info", "warn", "error"], var.image_updater_log_level)
+    error_message = "Log level must be one of: debug, info, warn, error"
+  }
+}
+
+variable "enable_monitoring" {
+  description = "Enable ServiceMonitor for Prometheus scraping"
+  type        = bool
+  default     = false
+}
+
+################################################################################
 # end of variables.tf
 ################################################################################

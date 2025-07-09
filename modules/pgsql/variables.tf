@@ -107,6 +107,95 @@ variable "flyway_secrets" {
 }
 
 ################################################################################
+# minio vars
+################################################################################
+
+variable "minio_config" {
+  description = "all env vars for minio"
+  type = object({
+    prod = object({
+      uid = string
+      gid = string
+      region = string
+      port = object({
+        external = object({
+          console = string
+          api     = string
+        })
+        internal = object({
+          api = string
+        })
+      })
+      endpoint = object({
+        internal = string
+      })
+      path = object({
+        data = string
+      })
+    })
+    stg = object({
+      uid = string
+      gid = string
+      region = string
+      port = object({
+        external = object({
+          console = string
+          api     = string
+        })
+        internal = object({
+          api = string
+        })
+      })
+      endpoint = object({
+        internal = string
+      })
+      path = object({
+        data = string
+      })
+    })
+    dev = object({
+      uid = string
+      gid = string
+      region = string
+      port = object({
+        external = object({
+          console = string
+          api     = string
+        })
+        internal = object({
+          api = string
+        })
+      })
+      endpoint = object({
+        internal = string
+      })
+      path = object({
+        data = string
+      })
+    })
+  })
+}
+
+variable "minio_secrets" {
+  description = "credentials for minio service"
+  type = object({
+    prod = object({
+      access_key = string
+      secret_key = string
+    })
+    stg = object({
+      access_key = string
+      secret_key = string
+    })
+    dev = object({
+      access_key = string
+      secret_key = string
+    })
+  })
+  sensitive = true
+}
+
+################################################################################
 # pgadmin vars
 ################################################################################
 

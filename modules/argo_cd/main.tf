@@ -220,6 +220,63 @@ resource "helm_release" "argocd" {
   ]
 }
 
+# ArgoCD Image Updater Helm Release
+resource "helm_release" "argocd_image_updater" {
+  count = var.enable_image_updater ? 1 : 0
+
+  name       = "argocd-image-updater"
+  repository = "https://argoproj.github.io/argo-helm"
+  chart      = "argocd-image-updater"
+  version    = "0.9.1"
+  namespace  = kubernetes_namespace.argocd.metadata[0].name
+
+  values = [
+    yamlencode({
+      config = {
+        registries = [
+          {
+            name        = "GitHub Container Registry"
+            api_url     = "https://ghcr.io"
+            prefix      = "ghcr.io"
+            ping        = true
+            credentials = "secret:argocd/${kubernetes_secret.ghcr_credentials.metadata[0].name}#.dockerconfigjson"
+            insecure    = false
+          }
+        ]
+        argocd = {
+          grpcWeb       = true
+          serverAddress = "argocd-server.${kubernetes_namespace.argocd.metadata[0].name}.svc.cluster.local"
+          insecure      = true
+          plaintext     = false
+        }
+      }
+
+      logLevel = var.image_updater_log_level
+
+      rbac = {
+        enabled = true
+      }
+
+      serviceAccount = {
+        create = true
+        name   = "argocd-image-updater"
+      }
+
+      metrics = {
+        enabled = true
+        serviceMonitor = {
+          enabled = var.enable_monitoring
+        }
+      }
+    })
+  ]
+
+  depends_on = [
+    helm_release.argocd,
+    kubernetes_secret.ghcr_credentials
+  ]
+}
+
 # Wait for ArgoCD to be ready
 resource "null_resource" "wait_for_argo" {
   provisioner "local-exec" {

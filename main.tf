@@ -55,12 +55,19 @@ module "pgsql" {
   source     = "./modules/pgsql"
   depends_on = [module.k3s]
 
+  # globarl vars
   server_ip       = var.server_ip
-  pgsql_config    = var.pgsql_config
   github_config   = var.github_config
+  # pgsql config vars
+  pgsql_config    = var.pgsql_config
+  # pgadmin vars
+  pgadmin4_config = var.pgadmin4_config
+  # flywheel vars 
   flyway_config   = local.flyway_config
   flyway_secrets  = local.flyway_secrets
-  pgadmin4_config = var.pgadmin4_config
+  # minio vars
+  minio_config    = local.minio_config
+  minio_secrets   = var.minio_secrets   
 }
 
 ################################################################################
@@ -108,8 +115,11 @@ module "ai_ml" {
   source     = "./modules/ai-ml"
   depends_on = [module.pgsql]
 
-  ai_ml_sensitive = var.ai_ml_sensitive
-  github_config   = var.github_config
+  # github vars
+  github_secrets = var.github_secrets
+  # mflow vars
+  mlflow_config  = local.mlflow_config
+  mlflow_secrets = local.mlflow_secrets
 }
 
 ################################################################################

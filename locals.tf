@@ -47,6 +47,69 @@ locals {
       }
     }
   }
+
+  minio_config = {
+    prod = {
+      uid = var.minio_config.uid
+      gid = var.minio_config.gid
+      region = var.minio_config.region
+      port = {
+        external = {
+          console = var.minio_config.prod.port.external.console
+          api     = var.minio_config.prod.port.external.api
+        }
+        internal = {
+          api = var.minio_config.prod.port.internal.api
+        }
+      }
+      endpoint = {
+        internal = var.minio_config.prod.endpoint.internal
+      }
+      path = {
+        data = "${var.minio_config.path.root}prod/${var.minio_config.path.directories.data}"
+      }
+    }
+    stg = {
+      uid = var.minio_config.uid
+      gid = var.minio_config.gid
+      region = var.minio_config.region
+      port = {
+        external = {
+          console = var.minio_config.stg.port.external.console
+          api     = var.minio_config.stg.port.external.api
+        }
+        internal = {
+          api = var.minio_config.stg.port.internal.api
+        }
+      }
+      endpoint = {
+        internal = var.minio_config.stg.endpoint.internal
+      }
+      path = {
+        data = "${var.minio_config.path.root}stg/${var.minio_config.path.directories.data}"
+      }
+    }
+    dev = {
+      uid = var.minio_config.uid
+      gid = var.minio_config.gid
+      region = var.minio_config.region
+      port = {
+        external = {
+          console = var.minio_config.dev.port.external.console
+          api     = var.minio_config.dev.port.external.api
+        }
+        internal = {
+          api = var.minio_config.dev.port.internal.api
+        }
+      }
+      endpoint = {
+        internal = var.minio_config.dev.endpoint.internal
+      }
+      path = {
+        data = "${var.minio_config.path.root}dev/${var.minio_config.path.directories.data}"
+      }
+    }
+  }
 }
 
 ################################################################################
@@ -284,6 +347,110 @@ locals {
   }
 }
 
+################################################################################
+# ai-ml locals
+################################################################################
+
+locals {
+  mlflow_config = {
+    prod = {
+      uid = var.minio_config.uid
+      gid = var.minio_config.gid
+      port_external = var.mlflow_vars.prod.port_external
+      path = {
+        logs = "${var.mlflow_vars.path.root}prod/${var.mlflow_vars.path.directories.logs}"
+        packages = "${var.mlflow_vars.path.root}prod/${var.mlflow_vars.path.directories.packages}"
+      }
+      pgsql = {
+        host = var.pgsql_default_config.prod.host
+        port = var.pgsql_default_config.prod.port
+        database = var.mlflow_vars.pgsql.database
+      }
+      minio = {
+        default_artifact_root = var.mlflow_vars.minio.default_artifact_root
+        endpoint = var.minio_config.prod.endpoint.internal
+        port = var.minio_config.prod.port.internal.api
+      }
+    }
+    stg = {
+      uid = var.minio_config.uid
+      gid = var.minio_config.gid
+      port_external = var.mlflow_vars.stg.port_external
+      path = {
+        logs = "${var.mlflow_vars.path.root}stg/${var.mlflow_vars.path.directories.logs}"
+        packages = "${var.mlflow_vars.path.root}stg/${var.mlflow_vars.path.directories.packages}"
+      }
+      pgsql = {
+        host = var.pgsql_default_config.stg.host
+        port = var.pgsql_default_config.stg.port
+        database = var.mlflow_vars.pgsql.database
+      }
+      minio = {
+        default_artifact_root = var.mlflow_vars.minio.default_artifact_root
+        endpoint = var.minio_config.stg.endpoint.internal
+        port = var.minio_config.stg.port.internal.api
+      }
+    }
+    dev = {
+      uid = var.minio_config.uid
+      gid = var.minio_config.gid
+      port_external = var.mlflow_vars.dev.port_external
+      path = {
+        logs = "${var.mlflow_vars.path.root}dev/${var.mlflow_vars.path.directories.logs}"
+        packages = "${var.mlflow_vars.path.root}dev/${var.mlflow_vars.path.directories.packages}"
+      }
+      pgsql = {
+        host = var.pgsql_default_config.dev.host
+        port = var.pgsql_default_config.dev.port
+        database = var.mlflow_vars.pgsql.database
+      }
+      minio = {
+        default_artifact_root = var.mlflow_vars.minio.default_artifact_root
+        endpoint = var.minio_config.dev.endpoint.internal
+        port = var.minio_config.dev.port.internal.api
+      }
+    }
+  }
+
+  mlflow_secrets = {
+    prod = {
+      username = var.mlflow_secrets.prod.username
+      password = var.mlflow_secrets.prod.password
+      pgsql = {
+        username = var.mlflow_secrets.prod.pgsql.username
+        password = var.mlflow_secrets.prod.pgsql.password
+      }
+      minio = {
+        aws_access_key_id = var.minio_secrets.prod.access_key
+        aws_secret_access_key = var.minio_secrets.prod.secret_key
+      }
+    }
+    stg = {
+      username = var.mlflow_secrets.stg.username
+      password = var.mlflow_secrets.stg.password
+      pgsql = {
+        username = var.mlflow_secrets.stg.pgsql.username
+        password = var.mlflow_secrets.stg.pgsql.password
+      }
+      minio = {
+        aws_access_key_id = var.minio_secrets.stg.access_key
+        aws_secret_access_key = var.minio_secrets.stg.secret_key
+      }
+    }
+    dev = {
+      username = var.mlflow_secrets.dev.username
+      password = var.mlflow_secrets.dev.password
+      pgsql = {
+        username = var.mlflow_secrets.dev.pgsql.username
+        password = var.mlflow_secrets.dev.pgsql.password
+      }
+      minio = {
+        aws_access_key_id = var.minio_secrets.dev.access_key
+        aws_secret_access_key = var.minio_secrets.dev.secret_key
+      }
+    }
+  }
+}
 
 
 ################################################################################

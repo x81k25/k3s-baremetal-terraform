@@ -177,6 +177,48 @@ resource "kubernetes_secret" "flyway_secrets_dev" {
 }
 
 ################################################################################
+# minio config and secrets
+################################################################################
+
+# Create ConfigMaps for non-sensitive minio env vars
+resource "kubernetes_config_map" "minio_config" {
+  for_each = var.minio_config
+
+  metadata {
+    name      = "minio-config-${each.key}"
+    namespace = "pgsql"
+  }
+
+  data = {
+    MINIO_REGION                = each.value.region
+    MINIO_PORT_EXTERNAL_CONSOLE = each.value.port.external.console
+    MINIO_PORT_EXTERNAL_API     = each.value.port.external.api
+    MINIO_PORT_INTERNAL_API     = each.value.port.internal.api
+    MINIO_ENDPOINT_INTERNAL     = each.value.endpoint.internal
+    MINIO_PATH_DATA             = each.value.path.data
+    MINIO_UID                   = each.value.uid
+    MINIO_GID                   = each.value.gid
+  }
+}
+
+# Create Secrets for sensitive minio env vars
+resource "kubernetes_secret" "minio_secrets" {
+  for_each = toset(local.environments)
+
+  metadata {
+    name      = "minio-secrets-${each.key}"
+    namespace = "pgsql"
+  }
+
+  data = {
+    MINIO_ACCESS_KEY = var.minio_secrets[each.key].access_key
+    MINIO_SECRET_KEY = var.minio_secrets[each.key].secret_key
+  }
+
+  type = "Opaque"
+}
+
+################################################################################
 # pgadmin config pass
 ################################################################################
 
