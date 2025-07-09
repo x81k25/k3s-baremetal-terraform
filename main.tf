@@ -116,7 +116,7 @@ module "ai_ml" {
   depends_on = [module.pgsql]
 
   # github vars
-  github_secrets = var.github_secrets
+  github_config = var.github_config
   # mflow vars
   mlflow_config  = local.mlflow_config
   mlflow_secrets = local.mlflow_secrets

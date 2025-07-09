@@ -2,10 +2,14 @@
 # ai-ml vars
 ################################################################################
 
-variable "github_secrets" {
+variable "github_config" {
   description = "github credentials"
   type = object({
-    ghcr_pull_image_token = string
+    username                         = string
+    email                            = string
+    k8s_manifests_repo               = string
+    argo_cd_pull_k8s_manifests_token = string
+    argo_cd_pull_image_token         = string
   })
   sensitive = true
 }
