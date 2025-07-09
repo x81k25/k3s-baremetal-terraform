@@ -3,7 +3,7 @@
 ################################################################################
 
 variable "server_ip" {
-  description = "interal ip address of servers hosts cluster"
+  description = "internal ip address of servers hosts cluster"
   type        = string
 }
 

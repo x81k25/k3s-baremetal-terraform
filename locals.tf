@@ -368,8 +368,14 @@ locals {
       }
       minio = {
         default_artifact_root = var.mlflow_vars.minio.default_artifact_root
-        endpoint = var.minio_config.prod.endpoint.internal
-        port = var.minio_config.prod.port.internal.api
+        endpoint = {
+          external = var.server_ip
+          internal = var.minio_config.prod.endpoint.internal
+        }
+        port = {
+          external = var.minio_config.prod.port.external.api
+          internal = var.minio_config.prod.port.internal.api
+        }
       }
     }
     stg = {
@@ -387,8 +393,14 @@ locals {
       }
       minio = {
         default_artifact_root = var.mlflow_vars.minio.default_artifact_root
-        endpoint = var.minio_config.stg.endpoint.internal
-        port = var.minio_config.stg.port.internal.api
+        endpoint = {
+          external = var.server_ip
+          internal = var.minio_config.stg.endpoint.internal
+        }
+        port = {
+          external = var.minio_config.stg.port.external.api
+          internal = var.minio_config.stg.port.internal.api
+        }
       }
     }
     dev = {
@@ -406,8 +418,14 @@ locals {
       }
       minio = {
         default_artifact_root = var.mlflow_vars.minio.default_artifact_root
-        endpoint = var.minio_config.dev.endpoint.internal
-        port = var.minio_config.dev.port.internal.api
+        endpoint = {
+          external = var.server_ip
+          internal = var.minio_config.dev.endpoint.internal
+        }
+        port = {
+          external = var.minio_config.dev.port.external.api
+          internal = var.minio_config.dev.port.internal.api
+        }
       }
     }
   }

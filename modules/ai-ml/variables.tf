@@ -32,8 +32,14 @@ variable "mlflow_config" {
       })
       minio = object({
         default_artifact_root = string
-        endpoint = string
-        port = string
+        endpoint = object({
+          external = string
+          internal = string
+        })
+        port = object({
+          external = string
+          internal = string
+        })
       })
     })
     stg = object({
@@ -51,8 +57,14 @@ variable "mlflow_config" {
       })
       minio = object({
         default_artifact_root = string
-        endpoint = string
-        port = string
+        endpoint = object({
+          external = string
+          internal = string
+        })
+        port = object({
+          external = string
+          internal = string
+        })
       })
     })
     dev = object({
@@ -70,8 +82,14 @@ variable "mlflow_config" {
       })
       minio = object({
         default_artifact_root = string
-        endpoint = string
-        port = string
+        endpoint = object({
+          external = string
+          internal = string
+        })
+        port = object({
+          external = string
+          internal = string
+        })
       })
     })
   })

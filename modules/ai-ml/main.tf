@@ -50,17 +50,19 @@ resource "kubernetes_config_map" "mlflow_config" {
   }
 
   data = {
-    MLFLOW_UID                       = each.value.uid
-    MLFLOW_GID                       = each.value.gid
-    MLFLOW_PORT_EXTERNAL             = each.value.port_external
-    MLFLOW_PATH_LOGS                 = each.value.path.logs
-    MLFLOW_PATH_PACKAGES             = each.value.path.packages
-    MLFLOW_PGSQL_HOST                = each.value.pgsql.host
-    MLFLOW_PGSQL_PORT                = each.value.pgsql.port
-    MLFLOW_PGSQL_DATABASE            = each.value.pgsql.database
+    MLFLOW_UID                         = each.value.uid
+    MLFLOW_GID                         = each.value.gid
+    MLFLOW_PORT_EXTERNAL               = each.value.port_external
+    MLFLOW_PATH_LOGS                   = each.value.path.logs
+    MLFLOW_PATH_PACKAGES               = each.value.path.packages
+    MLFLOW_PGSQL_HOST                  = each.value.pgsql.host
+    MLFLOW_PGSQL_PORT                  = each.value.pgsql.port
+    MLFLOW_PGSQL_DATABASE              = each.value.pgsql.database
     MLFLOW_MINIO_DEFAULT_ARTIFACT_ROOT = each.value.minio.default_artifact_root
-    MLFLOW_MINIO_ENDPOINT            = each.value.minio.endpoint
-    MLFLOW_MINIO_PORT                = each.value.minio.port
+    MLFLOW_MINIO_ENDPOINT_EXTERNAL     = each.value.minio.endpoint.external
+    MLFLOW_MINIO_ENDPOINT_INTERNAL     = each.value.minio.endpoint.internal
+    MLFLOW_MINIO_PORT_EXTERNAL         = each.value.minio.port.external
+    MLFLOW_MINIO_PORT_INTERNAL         = each.value.minio.port.internal
   }
 }
 
