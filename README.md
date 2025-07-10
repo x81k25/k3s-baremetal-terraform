@@ -13,7 +13,7 @@ This project contains Terraform configurations to automate the deployment of a f
 ├── .terraform           # Terraform working directory (gitignored)
 ├── modules/
 │   ├── ai-ml/           # AI/ML tools including MLflow
-│   ├── argo_cd/         # ArgoCD GitOps deployment
+│   ├── argocd/          # ArgoCD GitOps deployment
 │   ├── k3s/             # K3s cluster installation and configuration
 │   ├── media/           # Media services (Plex, Dagster orchestration, rear_diff service)
 │   ├── pgsql/           # PostgreSQL databases
@@ -118,10 +118,12 @@ This project uses variable files for configuration. You'll need to create a `ter
 - Ingress settings
 
 ### ArgoCD Configuration
-- Version
-- Repository access
-- Resource limits
-- Authentication settings
+- Version and namespace settings
+- SSH-based Git repository access (replaces HTTPS authentication)
+- GitHub Container Registry credentials (consolidated into secrets)
+- Resource limits for server, repo-server, and application controller
+- SSH private key path for Git operations
+- Kubeconfig path (consolidated into configuration object)
 
 ### PostgreSQL Configuration
 - Database credentials for dev/staging/prod environments
@@ -140,37 +142,66 @@ This project uses variable files for configuration. You'll need to create a `ter
 - GPU resource allocation
 - Multi-environment settings (dev/staging/prod)
 
+## Prerequisites
+
+### SSH Key Setup for ArgoCD Git Repository Access
+
+**Critical**: Before deploying ArgoCD, you must generate SSH keys for Git repository access:
+
+1. Generate a dedicated SSH key pair for ArgoCD:
+```bash
+ssh-keygen -t ed25519 -C "argocd" -f ~/.ssh/argocd_ed25519
+```
+
+2. Add the public key to your GitHub account:
+   - Navigate to GitHub Settings > SSH and GPG keys
+   - Add new SSH key with the content of `~/.ssh/argocd_ed25519.pub`
+   - Title: "ArgoCD Production Server"
+
+3. Ensure the private key path is correctly referenced in your `terraform.tfvars`:
+```hcl
+argocd_secrets = {
+  admin_pw             = "your-admin-password"
+  ssh_private_key_path = "~/.ssh/argocd_ed25519"  # Path to the private key you just generated
+}
+```
+
+4. Update your Git repository URLs in the ArgoCD configuration to use SSH format:
+   - Change from: `https://github.com/user/repo.git`
+   - Change to: `git@github.com:user/repo.git`
+
 ## Deployment Instructions
 
 1. Clone this repository
 2. Create a `terraform.tfvars` file with your specific configurations
-3. Initialize Terraform:
+3. **Complete the SSH key setup above** (required for ArgoCD)
+4. Initialize Terraform:
 
 ```bash
 terraform init
 ```
 
-4. Plan K3s before installing other modules:
+5. Plan K3s before installing other modules:
 ```bash
 sudo terraform plan -target=module.k3s
 ```
 
-5. Install K3s (this step must be completed before the rest of the Terraform modules will work):
+6. Install K3s (this step must be completed before the rest of the Terraform modules will work):
 ```bash
 sudo terraform apply -target=module.k3s
 ```
 
-6. Plan all other modules:
+7. Plan all other modules:
 ```bash
 terraform plan
 ```
 
-7. Apply all other modules:
+8. Apply all other modules:
 ```bash
 terraform apply
 ```
 
-8. Access the deployed services:
+9. Access the deployed services:
    - Rancher UI: https://[your-server-ip]
    - ArgoCD: https://[argocd-ingress-host] (if configured)
    - pgAdmin4: http://[your-server-ip]:port
@@ -203,10 +234,11 @@ Manages the Rancher installation:
 
 Configures GitOps with ArgoCD:
 
-- Installs ArgoCD server
-- Sets up repository access
-- Configures application auto-deployment
-- Implements security settings
+- Installs ArgoCD server with SSH-based Git repository access
+- Sets up GitHub Container Registry authentication via consolidated secrets
+- Configures application auto-deployment with SSH key authentication
+- Implements security settings with consolidated configuration management
+- Uses consolidated `argocd_config` and `argocd_secrets` objects for cleaner module interface
 
 ### PostgreSQL Module
 
@@ -261,10 +293,13 @@ To adapt this project for your environment:
 - This project is designed for single-node deployment but can be extended
 - All Terraform state is managed locally by default and excluded from git
 - Sensitive information should be stored in `terraform.tfvars` (gitignored)
+- **ArgoCD requires SSH key setup**: Manual SSH key generation and GitHub configuration must be completed before deployment
+- ArgoCD uses SSH-based Git authentication (not HTTPS) for enhanced security
 - The media module requires GPU drivers pre-installed on the host system for Plex hardware acceleration
 - MLflow and Dagster require PostgreSQL databases to be properly initialized
 - Dagster orchestration has been integrated into the media module for tighter coupling with media processing workflows
 - Each service (Dagster, Rear Diff) maintains separate database credentials for dev/staging/prod environments
+- ArgoCD configuration uses consolidated `locals` objects for cleaner module interfaces
 
 ## Contributing
 

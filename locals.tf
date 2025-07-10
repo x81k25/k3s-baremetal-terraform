@@ -1,4 +1,20 @@
 ################################################################################
+# argocd module
+################################################################################
+
+locals {
+  argocd_config = merge(var.argocd_config, {
+    kubeconfig_path = var.kubeconfig_path
+  })
+
+  argocd_secrets = {
+    admin_pw = var.argocd_secrets.admin_pw
+    ssh_private_key_path = var.argocd_secrets.ssh_private_key_path
+    ghcr_pull_image_token = var.github_secrets.ghcr_pull_image_token
+  }
+}
+
+################################################################################
 # pgsql module
 ################################################################################
 

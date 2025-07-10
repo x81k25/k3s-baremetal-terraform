@@ -7,13 +7,13 @@ output "namespace" {
 # ArgoCD server URL
 output "server_url" {
   description = "The URL to access ArgoCD server"
-  value       = var.argo_cd_config.ingress.enabled ? "https://${var.argo_cd_config.ingress.host}" : null
+  value       = var.argocd_config.ingress.enabled ? "https://${var.argocd_config.ingress.host}" : null
 }
 
 # ArgoCD version
 output "version" {
   description = "Installed version of ArgoCD"
-  value       = var.argo_cd_config.version
+  value       = var.argocd_config.version
 }
 
 # Server service details
@@ -22,7 +22,7 @@ output "server_service" {
   value = {
     name      = "argocd-server"
     namespace = kubernetes_namespace.argocd.metadata[0].name
-    type      = var.argo_cd_config.ingress.enabled ? "ClusterIP" : "LoadBalancer"
+    type      = var.argocd_config.ingress.enabled ? "ClusterIP" : "LoadBalancer"
   }
 }
 
@@ -36,8 +36,8 @@ output "is_ready" {
 output "config_status" {
   description = "Configuration status of key ArgoCD features"
   value = {
-    ha_enabled      = var.argo_cd_config.enable_ha
-    dex_enabled     = var.argo_cd_config.enable_dex
-    ingress_enabled = var.argo_cd_config.ingress.enabled
+    ha_enabled      = var.argocd_config.enable_ha
+    dex_enabled     = var.argocd_config.enable_dex
+    ingress_enabled = var.argocd_config.ingress.enabled
   }
 }

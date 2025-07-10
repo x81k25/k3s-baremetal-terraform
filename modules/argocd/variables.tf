@@ -1,31 +1,13 @@
 ################################################################################
-# global vars
-################################################################################
-
-variable "kubeconfig_path" {
-  description = "Path to kubeconfig file"
-}
-
-variable "github_config" {
-  description = "GitHub and GitHub Container Registry configuration"
-  type = object({
-    username                         = string
-    email                            = string
-    k8s_manifests_repo               = string
-    argo_cd_pull_k8s_manifests_token = string
-    argo_cd_pull_image_token         = string
-  })
-  sensitive = true
-}
-
-################################################################################
 # argocd vars
 ################################################################################
 
-variable "argo_cd_config" {
+variable "argocd_config" {
   type = object({
     namespace = string
     version   = string
+    k8s_manifests_repo = string
+    kubeconfig_path = string
     ingress = object({
       enabled = bool
       host    = string
@@ -56,10 +38,13 @@ variable "argo_cd_config" {
   })
 }
 
-variable "argo_cd_sensitive" {
+variable "argocd_secrets" {
   type = object({
     admin_pw = string
+    ssh_private_key_path = string
+    ghcr_pull_image_token = string
   })
+  sensitive = true
 }
 
 ################################################################################

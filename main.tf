@@ -37,14 +37,12 @@ module "rancher" {
 # argocd module
 ################################################################################
 
-module "argo_cd" {
-  source     = "./modules/argo_cd"
+module "argocd" {
+  source     = "./modules/argocd"
   depends_on = [module.rancher]
 
-  github_config     = var.github_config
-  argo_cd_config    = var.argo_cd_config
-  argo_cd_sensitive = var.argo_cd_sensitive
-  kubeconfig_path   = var.kubeconfig_path
+  argocd_config     = local.argocd_config
+  argocd_secrets    = local.argocd_secrets
 }
 
 ################################################################################
@@ -76,7 +74,7 @@ module "pgsql" {
 
 module "media" {
   source     = "./modules/media"
-  depends_on = [module.argo_cd, module.pgsql]
+  depends_on = [module.argocd, module.pgsql]
 
   # global vars
   server_ip     = var.server_ip

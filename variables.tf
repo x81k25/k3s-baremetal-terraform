@@ -20,13 +20,10 @@ variable "kubeconfig_path" {
 }
 
 variable "github_config" {
-  description = "GitHub and GitHub Container Registry configuration"
+  description = "GitHub Container Registry configuration"
   type = object({
-    username                         = string
-    email                            = string
-    k8s_manifests_repo               = string
-    argo_cd_pull_k8s_manifests_token = string
-    argo_cd_pull_image_token         = string
+    username                 = string
+    argo_cd_pull_image_token = string
   })
   sensitive = true
 }
@@ -142,10 +139,11 @@ variable "cert_manager_config" {
 # argo cd vars
 ################################################################################
 
-variable "argo_cd_config" {
+variable "argocd_config" {
   type = object({
     namespace = string
     version   = string
+    k8s_manifests_repo = string
     ingress = object({
       enabled = bool
       host    = string
@@ -176,10 +174,12 @@ variable "argo_cd_config" {
   })
 }
 
-variable "argo_cd_sensitive" {
+variable "argocd_secrets" {
   type = object({
     admin_pw = string
+    ssh_private_key_path = string
   })
+  sensitive = true
 }
 
 ################################################################################
