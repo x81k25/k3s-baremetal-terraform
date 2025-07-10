@@ -55,7 +55,7 @@ module "pgsql" {
 
   # globarl vars
   server_ip       = var.server_ip
-  github_config   = var.github_config
+  pgsql_secrets   = local.pgsql_secrets
   # pgsql config vars
   pgsql_config    = var.pgsql_config
   # pgadmin vars
@@ -79,10 +79,9 @@ module "media" {
   # global vars
   server_ip     = var.server_ip
   environment   = var.environment
-  github_config = var.github_config
   ssh_config    = var.ssh_config
   # plex vars
-  media_sensitive = var.media_sensitive
+  media_secrets = local.media_secrets
   # atd vars
   vpn_config          = var.vpn_config
   transmission_config = local.transmission_config
@@ -113,8 +112,6 @@ module "ai_ml" {
   source     = "./modules/ai-ml"
   depends_on = [module.pgsql]
 
-  # github vars
-  github_config = var.github_config
   # mflow vars
   mlflow_config  = local.mlflow_config
   mlflow_secrets = local.mlflow_secrets

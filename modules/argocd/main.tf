@@ -65,7 +65,28 @@ resource "kubernetes_secret" "ghcr_credentials" {
       auths = {
         "ghcr.io" = {
           username = "token"
-          password = var.argocd_secrets.ghcr_pull_image_token
+          password = var.argocd_secrets.github.token_packages_read
+        }
+      }
+    })
+  }
+
+  depends_on = [kubernetes_namespace.argocd]
+}
+
+resource "kubernetes_secret" "ghcr_image_updater_pull" {
+  metadata {
+    name      = "ghcr-image-updater-pull"
+    namespace = kubernetes_namespace.argocd.metadata[0].name
+  }
+
+  type = "kubernetes.io/dockerconfigjson"
+
+  data = {
+    ".dockerconfigjson" = jsonencode({
+      auths = {
+        "ghcr.io" = {
+          auth = base64encode("${var.argocd_secrets.github.username}:${var.argocd_secrets.github.token_packages_read}")
         }
       }
     })
@@ -244,7 +265,7 @@ resource "helm_release" "argocd_image_updater" {
             api_url     = "https://ghcr.io"
             prefix      = "ghcr.io"
             ping        = true
-            credentials = "secret:argocd/${kubernetes_secret.ghcr_credentials.metadata[0].name}#.dockerconfigjson"
+            credentials = "pullsecret:argocd/${kubernetes_secret.ghcr_image_updater_pull.metadata[0].name}"
             insecure    = false
           }
         ]
@@ -278,7 +299,7 @@ resource "helm_release" "argocd_image_updater" {
 
   depends_on = [
     helm_release.argocd,
-    kubernetes_secret.ghcr_credentials
+    kubernetes_secret.ghcr_image_updater_pull
   ]
 }
 

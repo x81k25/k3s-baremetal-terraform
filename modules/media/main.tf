@@ -72,8 +72,8 @@ resource "kubernetes_secret" "ghcr_credentials" {
     ".dockerconfigjson" = jsonencode({
       auths = {
         "ghcr.io" = {
-          username = var.github_config.username
-          password = var.github_config.argo_cd_pull_image_token
+          username = var.media_secrets.github.username
+          password = var.media_secrets.github.token_packages_read
         }
       }
     })
@@ -129,7 +129,7 @@ resource "kubernetes_secret" "ghcr_token" {
   }
 
   data = {
-    GHCR_PULL_IMAGE_TOKEN = var.github_config.argo_cd_pull_image_token
+    GHCR_PULL_IMAGE_TOKEN = var.media_secrets.github.token_packages_read
   }
 
   type = "Opaque"
@@ -327,7 +327,7 @@ resource "kubernetes_secret" "plex_secret" {
   }
 
   data = {
-    PLEX_CLAIM = var.media_sensitive.plex_claim
+    PLEX_CLAIM = var.media_secrets.plex_claim
   }
 }
 

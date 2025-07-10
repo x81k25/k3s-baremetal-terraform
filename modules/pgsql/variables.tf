@@ -7,11 +7,13 @@ variable "server_ip" {
   type        = string
 }
 
-variable "github_config" {
-  description = "GitHub Container Registry configuration"
+variable "pgsql_secrets" {
+  description = "PostgreSQL module secrets"
   type = object({
-    username                 = string
-    argo_cd_pull_image_token = string
+    github = object({
+      username = string
+      token_packages_read = string
+    })
   })
   sensitive = true
 }

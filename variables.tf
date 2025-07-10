@@ -19,19 +19,12 @@ variable "kubeconfig_path" {
   description = "Path to kubeconfig file"
 }
 
-variable "github_config" {
-  description = "GitHub Container Registry configuration"
-  type = object({
-    username                 = string
-    argo_cd_pull_image_token = string
-  })
-  sensitive = true
-}
 
 variable "github_secrets" {
   description = "github credentials"
   type = object({
-    ghcr_pull_image_token = string
+    username = string
+    token_packages_read = string
   })
   sensitive = true
 }
@@ -355,7 +348,7 @@ variable "dagster_secrets" {
 }
 
 # plex vars
-variable "media_sensitive" {
+variable "media_secrets" {
   type = object({
     plex_claim = string
   })

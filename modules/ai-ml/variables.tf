@@ -2,14 +2,6 @@
 # ai-ml vars
 ################################################################################
 
-variable "github_config" {
-  description = "GitHub Container Registry configuration"
-  type = object({
-    username                 = string
-    argo_cd_pull_image_token = string
-  })
-  sensitive = true
-}
 
 variable "mlflow_config" {
   description = "holds all env vars for mlflow"
@@ -95,6 +87,10 @@ variable "mlflow_config" {
 variable "mlflow_secrets" {
   description = "credentials for mlflow instances"
   type = object({
+    github = object({
+      username = string
+      token_packages_read = string
+    })
     prod = object({
       username = string
       password = string

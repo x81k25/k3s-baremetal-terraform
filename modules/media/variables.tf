@@ -15,14 +15,6 @@ variable "environment" {
   })
 }
 
-variable "github_config" {
-  description = "GitHub Container Registry configuration"
-  type = object({
-    username                 = string
-    argo_cd_pull_image_token = string
-  })
-  sensitive = true
-}
 
 variable "ssh_config" {
   type = object({
@@ -36,9 +28,13 @@ variable "ssh_config" {
 # plex vars
 ################################################################################
 
-variable "media_sensitive" {
+variable "media_secrets" {
   type = object({
     plex_claim = string
+    github = object({
+      username = string
+      token_packages_read = string
+    })
   })
   sensitive = true
 }

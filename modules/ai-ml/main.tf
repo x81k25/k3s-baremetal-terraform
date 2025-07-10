@@ -30,8 +30,8 @@ resource "kubernetes_secret" "github_registry" {
     ".dockerconfigjson" = jsonencode({
       auths = {
         "ghcr.io" = {
-          username = var.github_config.username
-          password = var.github_config.argo_cd_pull_image_token
+          username = var.mlflow_secrets.github.username
+          password = var.mlflow_secrets.github.token_packages_read
         }
       }
     })

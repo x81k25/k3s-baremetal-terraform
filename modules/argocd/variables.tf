@@ -42,7 +42,10 @@ variable "argocd_secrets" {
   type = object({
     admin_pw = string
     ssh_private_key_path = string
-    ghcr_pull_image_token = string
+    github = object({
+      username = string
+      token_packages_read = string
+    })
   })
   sensitive = true
 }

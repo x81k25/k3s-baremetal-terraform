@@ -10,7 +10,10 @@ locals {
   argocd_secrets = {
     admin_pw = var.argocd_secrets.admin_pw
     ssh_private_key_path = var.argocd_secrets.ssh_private_key_path
-    ghcr_pull_image_token = var.github_secrets.ghcr_pull_image_token
+    github = {
+      username = var.github_secrets.username
+      token_packages_read = var.github_secrets.token_packages_read
+    }
   }
 }
 
@@ -19,6 +22,13 @@ locals {
 ################################################################################
 
 locals {
+  pgsql_secrets = {
+    github = {
+      username = var.github_secrets.username
+      token_packages_read = var.github_secrets.token_packages_read
+    }
+  }
+
   flyway_config = {
     prod = {
       pgsql = {
@@ -133,6 +143,14 @@ locals {
 ################################################################################
 
 locals {
+  media_secrets = {
+    plex_claim = var.media_secrets.plex_claim
+    github = {
+      username = var.github_secrets.username
+      token_packages_read = var.github_secrets.token_packages_read
+    }
+  }
+
   dagster_config = {
     path = {
       prod = {
@@ -447,6 +465,10 @@ locals {
   }
 
   mlflow_secrets = {
+    github = {
+      username = var.github_secrets.username
+      token_packages_read = var.github_secrets.token_packages_read
+    }
     prod = {
       username = var.mlflow_secrets.prod.username
       password = var.mlflow_secrets.prod.password

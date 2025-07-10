@@ -25,7 +25,7 @@ resource "kubernetes_secret" "github_secrets" {
     ".dockerconfigjson" = jsonencode({
       auths = {
         "ghcr.io" = {
-          auth = base64encode("${var.github_config.username}:${var.github_config.argo_cd_pull_image_token}")
+          auth = base64encode("${var.pgsql_secrets.github.username}:${var.pgsql_secrets.github.token_packages_read}")
         }
       }
     })
