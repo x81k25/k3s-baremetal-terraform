@@ -180,6 +180,10 @@ resource "kubernetes_config_map" "at_config" {
     AT_DOWNLOAD_DIR = var.at_config[each.key].download_dir
     AT_MOVIE_DIR    = var.at_config[each.key].movie_dir
     AT_TV_SHOW_DIR  = var.at_config[each.key].tv_show_dir
+    
+    REEL_DRIVER_HOST   = var.at_config[each.key].reel_driver.host
+    REEL_DRIVER_PORT   = var.at_config[each.key].reel_driver.port
+    REEL_DRIVER_PREFIX = var.at_config[each.key].reel_driver.prefix
   }
 }
 
@@ -198,21 +202,6 @@ resource "kubernetes_config_map" "transmission_config" {
   }
 }
 
-# Create ConfigMap for reel-driver config - all environments
-resource "kubernetes_config_map" "reel_driver_config" {
-  for_each = toset(local.environments)
-
-  metadata {
-    name      = "reel-driver-config"
-    namespace = "media-${each.key}"
-  }
-
-  data = {
-    REEL_DRIVER_HOST   = var.reel_driver_config[each.key].host
-    REEL_DRIVER_PORT   = var.reel_driver_config[each.key].port
-    REEL_DRIVER_PREFIX = var.reel_driver_config[each.key].prefix
-  }
-}
 
 # Create Secret for AT sensitive config - all environments
 resource "kubernetes_secret" "at_secrets" {
@@ -388,6 +377,80 @@ resource "kubernetes_config_map" "center_console_config" {
     CENTER_CONSOLE_API_TIMEOUT   = each.value.api_timeout
     CENTER_CONSOLE_PORT_EXTERNAL = each.value.port_external
   }
+}
+
+################################################################################
+# reel-driver config maps and secrets  
+################################################################################
+
+# Create ConfigMaps for non-sensitive reel-driver env vars
+resource "kubernetes_config_map" "reel_driver_config" {
+  for_each = toset(local.environments)
+
+  metadata {
+    name      = "reel-driver-config"
+    namespace = "media-${each.key}"
+  }
+
+  data = {
+    REEL_DRIVER_MLFLOW_HOST       = var.reel_driver_config[each.key].mflow.host
+    REEL_DRIVER_MLFLOW_PORT       = var.reel_driver_config[each.key].mflow.port
+    REEL_DRIVER_MLFLOW_EXPERIMENT = var.reel_driver_config[each.key].mflow.experiment
+    REEL_DRIVER_MLFLOW_MODEL      = var.reel_driver_config[each.key].mflow.model
+    REEL_DRIVER_MINIO_ENDPOINT    = var.reel_driver_config[each.key].minio.endpoint
+    REEL_DRIVER_MINIO_PORT        = var.reel_driver_config[each.key].minio.port
+  }
+}
+
+# Create ConfigMaps for reel-driver training configuration
+resource "kubernetes_config_map" "reel_driver_training_config" {
+  for_each = toset(local.environments)
+
+  metadata {
+    name      = "reel-driver-training-config"
+    namespace = "media-${each.key}"
+  }
+
+  data = {
+    REEL_DRIVER_TRNG_PGSQL_HOST     = var.reel_driver_training_config[each.key].pgsql.host
+    REEL_DRIVER_TRNG_PGSQL_PORT     = var.reel_driver_training_config[each.key].pgsql.port
+    REEL_DRIVER_TRNG_PGSQL_DATABASE = var.reel_driver_training_config[each.key].pgsql.database
+    REEL_DRIVER_TRNG_PGSQL_SCHEMA   = var.reel_driver_training_config[each.key].pgsql.schema
+  }
+}
+
+# Create Secrets for sensitive reel-driver env vars
+resource "kubernetes_secret" "reel_driver_secrets" {
+  for_each = toset(local.environments)
+
+  metadata {
+    name      = "reel-driver-secrets"
+    namespace = "media-${each.key}"
+  }
+
+  data = {
+    REEL_DRIVER_MINIO_ACCESS_KEY = var.reel_driver_secrets[each.key].minio.access_key
+    REEL_DRIVER_MINIO_SECRET_KEY = var.reel_driver_secrets[each.key].minio.secrest_key
+  }
+
+  type = "Opaque"
+}
+
+# Create Secrets for reel-driver training credentials
+resource "kubernetes_secret" "reel_driver_training_secrets" {
+  for_each = toset(local.environments)
+
+  metadata {
+    name      = "reel-driver-training-secrets"
+    namespace = "media-${each.key}"
+  }
+
+  data = {
+    REEL_DRIVER_TRNG_PGSQL_USERNAME = var.reel_driver_training_secrets[each.key].pgsql.username
+    REEL_DRIVER_TRNG_PGSQL_PASSWORD = var.reel_driver_training_secrets[each.key].pgsql.password
+  }
+
+  type = "Opaque"
 }
 
 ################################################################################

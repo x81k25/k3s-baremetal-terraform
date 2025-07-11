@@ -91,8 +91,6 @@ module "media" {
   rear_diff_secrets = var.rear_diff_secrets
   # center-console vars
   center_console_config = var.center_console_config
-  # reel-driver vars
-  reel_driver_config = local.reel_driver_config
   # dagster vars
   dagster_config  = local.dagster_config
   dagster_secrets = var.dagster_secrets
@@ -102,6 +100,11 @@ module "media" {
   # wst vars
   wst_config  = local.wst_config
   wst_secrets = var.wst_secrets
+  # reel driver vars
+  reel_driver_config = local.reel_driver_config
+  reel_driver_training_config = local.reel_driver_training_config
+  reel_driver_secrets = local.reel_driver_secrets
+  reel_driver_training_secrets = local.reel_driver_training_secrets
 }
 
 ################################################################################
@@ -112,9 +115,17 @@ module "ai_ml" {
   source     = "./modules/ai-ml"
   depends_on = [module.pgsql]
 
+  # namespace vars
+  ai_ml_secrets = local.ai_ml_secrets
   # mflow vars
   mlflow_config  = local.mlflow_config
   mlflow_secrets = local.mlflow_secrets
+  # reel-driver vars
+  reel_driver_config = local.reel_driver_config
+  reel_driver_api_config = local.reel_driver_api_config
+  reel_driver_training_config = local.reel_driver_training_config
+  reel_driver_secrets = local.reel_driver_secrets
+  reel_driver_training_secrets = local.reel_driver_training_secrets
 }
 
 ################################################################################

@@ -2,132 +2,52 @@
 # ai-ml vars
 ################################################################################
 
-
-variable "mlflow_config" {
-  description = "holds all env vars for mlflow"
-  type = object({
-    prod = object({
-      uid = string
-      gid = string
-      port_external = string
-      path = object({
-        logs = string
-        packages = string
-      })
-      pgsql = object({
-        host = string
-        port = string
-        database = string
-      })
-      minio = object({
-        default_artifact_root = string
-        endpoint = object({
-          external = string
-          internal = string
-        })
-        port = object({
-          external = string
-          internal = string
-        })
-      })
-    })
-    stg = object({
-      uid = string
-      gid = string
-      port_external = string
-      path = object({
-        logs = string
-        packages = string
-      })
-      pgsql = object({
-        host = string
-        port = string
-        database = string
-      })
-      minio = object({
-        default_artifact_root = string
-        endpoint = object({
-          external = string
-          internal = string
-        })
-        port = object({
-          external = string
-          internal = string
-        })
-      })
-    })
-    dev = object({
-      uid = string
-      gid = string
-      port_external = string
-      path = object({
-        logs = string
-        packages = string
-      })
-      pgsql = object({
-        host = string
-        port = string
-        database = string
-      })
-      minio = object({
-        default_artifact_root = string
-        endpoint = object({
-          external = string
-          internal = string
-        })
-        port = object({
-          external = string
-          internal = string
-        })
-      })
-    })
-  })
-}
-
-variable "mlflow_secrets" {
-  description = "credentials for mlflow instances"
+variable "ai_ml_secrets" {
+  description = "namespace-level secrets for ai-ml services"
   type = object({
     github = object({
       username = string
       token_packages_read = string
     })
-    prod = object({
-      username = string
-      password = string
-      pgsql = object({
-        username = string
-        password = string
-      })
-      minio = object({
-        aws_access_key_id = string
-        aws_secret_access_key = string
-      })
-    })
-    stg = object({
-      username = string
-      password = string
-      pgsql = object({
-        username = string
-        password = string
-      })
-      minio = object({
-        aws_access_key_id = string
-        aws_secret_access_key = string
-      })
-    })
-    dev = object({
-      username = string
-      password = string
-      pgsql = object({
-        username = string
-        password = string
-      })
-      minio = object({
-        aws_access_key_id = string
-        aws_secret_access_key = string
-      })
-    })
   })
+  sensitive = true
+}
+
+variable "mlflow_config" {
+  description = "holds all env vars for mlflow"
+  type = any
+}
+
+variable "mlflow_secrets" {
+  description = "credentials for mlflow instances"
+  type = any
+  sensitive = true
+}
+
+variable "reel_driver_config" {
+  description = "reel-driver configuration for all environments"
+  type = any
+}
+
+variable "reel_driver_api_config" {
+  description = "reel-driver API configuration"
+  type = any
+}
+
+variable "reel_driver_training_config" {
+  description = "reel-driver training configuration"
+  type = any
+}
+
+variable "reel_driver_secrets" {
+  description = "reel-driver secrets"
+  type = any
+  sensitive = true
+}
+
+variable "reel_driver_training_secrets" {
+  description = "reel-driver training secrets"
+  type = any
   sensitive = true
 }
 

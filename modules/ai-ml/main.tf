@@ -30,8 +30,8 @@ resource "kubernetes_secret" "github_registry" {
     ".dockerconfigjson" = jsonencode({
       auths = {
         "ghcr.io" = {
-          username = var.mlflow_secrets.github.username
-          password = var.mlflow_secrets.github.token_packages_read
+          username = var.ai_ml_secrets.github.username
+          password = var.ai_ml_secrets.github.token_packages_read
         }
       }
     })
@@ -82,6 +82,98 @@ resource "kubernetes_secret" "mlflow_secrets" {
     MLFLOW_PGSQL_PASSWORD         = var.mlflow_secrets[each.key].pgsql.password
     MLFLOW_MINIO_AWS_ACCESS_KEY_ID     = var.mlflow_secrets[each.key].minio.aws_access_key_id
     MLFLOW_MINIO_AWS_SECRET_ACCESS_KEY = var.mlflow_secrets[each.key].minio.aws_secret_access_key
+  }
+
+  type = "Opaque"
+}
+
+################################################################################
+# reel-driver config maps and secrets
+################################################################################
+
+# Create ConfigMaps for non-sensitive reel-driver env vars
+resource "kubernetes_config_map" "reel_driver_config" {
+  for_each = var.reel_driver_config
+
+  metadata {
+    name      = "reel-driver-config-${each.key}"
+    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+  }
+
+  data = {
+    REEL_DRIVER_MLFLOW_HOST       = each.value.mflow.host
+    REEL_DRIVER_MLFLOW_PORT       = each.value.mflow.port
+    REEL_DRIVER_MLFLOW_EXPERIMENT = each.value.mflow.experiment
+    REEL_DRIVER_MLFLOW_MODEL      = each.value.mflow.model
+    REEL_DRIVER_MINIO_ENDPOINT    = each.value.minio.endpoint
+    REEL_DRIVER_MINIO_PORT        = each.value.minio.port
+  }
+}
+
+# Create ConfigMaps for reel-driver API configuration
+resource "kubernetes_config_map" "reel_driver_api_config" {
+  for_each = var.reel_driver_api_config
+
+  metadata {
+    name      = "reel-driver-api-config-${each.key}"
+    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+  }
+
+  data = {
+    REEL_DRIVER_API_HOST          = each.value.host
+    REEL_DRIVER_API_PORT_EXTERNAL = each.value.port.external
+    REEL_DRIVER_API_PORT_INTERNAL = each.value.port.internal
+    REEL_DRIVER_API_PREFIX        = each.value.prefix
+    REEL_DRIVER_API_LOG_LEVEL     = each.value.log_level
+  }
+}
+
+# Create ConfigMaps for reel-driver training configuration
+resource "kubernetes_config_map" "reel_driver_training_config" {
+  for_each = var.reel_driver_training_config
+
+  metadata {
+    name      = "reel-driver-training-config-${each.key}"
+    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+  }
+
+  data = {
+    REEL_DRIVER_TRNG_PGSQL_HOST     = each.value.pgsql.host
+    REEL_DRIVER_TRNG_PGSQL_PORT     = each.value.pgsql.port
+    REEL_DRIVER_TRNG_PGSQL_DATABASE = each.value.pgsql.database
+    REEL_DRIVER_TRNG_PGSQL_SCHEMA   = each.value.pgsql.schema
+  }
+}
+
+# Create Secrets for sensitive reel-driver env vars
+resource "kubernetes_secret" "reel_driver_secrets" {
+  for_each = toset(local.environments)
+
+  metadata {
+    name      = "reel-driver-secrets-${each.key}"
+    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+  }
+
+  data = {
+    REEL_DRIVER_MINIO_ACCESS_KEY = var.reel_driver_secrets[each.key].minio.access_key
+    REEL_DRIVER_MINIO_SECRET_KEY = var.reel_driver_secrets[each.key].minio.secrest_key
+  }
+
+  type = "Opaque"
+}
+
+# Create Secrets for reel-driver training credentials
+resource "kubernetes_secret" "reel_driver_training_secrets" {
+  for_each = toset(local.environments)
+
+  metadata {
+    name      = "reel-driver-training-secrets-${each.key}"
+    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+  }
+
+  data = {
+    REEL_DRIVER_TRNG_PGSQL_USERNAME = var.reel_driver_training_secrets[each.key].pgsql.username
+    REEL_DRIVER_TRNG_PGSQL_PASSWORD = var.reel_driver_training_secrets[each.key].pgsql.password
   }
 
   type = "Opaque"

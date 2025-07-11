@@ -176,30 +176,6 @@ variable "center_console_config" {
   })
 }
 
-################################################################################
-# reel-driver vars
-################################################################################
-
-variable "reel_driver_config" {
-  description = "Reel driver configuration per environment"
-  type = object({
-    prod = object({
-      host   = string
-      port   = string
-      prefix = string
-    })
-    stg = object({
-      host   = string
-      port   = string
-      prefix = string
-    })
-    dev = object({
-      host   = string
-      port   = string
-      prefix = string
-    })
-  })
-}
 
 ################################################################################
 # dagster vars
@@ -298,6 +274,11 @@ variable "at_config" {
         database = string
         schema   = string
       })
+      reel_driver = object({
+        host   = string
+        port   = string
+        prefix = string
+      })
     })
     stg = object({
       movie_search_api_base_url      = string
@@ -326,6 +307,11 @@ variable "at_config" {
         database = string
         schema   = string
       })
+      reel_driver = object({
+        host   = string
+        port   = string
+        prefix = string
+      })
     })
     dev = object({
       movie_search_api_base_url      = string
@@ -353,6 +339,11 @@ variable "at_config" {
         port     = string
         database = string
         schema   = string
+      })
+      reel_driver = object({
+        host   = string
+        port   = string
+        prefix = string
       })
     })
   })
@@ -446,6 +437,32 @@ variable "wst_secrets" {
       })
     })
   })
+  sensitive = true
+}
+
+################################################################################
+# reel driver vars
+################################################################################
+
+variable "reel_driver_config" {
+  description = "Reel driver configuration per environment"
+  type = any
+}
+
+variable "reel_driver_training_config" {
+  description = "Reel driver training configuration per environment"
+  type = any
+}
+
+variable "reel_driver_secrets" {
+  description = "Reel driver secrets per environment"
+  type = any
+  sensitive = true
+}
+
+variable "reel_driver_training_secrets" {
+  description = "Reel driver training secrets per environment"
+  type = any
   sensitive = true
 }
 

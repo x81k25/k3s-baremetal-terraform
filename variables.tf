@@ -451,23 +451,6 @@ variable "transmission_secrets" {
   sensitive = true
 }
 
-# reel-driver vars
-variable "reel_driver_vars" {
-  description = "Reel driver configuration variables"
-  type = object({
-    prefix = string
-    prod = object({
-      port = string
-    })
-    stg = object({
-      port = string
-    })
-    dev = object({
-      port = string
-    })
-  })
-}
-
 # automatic transmission vars
 variable "at_vars" {
   description = "Automatic transmission application variables and environment-specific configuration"
@@ -564,6 +547,7 @@ variable "wst_secrets" {
 # ai-ml vars
 ################################################################################
 
+# mlflow vars
 variable "mlflow_vars" {
   description = "env vars for mflow deployment"
   type = object({
@@ -590,6 +574,37 @@ variable "mlflow_vars" {
     })
     dev = object ({
       port_external = string
+    })
+  })
+}
+
+# new mlflow config var; mlflow_vars needs to rolled into this
+variable "mflow_conifg" {
+  description = "hold mlflow env vars"
+  type = object({
+    prod = object({
+      host = object({
+        internal = string
+      })
+      port = object({
+        internal = string
+      })
+    })
+    stg = object({
+      host = object({
+        internal = string
+      })
+      port = object({
+        internal = string
+      })
+    })
+    dev = object({
+      host = object({
+        internal = string
+      })
+      port = object({
+        internal = string
+      })
     })
   })
 }
@@ -623,6 +638,55 @@ variable "mlflow_secrets" {
     })
   })
   sensitive = true
+}
+
+# reel-driver vars
+variable "reel_driver_config" {
+  description = "env vars used by the reel-driver API and training containers"
+  type = object({
+    mlflow = object({
+      experiment = string
+      model      = string
+    })
+  })
+}
+
+variable "reel_driver_api_config" {
+  description = "env vars use by the reel-driver API"
+  type = object({
+    log_level = string
+    prefix = string
+    prod = object({
+      host = object({
+        external = string
+        internal = string
+      })
+      port = object({
+        external = string
+        internal = string
+      })
+    })
+    stg = object({
+      host = object({
+        external = string
+        internal = string
+      })
+      port = object({
+        external = string
+        internal = string
+      })
+    })
+    dev = object({
+      host = object({
+        external = string
+        internal = string
+      })
+      port = object({
+        external = string
+        internal = string
+      })
+    })
+  })
 }
 
 ################################################################################

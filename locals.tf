@@ -193,24 +193,6 @@ locals {
     }
   }
 
-  reel_driver_config = {
-    prod = {
-      host   = var.server_ip
-      port   = var.reel_driver_vars.prod.port
-      prefix = var.reel_driver_vars.prefix
-    }
-    stg = {
-      host   = var.server_ip
-      port   = var.reel_driver_vars.stg.port
-      prefix = var.reel_driver_vars.prefix
-    }
-    dev = {
-      host   = var.server_ip
-      port   = var.reel_driver_vars.dev.port
-      prefix = var.reel_driver_vars.prefix
-    }
-  }
-
   at_config = {
     prod = {
       movie_search_api_base_url      = var.at_vars.movie_search_api_base_url
@@ -238,6 +220,11 @@ locals {
         port     = var.pgsql_default_config.prod.port
         database = var.pgsql_default_config.database
         schema   = var.pgsql_default_config.schema
+      }
+      reel_driver = {
+        host   = var.reel_driver_api_config.prod.host.internal
+        port   = var.reel_driver_api_config.prod.port.internal
+        prefix = var.reel_driver_api_config.prefix
       }
     }
     stg = {
@@ -267,6 +254,11 @@ locals {
         database = var.pgsql_default_config.database
         schema   = var.pgsql_default_config.schema
       }
+      reel_driver = {
+        host   = var.reel_driver_api_config.stg.host.internal
+        port   = var.reel_driver_api_config.stg.port.internal
+        prefix = var.reel_driver_api_config.prefix
+      }
     }
     dev = {
       movie_search_api_base_url      = var.at_vars.movie_search_api_base_url
@@ -294,6 +286,11 @@ locals {
         port     = var.pgsql_default_config.dev.port
         database = var.pgsql_default_config.database
         schema   = var.pgsql_default_config.schema
+      }
+      reel_driver = {
+        host   = var.reel_driver_api_config.dev.host.internal
+        port   = var.reel_driver_api_config.dev.port.internal
+        prefix = var.reel_driver_api_config.prefix
       }
     }
   }
@@ -386,6 +383,13 @@ locals {
 ################################################################################
 
 locals {
+  ai_ml_secrets = {
+    github = {
+      username = var.github_secrets.username
+      token_packages_read = var.github_secrets.token_packages_read
+    }
+  }
+  
   mlflow_config = {
     prod = {
       uid = var.minio_config.uid
@@ -465,10 +469,6 @@ locals {
   }
 
   mlflow_secrets = {
-    github = {
-      username = var.github_secrets.username
-      token_packages_read = var.github_secrets.token_packages_read
-    }
     prod = {
       username = var.mlflow_secrets.prod.username
       password = var.mlflow_secrets.prod.password
@@ -506,8 +506,145 @@ locals {
       }
     }
   }
-}
 
+  reel_driver_config = {
+    prod = {
+      mflow = {
+        host = var.mflow_conifg.prod.host.internal
+        port = var.mflow_conifg.prod.port.internal
+        experiment = var.reel_driver_config.mlflow.experiment
+        model = var.reel_driver_config.mlflow.model
+      }
+      minio = {
+        endpoint = var.minio_config.prod.endpoint.internal
+        port = var.minio_config.prod.port.internal.api
+      }
+    }
+    stg = {
+      mflow = {
+        host = var.mflow_conifg.stg.host.internal
+        port = var.mflow_conifg.stg.port.internal
+        experiment = var.reel_driver_config.mlflow.experiment
+        model = var.reel_driver_config.mlflow.model
+      }
+      minio = {
+        endpoint = var.minio_config.stg.endpoint.internal
+        port = var.minio_config.stg.port.internal.api
+      }
+    }
+    dev = {
+      mflow = {
+        host = var.mflow_conifg.dev.host.internal
+        port = var.mflow_conifg.dev.port.internal
+        experiment = var.reel_driver_config.mlflow.experiment
+        model = var.reel_driver_config.mlflow.model
+      }
+      minio = {
+        endpoint = var.minio_config.dev.endpoint.internal
+        port = var.minio_config.dev.port.internal.api
+      }
+    }
+  }
+  
+  reel_driver_api_config = {
+    prod = {
+      host       = var.reel_driver_api_config.prod.host.external
+      port = {
+        external = var.reel_driver_api_config.prod.port.external
+        internal = var.reel_driver_api_config.prod.port.internal
+      }
+      prefix     = var.reel_driver_api_config.prefix
+      log_level  = var.reel_driver_api_config.log_level
+    }
+    stg ={
+      host       = var.reel_driver_api_config.stg.host.external
+      port = {
+        external = var.reel_driver_api_config.stg.port.external
+        internal = var.reel_driver_api_config.stg.port.internal
+      }
+      prefix     = var.reel_driver_api_config.prefix
+      log_level  = var.reel_driver_api_config.log_level      
+    }
+    dev = {
+      host       = var.reel_driver_api_config.dev.host.external
+      port = {
+        external = var.reel_driver_api_config.dev.port.external
+        internal = var.reel_driver_api_config.dev.port.internal
+      }
+      prefix     = var.reel_driver_api_config.prefix
+      log_level  = var.reel_driver_api_config.log_level      
+    }
+  }
+  
+  reel_driver_training_config = {
+    prod = {
+      pgsql = {
+        host     = var.pgsql_default_config.prod.host
+        port     = var.pgsql_default_config.prod.port
+        database = var.pgsql_default_config.database
+        schema   = var.pgsql_default_config.schema
+      }
+    }
+    stg = {
+      pgsql = {
+        host     = var.pgsql_default_config.stg.host
+        port     = var.pgsql_default_config.stg.port
+        database = var.pgsql_default_config.database
+        schema   = var.pgsql_default_config.schema
+      }
+    }
+    dev ={
+      pgsql = {
+        host     = var.pgsql_default_config.dev.host
+        port     = var.pgsql_default_config.dev.port
+        database = var.pgsql_default_config.database
+        schema   = var.pgsql_default_config.schema
+      }
+    }
+  }
+
+  reel_driver_secrets = {
+    prod = {
+      minio = {
+        access_key  = var.minio_secrets.prod.access_key
+        secrest_key = var.minio_secrets.prod.secret_key  
+      }
+    }
+    stg = {
+      minio = {
+        access_key  = var.minio_secrets.stg.access_key
+        secrest_key = var.minio_secrets.stg.secret_key  
+      }
+    }
+    dev = {
+      minio = {
+        access_key  = var.minio_secrets.stg.access_key
+        secrest_key = var.minio_secrets.stg.secret_key  
+      }
+    }
+  }
+
+  reel_driver_training_secrets = {
+    prod = {
+      pgsql = {
+        username = var.pgsql_config.prod.user
+        password = var.pgsql_config.prod.password
+      }
+    }
+    stg = {
+      pgsql = {
+        username = var.pgsql_config.stg.user
+        password = var.pgsql_config.stg.password
+      }
+    }
+    dev = {
+      pgsql = {
+        username = var.pgsql_config.dev.user
+        password = var.pgsql_config.dev.password
+      }
+    }
+  }
+}
 
 ################################################################################
 # end of locals.tf
