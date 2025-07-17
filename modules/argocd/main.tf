@@ -69,9 +69,9 @@ resource "kubernetes_secret" "argocd_repo_k8s_manifests" {
   depends_on = [kubernetes_namespace.argocd]
 }
 
-resource "kubernetes_secret" "ghcr_credentials" {
+resource "kubernetes_secret" "ghcr_pull_image_secret" {
   metadata {
-    name      = "ghcr-pull-image-token"
+    name      = "ghcr-pull-image-secret"
     namespace = kubernetes_namespace.argocd.metadata[0].name
     labels = {
       "argocd.argoproj.io/secret-type" = "repository"
@@ -84,7 +84,7 @@ resource "kubernetes_secret" "ghcr_credentials" {
     ".dockerconfigjson" = jsonencode({
       auths = {
         "ghcr.io" = {
-          username = "token"
+          username = var.argocd_secrets.github.username
           password = var.argocd_secrets.github.token_packages_read
         }
       }
@@ -106,7 +106,8 @@ resource "kubernetes_secret" "ghcr_image_updater_pull" {
     ".dockerconfigjson" = jsonencode({
       auths = {
         "ghcr.io" = {
-          auth = base64encode("${var.argocd_secrets.github.username}:${var.argocd_secrets.github.token_packages_read}")
+          username = var.argocd_secrets.github.username
+          password = var.argocd_secrets.github.token_packages_read
         }
       }
     })

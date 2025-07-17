@@ -110,11 +110,11 @@ resource "kubernetes_config_map" "environment" {
 # - sets env vars and secrets used for various services in the media namespaces
 ################################################################################
 
-resource "kubernetes_secret" "ghcr_credentials" {
+resource "kubernetes_secret" "ghcr_pull_image_secret" {
   for_each = toset(["media-dev", "media-stg", "media-prod"])
 
   metadata {
-    name      = "ghcr-pull-image-token"
+    name      = "ghcr-pull-image-secret"
     namespace = each.key
   }
 

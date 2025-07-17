@@ -35,9 +35,9 @@ resource "kubernetes_resource_quota" "pgsql_quota" {
   }
 }
 
-resource "kubernetes_secret" "github_secrets" {
+resource "kubernetes_secret" "ghcr_pull_image_secret" {
   metadata {
-    name      = "github-secrets"
+    name      = "ghcr-pull-image-secret"
     namespace = "pgsql"
   }
 
@@ -45,7 +45,8 @@ resource "kubernetes_secret" "github_secrets" {
     ".dockerconfigjson" = jsonencode({
       auths = {
         "ghcr.io" = {
-          auth = base64encode("${var.pgsql_secrets.github.username}:${var.pgsql_secrets.github.token_packages_read}")
+          username = var.pgsql_secrets.github.username
+          password = var.pgsql_secrets.github.token_packages_read
         }
       }
     })

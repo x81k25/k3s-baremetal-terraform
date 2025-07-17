@@ -40,9 +40,9 @@ resource "kubernetes_resource_quota" "ai_ml_quota" {
 ################################################################################
 
 # Create GitHub Container Registry secret
-resource "kubernetes_secret" "github_registry" {
+resource "kubernetes_secret" "ghcr_pull_image_secret" {
   metadata {
-    name      = "github-registry"
+    name      = "ghcr-pull-image-secret"
     namespace = kubernetes_namespace.ai_ml.metadata[0].name
   }
 
