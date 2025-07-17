@@ -698,6 +698,21 @@ variable "reel_driver_api_config" {
   })
 }
 
+variable "reel_driver_training_config" {
+  description = "env vars used by the reel-driver training containers"
+  type = object({
+    prod = object({
+      hyper_param_search_start = string
+    })
+    stg = object({
+      hyper_param_search_start = string
+    })
+    dev = object({
+      hyper_param_search_start = string
+    })
+  })
+}
+
 ################################################################################
 # observability vars
 ################################################################################

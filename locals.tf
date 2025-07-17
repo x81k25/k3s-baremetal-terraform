@@ -578,6 +578,7 @@ locals {
   
   reel_driver_training_config = {
     prod = {
+      hyper_param_search_start = var.reel_driver_training_config.prod.hyper_param_search_start
       pgsql = {
         host     = var.pgsql_default_config.prod.host
         port     = var.pgsql_default_config.prod.port
@@ -586,6 +587,7 @@ locals {
       }
     }
     stg = {
+      hyper_param_search_start = var.reel_driver_training_config.stg.hyper_param_search_start
       pgsql = {
         host     = var.pgsql_default_config.stg.host
         port     = var.pgsql_default_config.stg.port
@@ -594,6 +596,7 @@ locals {
       }
     }
     dev ={
+      hyper_param_search_start = var.reel_driver_training_config.dev.hyper_param_search_start
       pgsql = {
         host     = var.pgsql_default_config.dev.host
         port     = var.pgsql_default_config.dev.port
