@@ -36,6 +36,7 @@ This project contains Terraform configurations to automate the deployment of a f
 - **Media Services**: Pre-configured media stack with GPU support including Plex media server
 - **Automotive Services**: Rear differential monitoring and analysis service
 - **Namespace Management**: Structured namespace provisioning with proper RBAC
+- **Resource Quota Management**: Comprehensive namespace-level resource limits for all services
 - **Container Registry Integration**: GitHub Container Registry authentication
 - **Backup Configuration**: Built-in etcd snapshot backups
 - **Network Customization**: Flexible network configuration options
@@ -300,6 +301,97 @@ To adapt this project for your environment:
 - Dagster orchestration has been integrated into the media module for tighter coupling with media processing workflows
 - Each service (Dagster, Rear Diff) maintains separate database credentials for dev/staging/prod environments
 - ArgoCD configuration uses consolidated `locals` objects for cleaner module interfaces
+
+## Resource Quota Management
+
+This project implements comprehensive resource quota management to ensure optimal resource allocation across all Kubernetes namespaces. Resource quotas are enforced at the namespace level using Kubernetes ResourceQuota objects.
+
+### Resource Allocation Strategy
+
+The resource allocation is designed for a system with 24 CPU cores and 32GB RAM:
+
+| Component | CPU Request | CPU Limit | Memory Request | Memory Limit | Notes |
+|-----------|-------------|-----------|----------------|--------------|-------|
+| **System Overhead** | 2.0 | 2.0 | 2.0Gi | 4.0Gi | OS, SSH, monitoring agents |
+| **K3s Control Plane** | 3.0 | 3.0 | 3.0Gi | 6.0Gi | K3s server, etcd, kube-system |
+| **Rancher (cattle-system)** | 1.0 | 4.0 | 1.0Gi | 4.0Gi | Rancher management UI |
+| **ArgoCD** | 1.0 | 4.0 | 1.0Gi | 4.0Gi | GitOps continuous deployment |
+| **PostgreSQL** | 1.0 | 4.0 | 1.0Gi | 4.0Gi | Database services |
+| **AI/ML** | 1.0 | 4.0 | 1.0Gi | 8.0Gi | MLflow, reel-driver ML services |
+| **Media (prod)** | 2.0 | 4.0 | 2.0Gi | 8.0Gi | Plex, Dagster, ATD production |
+| **Media (stg)** | 1.0 | 2.0 | 1.0Gi | 4.0Gi | Staging media services |
+| **Media (dev)** | 1.0 | 2.0 | 1.0Gi | 4.0Gi | Development media services |
+| **Observability** | 1.0 | 2.0 | 1.0Gi | 4.0Gi | Prometheus, Grafana, Loki |
+| **Experiments** | 1.0 | 2.0 | 1.0Gi | 4.0Gi | Research and development |
+| **Cert-Manager** | 0.5 | 1.0 | 0.5Gi | 2.0Gi | Certificate management |
+| **Unallocated Buffer** | 8.5 | - | 6.5Gi | - | Reserved for system flexibility |
+
+### Resource Quota Configuration
+
+Resource quotas are configured using a consistent pattern across all modules:
+
+```hcl
+# terraform.tfvars example
+ai_ml_config = {
+  resource_quota = {
+    cpu_request    = "1"
+    cpu_limit      = "4"
+    memory_request = "1Gi"
+    memory_limit   = "8Gi"
+  }
+}
+```
+
+### Checking Resource Quota Usage
+
+To monitor resource quota usage across all namespaces:
+
+```bash
+# Check all resource quotas
+kubectl get resourcequota --all-namespaces
+
+# Check specific namespace usage
+kubectl describe resourcequota -n ai-ml
+
+# View current resource consumption
+kubectl top nodes
+kubectl top pods --all-namespaces
+```
+
+### Modifying Resource Quotas
+
+To modify resource quotas:
+
+1. Update the appropriate `*_config.resource_quota` values in `terraform.tfvars`
+2. Run `terraform plan` to review changes
+3. Apply changes with `terraform apply`
+4. ResourceQuota changes take effect immediately
+
+### K3s System Resource Reservations
+
+The K3s cluster is configured with system and kubelet resource reservations:
+
+```hcl
+k3s_config = {
+  resource_quota = {
+    system_reserved_cpu = "2"
+    system_reserved_memory = "2Gi"
+    kube_reserved_cpu = "2"
+    kube_reserved_memory = "2Gi"
+  }
+}
+```
+
+These reservations ensure system stability by preventing Kubernetes workloads from consuming all available resources.
+
+### Resource Quota Enforcement
+
+- **CPU Requests**: Guaranteed CPU allocation (enforced by CFS scheduler)
+- **CPU Limits**: Maximum CPU usage (burstable up to limit)
+- **Memory Requests**: Guaranteed memory allocation
+- **Memory Limits**: Hard memory limit (OOMKilled if exceeded)
+
+ResourceQuotas prevent namespace-level resource consumption from exceeding defined limits, ensuring fair resource distribution across all services.
 
 ## Contributing
 

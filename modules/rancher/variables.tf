@@ -15,6 +15,18 @@ variable "kubeconfig_path" {
 # rancher vars
 ################################################################################
 
+variable "cattle_system_config" {
+  description = "Resource configuration for cattle-system namespace"
+  type = object({
+    resource_quota = object({
+      cpu_request    = string
+      cpu_limit      = string
+      memory_request = string
+      memory_limit   = string
+    })
+  })
+}
+
 variable "rancher_config" {
   description = "rancher config"
   type = object({
@@ -38,6 +50,12 @@ variable "rancher_sensitive" {
 variable "cert_manager_config" {
   type = object({
     version = string
+    resource_quota = object({
+      cpu_request    = string
+      cpu_limit      = string
+      memory_request = string
+      memory_limit   = string
+    })
   })
 }
 

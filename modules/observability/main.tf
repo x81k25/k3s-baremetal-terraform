@@ -13,6 +13,26 @@ resource "kubernetes_namespace" "observability" {
   }
 }
 
+################################################################################
+# namespace resource quotas
+################################################################################
+
+resource "kubernetes_resource_quota" "observability_quota" {
+  metadata {
+    name      = "observability-resource-quota"
+    namespace = kubernetes_namespace.observability.metadata[0].name
+  }
+
+  spec {
+    hard = {
+      "requests.cpu"    = var.observability_config.resource_quota.cpu_request
+      "limits.cpu"      = var.observability_config.resource_quota.cpu_limit
+      "requests.memory" = var.observability_config.resource_quota.memory_request
+      "limits.memory"   = var.observability_config.resource_quota.memory_limit
+    }
+  }
+}
+
 # Create Loki credentials secret
 resource "kubernetes_secret" "loki_credentials" {
   metadata {

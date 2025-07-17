@@ -84,10 +84,11 @@ variable "k3s_config" {
   description = "K3s Kubernetes configuration settings"
   type = object({
     version = string
-    resource_limits = object({
-      cpu_threads = number
-      memory_gb   = number
-      storage_gb  = number
+    resource_quota = object({
+      system_reserved_cpu = string
+      system_reserved_memory = string
+      kube_reserved_cpu = string
+      kube_reserved_memory = string
     })
     network_config = object({
       network_subnet = string
@@ -110,6 +111,18 @@ variable "k3s_config" {
 ################################################################################
 
 # rancher vars
+variable "cattle_system_config" {
+  description = "Resource configuration for cattle-system namespace"
+  type = object({
+    resource_quota = object({
+      cpu_request    = string
+      cpu_limit      = string
+      memory_request = string
+      memory_limit   = string
+    })
+  })
+}
+
 variable "rancher_config" {
   description = "rancher config"
   type = object({
@@ -134,6 +147,12 @@ variable "rancher_sensitive" {
 variable "cert_manager_config" {
   type = object({
     version = string
+    resource_quota = object({
+      cpu_request    = string
+      cpu_limit      = string
+      memory_request = string
+      memory_limit   = string
+    })
   })
 }
 
@@ -164,6 +183,12 @@ variable "argocd_config" {
         memory = string
       })
     })
+    resource_quota = object({
+      cpu_request    = string
+      cpu_limit      = string
+      memory_request = string
+      memory_limit   = string
+    })
     git_repositories = map(object({
       url                 = string
       name                = string
@@ -187,6 +212,18 @@ variable "argocd_secrets" {
 ################################################################################
 # pgsql vars
 ################################################################################
+
+variable "pgsql_namespace_config" {
+  description = "Resource configuration for pgsql namespace"
+  type = object({
+    resource_quota = object({
+      cpu_request    = string
+      cpu_limit      = string
+      memory_request = string
+      memory_limit   = string
+    })
+  })
+}
 
 variable "pgadmin4_config" {
   description = "config vars for the pgadmin4 web app"
@@ -304,6 +341,37 @@ variable "minio_secrets" {
 ################################################################################
 # media vars
 ################################################################################
+
+# media namespace resource configuration
+variable "media_config" {
+  description = "Resource configuration for media namespaces"
+  type = object({
+    prod = object({
+      resource_quota = object({
+        cpu_request    = string
+        cpu_limit      = string
+        memory_request = string
+        memory_limit   = string
+      })
+    })
+    stg = object({
+      resource_quota = object({
+        cpu_request    = string
+        cpu_limit      = string
+        memory_request = string
+        memory_limit   = string
+      })
+    })
+    dev = object({
+      resource_quota = object({
+        cpu_request    = string
+        cpu_limit      = string
+        memory_request = string
+        memory_limit   = string
+      })
+    })
+  })
+}
 
 # media vars
 variable "environment" {
@@ -556,6 +624,19 @@ variable "wst_secrets" {
 # ai-ml vars
 ################################################################################
 
+# ai-ml namespace resource configuration
+variable "ai_ml_config" {
+  description = "Resource configuration for ai-ml namespace"
+  type = object({
+    resource_quota = object({
+      cpu_request    = string
+      cpu_limit      = string
+      memory_request = string
+      memory_limit   = string
+    })
+  })
+}
+
 # mlflow vars
 variable "mlflow_vars" {
   description = "env vars for mflow deployment"
@@ -714,8 +795,38 @@ variable "reel_driver_training_config" {
 }
 
 ################################################################################
+# experiments vars
+################################################################################
+
+# experiments namespace resource configuration
+variable "experiments_config" {
+  description = "Resource configuration for experiments namespace"
+  type = object({
+    resource_quota = object({
+      cpu_request    = string
+      cpu_limit      = string
+      memory_request = string
+      memory_limit   = string
+    })
+  })
+}
+
+################################################################################
 # observability vars
 ################################################################################
+
+# observability namespace resource configuration
+variable "observability_config" {
+  description = "Resource configuration for observability namespace"
+  type = object({
+    resource_quota = object({
+      cpu_request    = string
+      cpu_limit      = string
+      memory_request = string
+      memory_limit   = string
+    })
+  })
+}
 
 variable "loki_sensitive" {
   description = "Loki authentication credentials"

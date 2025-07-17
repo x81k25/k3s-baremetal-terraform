@@ -21,6 +21,7 @@ module "rancher" {
 
   server_ip           = var.server_ip
   kubeconfig_path     = var.kubeconfig_path
+  cattle_system_config = var.cattle_system_config
   rancher_config      = var.rancher_config
   rancher_sensitive   = var.rancher_sensitive
   cert_manager_config = var.cert_manager_config
@@ -57,6 +58,7 @@ module "pgsql" {
   server_ip       = var.server_ip
   pgsql_secrets   = local.pgsql_secrets
   # pgsql config vars
+  pgsql_namespace_config = var.pgsql_namespace_config
   pgsql_config    = var.pgsql_config
   # pgadmin vars
   pgadmin4_config = var.pgadmin4_config
@@ -80,6 +82,8 @@ module "media" {
   server_ip     = var.server_ip
   environment   = var.environment
   ssh_config    = var.ssh_config
+  # namespace vars
+  media_config  = var.media_config
   # plex vars
   media_secrets = local.media_secrets
   # atd vars
@@ -116,6 +120,7 @@ module "ai_ml" {
   depends_on = [module.pgsql]
 
   # namespace vars
+  ai_ml_config = var.ai_ml_config
   ai_ml_secrets = local.ai_ml_secrets
   # mflow vars
   mlflow_config  = local.mlflow_config
@@ -136,6 +141,7 @@ module "experiments" {
   source     = "./modules/experiments"
   depends_on = [module.k3s]
 
+  experiments_config = var.experiments_config
   ng_github_secrets = var.ng_github_secrets
 }
 
@@ -147,6 +153,7 @@ module "observability" {
   source     = "./modules/observability"
   depends_on = [module.k3s]
 
+  observability_config = var.observability_config
   loki_sensitive    = var.loki_sensitive
   grafana_sensitive = var.grafana_sensitive
 }

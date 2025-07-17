@@ -7,6 +7,26 @@ resource "kubernetes_namespace" "experiments" {
   }
 }
 
+################################################################################
+# namespace resource quotas
+################################################################################
+
+resource "kubernetes_resource_quota" "experiments_quota" {
+  metadata {
+    name      = "experiments-resource-quota"
+    namespace = kubernetes_namespace.experiments.metadata[0].name
+  }
+
+  spec {
+    hard = {
+      "requests.cpu"    = var.experiments_config.resource_quota.cpu_request
+      "limits.cpu"      = var.experiments_config.resource_quota.cpu_limit
+      "requests.memory" = var.experiments_config.resource_quota.memory_request
+      "limits.memory"   = var.experiments_config.resource_quota.memory_limit
+    }
+  }
+}
+
 # Create GitHub Container Registry secret
 resource "kubernetes_secret" "ng_github_registry" {
   metadata {

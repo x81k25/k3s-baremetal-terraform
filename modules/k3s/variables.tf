@@ -17,10 +17,11 @@ variable "k3s_config" {
   description = "K3s Kubernetes configuration settings"
   type = object({
     version = string
-    resource_limits = object({
-      cpu_threads = number
-      memory_gb   = number
-      storage_gb  = number
+    resource_quota = object({
+      system_reserved_cpu = string
+      system_reserved_memory = string
+      kube_reserved_cpu = string
+      kube_reserved_memory = string
     })
     network_config = object({
       network_subnet = string

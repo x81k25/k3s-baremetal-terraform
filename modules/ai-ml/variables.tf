@@ -2,6 +2,18 @@
 # ai-ml vars
 ################################################################################
 
+variable "ai_ml_config" {
+  description = "Resource configuration for ai-ml namespace"
+  type = object({
+    resource_quota = object({
+      cpu_request    = string
+      cpu_limit      = string
+      memory_request = string
+      memory_limit   = string
+    })
+  })
+}
+
 variable "ai_ml_secrets" {
   description = "namespace-level secrets for ai-ml services"
   type = object({

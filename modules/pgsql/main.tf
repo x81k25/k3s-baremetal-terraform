@@ -15,6 +15,26 @@ resource "kubernetes_namespace" "pgsql" {
   }
 }
 
+################################################################################
+# namespace resource quotas
+################################################################################
+
+resource "kubernetes_resource_quota" "pgsql_quota" {
+  metadata {
+    name      = "pgsql-resource-quota"
+    namespace = kubernetes_namespace.pgsql.metadata[0].name
+  }
+
+  spec {
+    hard = {
+      "requests.cpu"    = var.pgsql_namespace_config.resource_quota.cpu_request
+      "limits.cpu"      = var.pgsql_namespace_config.resource_quota.cpu_limit
+      "requests.memory" = var.pgsql_namespace_config.resource_quota.memory_request
+      "limits.memory"   = var.pgsql_namespace_config.resource_quota.memory_limit
+    }
+  }
+}
+
 resource "kubernetes_secret" "github_secrets" {
   metadata {
     name      = "github-secrets"

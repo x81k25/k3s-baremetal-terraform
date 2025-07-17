@@ -7,6 +7,18 @@ variable "server_ip" {
   type        = string
 }
 
+variable "pgsql_namespace_config" {
+  description = "Resource configuration for pgsql namespace"
+  type = object({
+    resource_quota = object({
+      cpu_request    = string
+      cpu_limit      = string
+      memory_request = string
+      memory_limit   = string
+    })
+  })
+}
+
 variable "pgsql_secrets" {
   description = "PostgreSQL module secrets"
   type = object({

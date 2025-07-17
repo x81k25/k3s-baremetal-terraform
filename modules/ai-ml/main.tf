@@ -16,6 +16,26 @@ resource "kubernetes_namespace" "ai_ml" {
 }
 
 ################################################################################
+# namespace resource quotas
+################################################################################
+
+resource "kubernetes_resource_quota" "ai_ml_quota" {
+  metadata {
+    name      = "ai-ml-resource-quota"
+    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+  }
+
+  spec {
+    hard = {
+      "requests.cpu"    = var.ai_ml_config.resource_quota.cpu_request
+      "limits.cpu"      = var.ai_ml_config.resource_quota.cpu_limit
+      "requests.memory" = var.ai_ml_config.resource_quota.memory_request
+      "limits.memory"   = var.ai_ml_config.resource_quota.memory_limit
+    }
+  }
+}
+
+################################################################################
 # env vars & secrets
 ################################################################################
 

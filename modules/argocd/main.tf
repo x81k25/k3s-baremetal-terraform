@@ -12,6 +12,26 @@ resource "kubernetes_namespace" "argocd" {
   }
 }
 
+################################################################################
+# namespace resource quotas
+################################################################################
+
+resource "kubernetes_resource_quota" "argocd_quota" {
+  metadata {
+    name      = "argocd-resource-quota"
+    namespace = kubernetes_namespace.argocd.metadata[0].name
+  }
+
+  spec {
+    hard = {
+      "requests.cpu"    = var.argocd_config.resource_quota.cpu_request
+      "limits.cpu"      = var.argocd_config.resource_quota.cpu_limit
+      "requests.memory" = var.argocd_config.resource_quota.memory_request
+      "limits.memory"   = var.argocd_config.resource_quota.memory_limit
+    }
+  }
+}
+
 
 ################################################################################
 # ArgoCD base env vars & secrets

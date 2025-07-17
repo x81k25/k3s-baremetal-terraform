@@ -23,15 +23,12 @@ resource "local_file" "k3s_config" {
     kubelet-arg = [
       "max-pods=150",
       "cpu-manager-policy=static",
-      "kube-reserved=cpu=500m,memory=500Mi,ephemeral-storage=1Gi",
-      "system-reserved=cpu=500m,memory=500Mi,ephemeral-storage=1Gi",
       "cpu-cfs-quota=true",
       "cpu-cfs-quota-period=100ms",
       "kube-api-qps=50",
       "kube-api-burst=100",
-      "cpu-manager-policy=static",
-      "system-reserved=cpu=2,memory=2Gi",
-      "kube-reserved=cpu=2,memory=2Gi"
+      "system-reserved=cpu=${var.k3s_config.resource_quota.system_reserved_cpu},memory=${var.k3s_config.resource_quota.system_reserved_memory},ephemeral-storage=1Gi",
+      "kube-reserved=cpu=${var.k3s_config.resource_quota.kube_reserved_cpu},memory=${var.k3s_config.resource_quota.kube_reserved_memory},ephemeral-storage=1Gi"
     ]
   })
 }

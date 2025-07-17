@@ -34,6 +34,58 @@ resource "kubernetes_namespace" "media-dev" {
 }
 
 ################################################################################
+# namespace resource quotas
+################################################################################
+
+resource "kubernetes_resource_quota" "media_prod_quota" {
+  metadata {
+    name      = "media-prod-resource-quota"
+    namespace = kubernetes_namespace.media-prod.metadata[0].name
+  }
+
+  spec {
+    hard = {
+      "requests.cpu"    = var.media_config.prod.resource_quota.cpu_request
+      "limits.cpu"      = var.media_config.prod.resource_quota.cpu_limit
+      "requests.memory" = var.media_config.prod.resource_quota.memory_request
+      "limits.memory"   = var.media_config.prod.resource_quota.memory_limit
+    }
+  }
+}
+
+resource "kubernetes_resource_quota" "media_stg_quota" {
+  metadata {
+    name      = "media-stg-resource-quota"
+    namespace = kubernetes_namespace.media-stg.metadata[0].name
+  }
+
+  spec {
+    hard = {
+      "requests.cpu"    = var.media_config.stg.resource_quota.cpu_request
+      "limits.cpu"      = var.media_config.stg.resource_quota.cpu_limit
+      "requests.memory" = var.media_config.stg.resource_quota.memory_request
+      "limits.memory"   = var.media_config.stg.resource_quota.memory_limit
+    }
+  }
+}
+
+resource "kubernetes_resource_quota" "media_dev_quota" {
+  metadata {
+    name      = "media-dev-resource-quota"
+    namespace = kubernetes_namespace.media-dev.metadata[0].name
+  }
+
+  spec {
+    hard = {
+      "requests.cpu"    = var.media_config.dev.resource_quota.cpu_request
+      "limits.cpu"      = var.media_config.dev.resource_quota.cpu_limit
+      "requests.memory" = var.media_config.dev.resource_quota.memory_request
+      "limits.memory"   = var.media_config.dev.resource_quota.memory_limit
+    }
+  }
+}
+
+################################################################################
 # environment declaration
 # - sets ENVRIONMENT environment variables to be used for various configs
 # - no other env vars are set here

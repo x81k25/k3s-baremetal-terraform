@@ -1,4 +1,22 @@
+resource "kubernetes_resource_quota" "cert_manager_quota" {
+  metadata {
+    name      = "cert-manager-resource-quota"
+    namespace = "cert-manager"
+  }
+
+  spec {
+    hard = {
+      "requests.cpu"    = var.cert_manager_config.resource_quota.cpu_request
+      "limits.cpu"      = var.cert_manager_config.resource_quota.cpu_limit
+      "requests.memory" = var.cert_manager_config.resource_quota.memory_request
+      "limits.memory"   = var.cert_manager_config.resource_quota.memory_limit
+    }
+  }
+}
+
 resource "helm_release" "cert_manager" {
+  depends_on = [kubernetes_resource_quota.cert_manager_quota]
+  
   name             = "cert-manager"
   namespace        = "cert-manager"
   create_namespace = true
@@ -31,10 +49,32 @@ resource "null_resource" "cleanup_cattle_system" {
   }
 }
 
-resource "helm_release" "rancher" {
+resource "kubernetes_resource_quota" "cattle_system_quota" {
   depends_on = [
     time_sleep.wait_for_cert_manager,
     null_resource.cleanup_cattle_system
+  ]
+  
+  metadata {
+    name      = "cattle-system-resource-quota"
+    namespace = "cattle-system"
+  }
+
+  spec {
+    hard = {
+      "requests.cpu"    = var.cattle_system_config.resource_quota.cpu_request
+      "limits.cpu"      = var.cattle_system_config.resource_quota.cpu_limit
+      "requests.memory" = var.cattle_system_config.resource_quota.memory_request
+      "limits.memory"   = var.cattle_system_config.resource_quota.memory_limit
+    }
+  }
+}
+
+resource "helm_release" "rancher" {
+  depends_on = [
+    time_sleep.wait_for_cert_manager,
+    null_resource.cleanup_cattle_system,
+    kubernetes_resource_quota.cattle_system_quota
   ]
   name             = "rancher"
   namespace        = "cattle-system"

@@ -6,6 +6,36 @@ variable "server_ip" {
   type = string
 }
 
+variable "media_config" {
+  description = "Resource configuration for media namespaces"
+  type = object({
+    prod = object({
+      resource_quota = object({
+        cpu_request    = string
+        cpu_limit      = string
+        memory_request = string
+        memory_limit   = string
+      })
+    })
+    stg = object({
+      resource_quota = object({
+        cpu_request    = string
+        cpu_limit      = string
+        memory_request = string
+        memory_limit   = string
+      })
+    })
+    dev = object({
+      resource_quota = object({
+        cpu_request    = string
+        cpu_limit      = string
+        memory_request = string
+        memory_limit   = string
+      })
+    })
+  })
+}
+
 variable "environment" {
   description = "Map of environment names"
   type = object({
