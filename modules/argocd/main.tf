@@ -136,6 +136,7 @@ resource "kubernetes_secret" "ghcr_image_updater_token" {
 }
 
 
+
 # SSH key for Git repository access
 resource "kubernetes_secret" "argocd_ssh_key" {
   metadata {
