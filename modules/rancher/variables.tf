@@ -24,6 +24,12 @@ variable "cattle_system_config" {
       memory_request = string
       memory_limit   = string
     })
+    container_defaults = object({
+      cpu_request    = string
+      cpu_limit      = string
+      memory_request = string
+      memory_limit   = string
+    })
   })
 }
 
@@ -51,6 +57,12 @@ variable "cert_manager_config" {
   type = object({
     version = string
     resource_quota = object({
+      cpu_request    = string
+      cpu_limit      = string
+      memory_request = string
+      memory_limit   = string
+    })
+    container_defaults = object({
       cpu_request    = string
       cpu_limit      = string
       memory_request = string

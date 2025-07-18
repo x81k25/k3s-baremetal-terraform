@@ -308,39 +308,28 @@ This project implements comprehensive resource quota management to ensure optima
 
 ### Resource Allocation Strategy
 
-The resource allocation is designed for a system with 24 CPU cores and 32GB RAM:
+The resource allocation is designed for a system with sufficient CPU cores and RAM to handle production workloads:
 
 | Component | CPU Request | CPU Limit | Memory Request | Memory Limit | Notes |
 |-----------|-------------|-----------|----------------|--------------|-------|
-| **System Overhead** | 2.0 | 2.0 | 2.0Gi | 4.0Gi | OS, SSH, monitoring agents |
-| **K3s Control Plane** | 3.0 | 3.0 | 3.0Gi | 6.0Gi | K3s server, etcd, kube-system |
-| **Rancher (cattle-system)** | 1.0 | 4.0 | 1.0Gi | 4.0Gi | Rancher management UI |
-| **ArgoCD** | 1.0 | 4.0 | 1.0Gi | 4.0Gi | GitOps continuous deployment |
-| **PostgreSQL** | 1.0 | 4.0 | 1.0Gi | 4.0Gi | Database services |
-| **AI/ML** | 1.0 | 4.0 | 1.0Gi | 8.0Gi | MLflow, reel-driver ML services |
-| **Media (prod)** | 2.0 | 4.0 | 2.0Gi | 8.0Gi | Plex, Dagster, ATD production |
-| **Media (stg)** | 1.0 | 2.0 | 1.0Gi | 4.0Gi | Staging media services |
-| **Media (dev)** | 1.0 | 2.0 | 1.0Gi | 4.0Gi | Development media services |
-| **Observability** | 1.0 | 2.0 | 1.0Gi | 4.0Gi | Prometheus, Grafana, Loki |
-| **Experiments** | 1.0 | 2.0 | 1.0Gi | 4.0Gi | Research and development |
-| **Cert-Manager** | 0.5 | 1.0 | 0.5Gi | 2.0Gi | Certificate management |
-| **Unallocated Buffer** | 8.5 | - | 6.5Gi | - | Reserved for system flexibility |
+| **K3s System Reserved** | 2.0 | 2.0 | 2.0Gi | 2.0Gi | System overhead for OS, SSH, monitoring |
+| **K3s Kube Reserved** | 2.0 | 2.0 | 2.0Gi | 2.0Gi | Kubernetes system components |
+| **Rancher (cattle-system)** | 2.0 | 2.0 | 2.0Gi | 4.0Gi | Rancher management UI |
+| **ArgoCD** | 2.0 | 4.0 | 2.0Gi | 4.0Gi | GitOps continuous deployment |
+| **PostgreSQL** | 4.0 | 8.0 | 6.0Gi | 10.0Gi | Database services with pgAdmin |
+| **AI/ML** | 4.0 | 20.0 | 6.0Gi | 16.0Gi | MLflow, reel-driver ML services |
+| **Media (prod)** | 4.0 | 8.0 | 6.0Gi | 8.0Gi | Plex, Dagster, ATD production |
+| **Media (stg)** | - | 2.0 | - | 2.0Gi | Staging media services* |
+| **Media (dev)** | - | 2.0 | - | 2.0Gi | Development media services* |
+| **Observability** | 1.0 | 4.0 | 1.0Gi | 8.0Gi | Prometheus, Grafana, Loki |
+| **Experiments** | - | 8.0 | - | 8.0Gi | Research and development* |
+| **Cert-Manager** | 1.0 | 2.0 | 1.0Gi | 2.0Gi | Certificate management |
+
+*Note: Staging, development, and experiments namespaces use only resource limits without requests for greater flexibility.
 
 ### Resource Quota Configuration
 
-Resource quotas are configured using a consistent pattern across all modules:
-
-```hcl
-# terraform.tfvars example
-ai_ml_config = {
-  resource_quota = {
-    cpu_request    = "1"
-    cpu_limit      = "4"
-    memory_request = "1Gi"
-    memory_limit   = "8Gi"
-  }
-}
-```
+Resource quotas are configured using a consistent pattern across all modules in the `terraform.tfvars` file. Production environments typically include both resource requests and limits, while development and staging environments may use only limits for greater flexibility.
 
 ### Checking Resource Quota Usage
 

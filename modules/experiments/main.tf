@@ -19,10 +19,33 @@ resource "kubernetes_resource_quota" "experiments_quota" {
 
   spec {
     hard = {
-      "requests.cpu"    = var.experiments_config.resource_quota.cpu_request
-      "limits.cpu"      = var.experiments_config.resource_quota.cpu_limit
-      "requests.memory" = var.experiments_config.resource_quota.memory_request
-      "limits.memory"   = var.experiments_config.resource_quota.memory_limit
+      "limits.cpu"    = var.experiments_config.resource_quota.cpu_limit
+      "limits.memory" = var.experiments_config.resource_quota.memory_limit
+    }
+  }
+}
+
+################################################################################
+# namespace limit ranges - default container limits
+################################################################################
+
+resource "kubernetes_limit_range" "experiments_limits" {
+  metadata {
+    name      = "experiments-limit-range"
+    namespace = kubernetes_namespace.experiments.metadata[0].name
+  }
+
+  spec {
+    limit {
+      type = "Container"
+      default = {
+        cpu    = var.experiments_config.container_defaults.cpu_limit
+        memory = var.experiments_config.container_defaults.memory_limit
+      }
+      default_request = {
+        cpu    = "10m"
+        memory = "64Mi"
+      }
     }
   }
 }

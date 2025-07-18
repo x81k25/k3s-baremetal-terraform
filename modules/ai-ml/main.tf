@@ -36,6 +36,31 @@ resource "kubernetes_resource_quota" "ai_ml_quota" {
 }
 
 ################################################################################
+# namespace limit ranges - default container limits
+################################################################################
+
+resource "kubernetes_limit_range" "ai_ml_limits" {
+  metadata {
+    name      = "ai-ml-limit-range"
+    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+  }
+
+  spec {
+    limit {
+      type = "Container"
+      default = {
+        cpu    = var.ai_ml_config.container_defaults.cpu_limit
+        memory = var.ai_ml_config.container_defaults.memory_limit
+      }
+      default_request = {
+        cpu    = var.ai_ml_config.container_defaults.cpu_request
+        memory = var.ai_ml_config.container_defaults.memory_request
+      }
+    }
+  }
+}
+
+################################################################################
 # env vars & secrets
 ################################################################################
 

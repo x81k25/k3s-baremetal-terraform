@@ -33,6 +33,31 @@ resource "kubernetes_resource_quota" "observability_quota" {
   }
 }
 
+################################################################################
+# namespace limit ranges - default container limits
+################################################################################
+
+resource "kubernetes_limit_range" "observability_limits" {
+  metadata {
+    name      = "observability-limit-range"
+    namespace = kubernetes_namespace.observability.metadata[0].name
+  }
+
+  spec {
+    limit {
+      type = "Container"
+      default = {
+        cpu    = var.observability_config.container_defaults.cpu_limit
+        memory = var.observability_config.container_defaults.memory_limit
+      }
+      default_request = {
+        cpu    = var.observability_config.container_defaults.cpu_request
+        memory = var.observability_config.container_defaults.memory_request
+      }
+    }
+  }
+}
+
 # Create Loki credentials secret
 resource "kubernetes_secret" "loki_credentials" {
   metadata {

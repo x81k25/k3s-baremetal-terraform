@@ -16,21 +16,31 @@ variable "media_config" {
         memory_request = string
         memory_limit   = string
       })
-    })
-    stg = object({
-      resource_quota = object({
+      container_defaults = object({
         cpu_request    = string
         cpu_limit      = string
         memory_request = string
         memory_limit   = string
       })
     })
+    stg = object({
+      resource_quota = object({
+        cpu_limit    = string
+        memory_limit = string
+      })
+      container_defaults = object({
+        cpu_limit    = string
+        memory_limit = string
+      })
+    })
     dev = object({
       resource_quota = object({
-        cpu_request    = string
-        cpu_limit      = string
-        memory_request = string
-        memory_limit   = string
+        cpu_limit    = string
+        memory_limit = string
+      })
+      container_defaults = object({
+        cpu_limit    = string
+        memory_limit = string
       })
     })
   })

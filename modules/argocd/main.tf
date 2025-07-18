@@ -32,6 +32,31 @@ resource "kubernetes_resource_quota" "argocd_quota" {
   }
 }
 
+################################################################################
+# namespace limit ranges - default container limits
+################################################################################
+
+resource "kubernetes_limit_range" "argocd_limits" {
+  metadata {
+    name      = "argocd-limit-range"
+    namespace = kubernetes_namespace.argocd.metadata[0].name
+  }
+
+  spec {
+    limit {
+      type = "Container"
+      default = {
+        cpu    = var.argocd_config.container_defaults.cpu_limit
+        memory = var.argocd_config.container_defaults.memory_limit
+      }
+      default_request = {
+        cpu    = var.argocd_config.container_defaults.cpu_request
+        memory = var.argocd_config.container_defaults.memory_request
+      }
+    }
+  }
+}
+
 
 ################################################################################
 # ArgoCD base env vars & secrets

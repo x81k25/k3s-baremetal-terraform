@@ -120,6 +120,12 @@ variable "cattle_system_config" {
       memory_request = string
       memory_limit   = string
     })
+    container_defaults = object({
+      cpu_request    = string
+      cpu_limit      = string
+      memory_request = string
+      memory_limit   = string
+    })
   })
 }
 
@@ -148,6 +154,12 @@ variable "cert_manager_config" {
   type = object({
     version = string
     resource_quota = object({
+      cpu_request    = string
+      cpu_limit      = string
+      memory_request = string
+      memory_limit   = string
+    })
+    container_defaults = object({
       cpu_request    = string
       cpu_limit      = string
       memory_request = string
@@ -189,6 +201,12 @@ variable "argocd_config" {
       memory_request = string
       memory_limit   = string
     })
+    container_defaults = object({
+      cpu_request    = string
+      cpu_limit      = string
+      memory_request = string
+      memory_limit   = string
+    })
     git_repositories = map(object({
       url                 = string
       name                = string
@@ -217,6 +235,12 @@ variable "pgsql_namespace_config" {
   description = "Resource configuration for pgsql namespace"
   type = object({
     resource_quota = object({
+      cpu_request    = string
+      cpu_limit      = string
+      memory_request = string
+      memory_limit   = string
+    })
+    container_defaults = object({
       cpu_request    = string
       cpu_limit      = string
       memory_request = string
@@ -353,21 +377,31 @@ variable "media_config" {
         memory_request = string
         memory_limit   = string
       })
-    })
-    stg = object({
-      resource_quota = object({
+      container_defaults = object({
         cpu_request    = string
         cpu_limit      = string
         memory_request = string
         memory_limit   = string
       })
     })
+    stg = object({
+      resource_quota = object({
+        cpu_limit    = string
+        memory_limit = string
+      })
+      container_defaults = object({
+        cpu_limit    = string
+        memory_limit = string
+      })
+    })
     dev = object({
       resource_quota = object({
-        cpu_request    = string
-        cpu_limit      = string
-        memory_request = string
-        memory_limit   = string
+        cpu_limit    = string
+        memory_limit = string
+      })
+      container_defaults = object({
+        cpu_limit    = string
+        memory_limit = string
       })
     })
   })
@@ -634,6 +668,12 @@ variable "ai_ml_config" {
       memory_request = string
       memory_limit   = string
     })
+    container_defaults = object({
+      cpu_request    = string
+      cpu_limit      = string
+      memory_request = string
+      memory_limit   = string
+    })
   })
 }
 
@@ -803,10 +843,12 @@ variable "experiments_config" {
   description = "Resource configuration for experiments namespace"
   type = object({
     resource_quota = object({
-      cpu_request    = string
-      cpu_limit      = string
-      memory_request = string
-      memory_limit   = string
+      cpu_limit    = string
+      memory_limit = string
+    })
+    container_defaults = object({
+      cpu_limit    = string
+      memory_limit = string
     })
   })
 }
@@ -820,6 +862,12 @@ variable "observability_config" {
   description = "Resource configuration for observability namespace"
   type = object({
     resource_quota = object({
+      cpu_request    = string
+      cpu_limit      = string
+      memory_request = string
+      memory_limit   = string
+    })
+    container_defaults = object({
       cpu_request    = string
       cpu_limit      = string
       memory_request = string

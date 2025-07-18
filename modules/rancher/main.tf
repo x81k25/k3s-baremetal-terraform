@@ -14,8 +14,32 @@ resource "kubernetes_resource_quota" "cert_manager_quota" {
   }
 }
 
+resource "kubernetes_limit_range" "cert_manager_limits" {
+  metadata {
+    name      = "cert-manager-limit-range"
+    namespace = "cert-manager"
+  }
+
+  spec {
+    limit {
+      type = "Container"
+      default = {
+        cpu    = var.cert_manager_config.container_defaults.cpu_limit
+        memory = var.cert_manager_config.container_defaults.memory_limit
+      }
+      default_request = {
+        cpu    = var.cert_manager_config.container_defaults.cpu_request
+        memory = var.cert_manager_config.container_defaults.memory_request
+      }
+    }
+  }
+}
+
 resource "helm_release" "cert_manager" {
-  depends_on = [kubernetes_resource_quota.cert_manager_quota]
+  depends_on = [
+    kubernetes_resource_quota.cert_manager_quota,
+    kubernetes_limit_range.cert_manager_limits
+  ]
   
   name             = "cert-manager"
   namespace        = "cert-manager"
@@ -70,11 +94,38 @@ resource "kubernetes_resource_quota" "cattle_system_quota" {
   }
 }
 
+resource "kubernetes_limit_range" "cattle_system_limits" {
+  depends_on = [
+    time_sleep.wait_for_cert_manager,
+    null_resource.cleanup_cattle_system
+  ]
+  
+  metadata {
+    name      = "cattle-system-limit-range"
+    namespace = "cattle-system"
+  }
+
+  spec {
+    limit {
+      type = "Container"
+      default = {
+        cpu    = var.cattle_system_config.container_defaults.cpu_limit
+        memory = var.cattle_system_config.container_defaults.memory_limit
+      }
+      default_request = {
+        cpu    = var.cattle_system_config.container_defaults.cpu_request
+        memory = var.cattle_system_config.container_defaults.memory_request
+      }
+    }
+  }
+}
+
 resource "helm_release" "rancher" {
   depends_on = [
     time_sleep.wait_for_cert_manager,
     null_resource.cleanup_cattle_system,
-    kubernetes_resource_quota.cattle_system_quota
+    kubernetes_resource_quota.cattle_system_quota,
+    kubernetes_limit_range.cattle_system_limits
   ]
   name             = "rancher"
   namespace        = "cattle-system"

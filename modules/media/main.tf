@@ -61,10 +61,8 @@ resource "kubernetes_resource_quota" "media_stg_quota" {
 
   spec {
     hard = {
-      "requests.cpu"    = var.media_config.stg.resource_quota.cpu_request
-      "limits.cpu"      = var.media_config.stg.resource_quota.cpu_limit
-      "requests.memory" = var.media_config.stg.resource_quota.memory_request
-      "limits.memory"   = var.media_config.stg.resource_quota.memory_limit
+      "limits.cpu"    = var.media_config.stg.resource_quota.cpu_limit
+      "limits.memory" = var.media_config.stg.resource_quota.memory_limit
     }
   }
 }
@@ -77,10 +75,75 @@ resource "kubernetes_resource_quota" "media_dev_quota" {
 
   spec {
     hard = {
-      "requests.cpu"    = var.media_config.dev.resource_quota.cpu_request
-      "limits.cpu"      = var.media_config.dev.resource_quota.cpu_limit
-      "requests.memory" = var.media_config.dev.resource_quota.memory_request
-      "limits.memory"   = var.media_config.dev.resource_quota.memory_limit
+      "limits.cpu"    = var.media_config.dev.resource_quota.cpu_limit
+      "limits.memory" = var.media_config.dev.resource_quota.memory_limit
+    }
+  }
+}
+
+################################################################################
+# namespace limit ranges - default container limits
+################################################################################
+
+resource "kubernetes_limit_range" "media_prod_limits" {
+  metadata {
+    name      = "media-prod-limit-range"
+    namespace = kubernetes_namespace.media-prod.metadata[0].name
+  }
+
+  spec {
+    limit {
+      type = "Container"
+      default = {
+        cpu    = var.media_config.prod.container_defaults.cpu_limit
+        memory = var.media_config.prod.container_defaults.memory_limit
+      }
+      default_request = {
+        cpu    = var.media_config.prod.container_defaults.cpu_request
+        memory = var.media_config.prod.container_defaults.memory_request
+      }
+    }
+  }
+}
+
+resource "kubernetes_limit_range" "media_stg_limits" {
+  metadata {
+    name      = "media-stg-limit-range"
+    namespace = kubernetes_namespace.media-stg.metadata[0].name
+  }
+
+  spec {
+    limit {
+      type = "Container"
+      default = {
+        cpu    = var.media_config.stg.container_defaults.cpu_limit
+        memory = var.media_config.stg.container_defaults.memory_limit
+      }
+      default_request = {
+        cpu    = "10m"
+        memory = "64Mi"
+      }
+    }
+  }
+}
+
+resource "kubernetes_limit_range" "media_dev_limits" {
+  metadata {
+    name      = "media-dev-limit-range"
+    namespace = kubernetes_namespace.media-dev.metadata[0].name
+  }
+
+  spec {
+    limit {
+      type = "Container"
+      default = {
+        cpu    = var.media_config.dev.container_defaults.cpu_limit
+        memory = var.media_config.dev.container_defaults.memory_limit
+      }
+      default_request = {
+        cpu    = "10m"
+        memory = "64Mi"
+      }
     }
   }
 }

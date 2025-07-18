@@ -35,6 +35,31 @@ resource "kubernetes_resource_quota" "pgsql_quota" {
   }
 }
 
+################################################################################
+# namespace limit ranges - default container limits
+################################################################################
+
+resource "kubernetes_limit_range" "pgsql_limits" {
+  metadata {
+    name      = "pgsql-limit-range"
+    namespace = kubernetes_namespace.pgsql.metadata[0].name
+  }
+
+  spec {
+    limit {
+      type = "Container"
+      default = {
+        cpu    = var.pgsql_namespace_config.container_defaults.cpu_limit
+        memory = var.pgsql_namespace_config.container_defaults.memory_limit
+      }
+      default_request = {
+        cpu    = var.pgsql_namespace_config.container_defaults.cpu_request
+        memory = var.pgsql_namespace_config.container_defaults.memory_request
+      }
+    }
+  }
+}
+
 resource "kubernetes_secret" "ghcr_pull_image_secret" {
   metadata {
     name      = "ghcr-pull-image-secret"
