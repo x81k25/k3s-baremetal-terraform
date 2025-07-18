@@ -119,27 +119,22 @@ resource "kubernetes_secret" "ghcr_pull_image_secret" {
   depends_on = [kubernetes_namespace.argocd]
 }
 
-resource "kubernetes_secret" "ghcr_image_updater_pull" {
+# Create a generic secret for ArgoCD Image Updater with token format
+resource "kubernetes_secret" "ghcr_image_updater_token" {
   metadata {
-    name      = "ghcr-image-updater-pull"
+    name      = "ghcr-image-updater-token"
     namespace = kubernetes_namespace.argocd.metadata[0].name
   }
 
-  type = "kubernetes.io/dockerconfigjson"
+  type = "Opaque"
 
   data = {
-    ".dockerconfigjson" = jsonencode({
-      auths = {
-        "ghcr.io" = {
-          username = var.argocd_secrets.github.username
-          password = var.argocd_secrets.github.token_packages_read
-        }
-      }
-    })
+    token = "${var.argocd_secrets.github.username}:${var.argocd_secrets.github.token_packages_read}"
   }
 
   depends_on = [kubernetes_namespace.argocd]
 }
+
 
 # SSH key for Git repository access
 resource "kubernetes_secret" "argocd_ssh_key" {
@@ -311,7 +306,7 @@ resource "helm_release" "argocd_image_updater" {
             api_url     = "https://ghcr.io"
             prefix      = "ghcr.io"
             ping        = true
-            credentials = "pullsecret:argocd/${kubernetes_secret.ghcr_image_updater_pull.metadata[0].name}"
+            credentials = "secret:argocd/ghcr-image-updater-token#token"
             insecure    = false
           }
         ]
@@ -345,7 +340,8 @@ resource "helm_release" "argocd_image_updater" {
 
   depends_on = [
     helm_release.argocd,
-    kubernetes_secret.ghcr_image_updater_pull
+    kubernetes_secret.ghcr_pull_image_secret,
+    kubernetes_secret.ghcr_image_updater_token
   ]
 }
 
