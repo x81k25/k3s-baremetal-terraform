@@ -25,22 +25,30 @@ variable "media_config" {
     })
     stg = object({
       resource_quota = object({
-        cpu_limit    = string
-        memory_limit = string
+        cpu_request    = string
+        cpu_limit      = string
+        memory_request = string
+        memory_limit   = string
       })
       container_defaults = object({
-        cpu_limit    = string
-        memory_limit = string
+        cpu_request    = string
+        cpu_limit      = string
+        memory_request = string
+        memory_limit   = string
       })
     })
     dev = object({
       resource_quota = object({
-        cpu_limit    = string
-        memory_limit = string
+        cpu_request    = string
+        cpu_limit      = string
+        memory_request = string
+        memory_limit   = string
       })
       container_defaults = object({
-        cpu_limit    = string
-        memory_limit = string
+        cpu_request    = string
+        cpu_limit      = string
+        memory_request = string
+        memory_limit   = string
       })
     })
   })
@@ -68,9 +76,15 @@ variable "ssh_config" {
 # plex vars
 ################################################################################
 
+variable "plex_secrets" {
+  type = object({
+    claim = string
+  })
+  sensitive = true
+}
+
 variable "media_secrets" {
   type = object({
-    plex_claim = string
     github = object({
       username = string
       token_packages_read = string

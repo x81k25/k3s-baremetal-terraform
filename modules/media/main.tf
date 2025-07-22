@@ -61,8 +61,10 @@ resource "kubernetes_resource_quota" "media_stg_quota" {
 
   spec {
     hard = {
-      "limits.cpu"    = var.media_config.stg.resource_quota.cpu_limit
-      "limits.memory" = var.media_config.stg.resource_quota.memory_limit
+      "requests.cpu"    = var.media_config.stg.resource_quota.cpu_request
+      "limits.cpu"      = var.media_config.stg.resource_quota.cpu_limit
+      "requests.memory" = var.media_config.stg.resource_quota.memory_request
+      "limits.memory"   = var.media_config.stg.resource_quota.memory_limit
     }
   }
 }
@@ -75,8 +77,10 @@ resource "kubernetes_resource_quota" "media_dev_quota" {
 
   spec {
     hard = {
-      "limits.cpu"    = var.media_config.dev.resource_quota.cpu_limit
-      "limits.memory" = var.media_config.dev.resource_quota.memory_limit
+      "requests.cpu"    = var.media_config.dev.resource_quota.cpu_request
+      "limits.cpu"      = var.media_config.dev.resource_quota.cpu_limit
+      "requests.memory" = var.media_config.dev.resource_quota.memory_request
+      "limits.memory"   = var.media_config.dev.resource_quota.memory_limit
     }
   }
 }
@@ -120,8 +124,8 @@ resource "kubernetes_limit_range" "media_stg_limits" {
         memory = var.media_config.stg.container_defaults.memory_limit
       }
       default_request = {
-        cpu    = "10m"
-        memory = "64Mi"
+        cpu    = var.media_config.stg.container_defaults.cpu_request
+        memory = var.media_config.stg.container_defaults.memory_request
       }
     }
   }
@@ -141,8 +145,8 @@ resource "kubernetes_limit_range" "media_dev_limits" {
         memory = var.media_config.dev.container_defaults.memory_limit
       }
       default_request = {
-        cpu    = "10m"
-        memory = "64Mi"
+        cpu    = var.media_config.dev.container_defaults.cpu_request
+        memory = var.media_config.dev.container_defaults.memory_request
       }
     }
   }
@@ -431,7 +435,7 @@ resource "kubernetes_secret" "plex_secret" {
   }
 
   data = {
-    PLEX_CLAIM = var.media_secrets.plex_claim
+    PLEX_CLAIM = var.plex_secrets.claim
   }
 }
 

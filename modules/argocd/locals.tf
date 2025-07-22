@@ -10,23 +10,6 @@ locals {
     "https://${var.argocd_config.ingress.host}"
   ) : null
 
-  # Resource limits with defaults merged
-  resource_limits = {
-    server = merge({
-      cpu    = "500m"
-      memory = "512Mi"
-    }, try(var.argocd_config.resource_limits.server, {}))
-
-    repo_server = merge({
-      cpu    = "500m"
-      memory = "512Mi"
-    }, try(var.argocd_config.resource_limits.repo_server, {}))
-
-    application_controller = merge({
-      cpu    = "500m"
-      memory = "512Mi"
-    }, try(var.argocd_config.resource_limits.application_controller, {}))
-  }
 
   # Git repository configuration formatting
   formatted_repositories = {

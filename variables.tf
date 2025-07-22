@@ -107,68 +107,6 @@ variable "k3s_config" {
 }
 
 ################################################################################
-# rancher vars
-################################################################################
-
-# rancher vars
-variable "cattle_system_config" {
-  description = "Resource configuration for cattle-system namespace"
-  type = object({
-    resource_quota = object({
-      cpu_request    = string
-      cpu_limit      = string
-      memory_request = string
-      memory_limit   = string
-    })
-    container_defaults = object({
-      cpu_request    = string
-      cpu_limit      = string
-      memory_request = string
-      memory_limit   = string
-    })
-  })
-}
-
-variable "rancher_config" {
-  description = "rancher config"
-  type = object({
-    version  = string
-    hostname = string
-    ingress_config = object({
-      http_enabled     = bool
-      https_enabled    = bool
-      additional_ports = list(number)
-    })
-  })
-}
-
-variable "rancher_sensitive" {
-  type = object({
-    admin_pw = string
-  })
-  sensitive = true
-}
-
-# cert manager vars
-variable "cert_manager_config" {
-  type = object({
-    version = string
-    resource_quota = object({
-      cpu_request    = string
-      cpu_limit      = string
-      memory_request = string
-      memory_limit   = string
-    })
-    container_defaults = object({
-      cpu_request    = string
-      cpu_limit      = string
-      memory_request = string
-      memory_limit   = string
-    })
-  })
-}
-
-################################################################################
 # argo cd vars
 ################################################################################
 
@@ -180,20 +118,6 @@ variable "argocd_config" {
     ingress = object({
       enabled = bool
       host    = string
-    })
-    resource_limits = object({
-      server = object({
-        cpu    = string
-        memory = string
-      })
-      repo_server = object({
-        cpu    = string
-        memory = string
-      })
-      application_controller = object({
-        cpu    = string
-        memory = string
-      })
     })
     resource_quota = object({
       cpu_request    = string
@@ -386,22 +310,30 @@ variable "media_config" {
     })
     stg = object({
       resource_quota = object({
-        cpu_limit    = string
-        memory_limit = string
+        cpu_request    = string
+        cpu_limit      = string
+        memory_request = string
+        memory_limit   = string
       })
       container_defaults = object({
-        cpu_limit    = string
-        memory_limit = string
+        cpu_request    = string
+        cpu_limit      = string
+        memory_request = string
+        memory_limit   = string
       })
     })
     dev = object({
       resource_quota = object({
-        cpu_limit    = string
-        memory_limit = string
+        cpu_request    = string
+        cpu_limit      = string
+        memory_request = string
+        memory_limit   = string
       })
       container_defaults = object({
-        cpu_limit    = string
-        memory_limit = string
+        cpu_request    = string
+        cpu_limit      = string
+        memory_request = string
+        memory_limit   = string
       })
     })
   })
@@ -459,9 +391,9 @@ variable "dagster_secrets" {
 }
 
 # plex vars
-variable "media_secrets" {
+variable "plex_secrets" {
   type = object({
-    plex_claim = string
+    claim = string
   })
   sensitive = true
 }
@@ -843,12 +775,16 @@ variable "experiments_config" {
   description = "Resource configuration for experiments namespace"
   type = object({
     resource_quota = object({
-      cpu_limit    = string
-      memory_limit = string
+      cpu_request    = string
+      cpu_limit      = string
+      memory_request = string
+      memory_limit   = string
     })
     container_defaults = object({
-      cpu_limit    = string
-      memory_limit = string
+      cpu_request    = string
+      cpu_limit      = string
+      memory_request = string
+      memory_limit   = string
     })
   })
 }

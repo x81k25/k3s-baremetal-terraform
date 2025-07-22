@@ -144,7 +144,6 @@ locals {
 
 locals {
   media_secrets = {
-    plex_claim = var.media_secrets.plex_claim
     github = {
       username = var.github_secrets.username
       token_packages_read = var.github_secrets.token_packages_read

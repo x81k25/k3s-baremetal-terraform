@@ -12,35 +12,12 @@ module "k3s" {
 }
 
 ################################################################################
-# rancher module
-################################################################################
-
-module "rancher" {
-  source     = "./modules/rancher"
-  depends_on = [module.k3s]
-
-  server_ip           = var.server_ip
-  kubeconfig_path     = var.kubeconfig_path
-  cattle_system_config = var.cattle_system_config
-  rancher_config      = var.rancher_config
-  rancher_sensitive   = var.rancher_sensitive
-  cert_manager_config = var.cert_manager_config
-
-  providers = {
-    rancher2 = rancher2
-    helm     = helm
-    null     = null
-    time     = time
-  }
-}
-
-################################################################################
 # argocd module
 ################################################################################
 
 module "argocd" {
   source     = "./modules/argocd"
-  depends_on = [module.rancher]
+  depends_on = [module.k3s]
 
   argocd_config     = local.argocd_config
   argocd_secrets    = local.argocd_secrets
@@ -85,6 +62,7 @@ module "media" {
   # namespace vars
   media_config  = var.media_config
   # plex vars
+  plex_secrets  = var.plex_secrets
   media_secrets = local.media_secrets
   # atd vars
   vpn_config          = var.vpn_config

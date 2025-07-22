@@ -182,16 +182,13 @@ resource "helm_release" "argocd" {
         extraArgs = [
           "--insecure" # Remove in strict production environments
         ]
-        resources = var.argocd_config.resource_limits.server
         secretKey = var.argocd_secrets.admin_pw
       }
 
       repoServer = {
-        resources = var.argocd_config.resource_limits.repo_server
       }
 
       controller = {
-        resources = var.argocd_config.resource_limits.application_controller
         args = {
           "controller.image-pull-secret-propagation.enabled" = "true"
         }

@@ -19,8 +19,10 @@ resource "kubernetes_resource_quota" "experiments_quota" {
 
   spec {
     hard = {
-      "limits.cpu"    = var.experiments_config.resource_quota.cpu_limit
-      "limits.memory" = var.experiments_config.resource_quota.memory_limit
+      "requests.cpu"    = var.experiments_config.resource_quota.cpu_request
+      "limits.cpu"      = var.experiments_config.resource_quota.cpu_limit
+      "requests.memory" = var.experiments_config.resource_quota.memory_request
+      "limits.memory"   = var.experiments_config.resource_quota.memory_limit
     }
   }
 }
@@ -43,8 +45,8 @@ resource "kubernetes_limit_range" "experiments_limits" {
         memory = var.experiments_config.container_defaults.memory_limit
       }
       default_request = {
-        cpu    = "10m"
-        memory = "64Mi"
+        cpu    = var.experiments_config.container_defaults.cpu_request
+        memory = var.experiments_config.container_defaults.memory_request
       }
     }
   }

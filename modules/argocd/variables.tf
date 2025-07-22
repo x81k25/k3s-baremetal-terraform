@@ -12,20 +12,6 @@ variable "argocd_config" {
       enabled = bool
       host    = string
     })
-    resource_limits = object({
-      server = object({
-        cpu    = string
-        memory = string
-      })
-      repo_server = object({
-        cpu    = string
-        memory = string
-      })
-      application_controller = object({
-        cpu    = string
-        memory = string
-      })
-    })
     resource_quota = object({
       cpu_request    = string
       cpu_limit      = string
