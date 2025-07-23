@@ -170,7 +170,7 @@ resource "helm_release" "argocd" {
   # Basic configuration
   values = [
     yamlencode({
-      server = {
+      server = merge({
         service = {
           type = var.argocd_config.ingress.enabled ? "ClusterIP" : "LoadBalancer"
         }
@@ -183,16 +183,85 @@ resource "helm_release" "argocd" {
           "--insecure" # Remove in strict production environments
         ]
         secretKey = var.argocd_secrets.admin_pw
-      }
+        resources = {
+          limits = {
+            cpu    = var.argocd_config.container_defaults.cpu_limit
+            memory = var.argocd_config.container_defaults.memory_limit
+          }
+          requests = {
+            cpu    = var.argocd_config.container_defaults.cpu_request
+            memory = var.argocd_config.container_defaults.memory_request
+          }
+        }
+      })
 
-      repoServer = {
-      }
+      repoServer = merge({
+        resources = {
+          limits = {
+            cpu    = lookup(var.argocd_config.container_overrides, "repo_server", var.argocd_config.container_defaults).cpu_limit
+            memory = lookup(var.argocd_config.container_overrides, "repo_server", var.argocd_config.container_defaults).memory_limit
+          }
+          requests = {
+            cpu    = lookup(var.argocd_config.container_overrides, "repo_server", var.argocd_config.container_defaults).cpu_request
+            memory = lookup(var.argocd_config.container_overrides, "repo_server", var.argocd_config.container_defaults).memory_request
+          }
+        }
+      })
 
-      controller = {
+      controller = merge({
         args = {
           "controller.image-pull-secret-propagation.enabled" = "true"
         }
-      }
+        resources = {
+          limits = {
+            cpu    = var.argocd_config.container_defaults.cpu_limit
+            memory = var.argocd_config.container_defaults.memory_limit
+          }
+          requests = {
+            cpu    = var.argocd_config.container_defaults.cpu_request
+            memory = var.argocd_config.container_defaults.memory_request
+          }
+        }
+      })
+
+      applicationSet = merge({
+        resources = {
+          limits = {
+            cpu    = lookup(var.argocd_config.container_overrides, "applicationset_controller", var.argocd_config.container_defaults).cpu_limit
+            memory = lookup(var.argocd_config.container_overrides, "applicationset_controller", var.argocd_config.container_defaults).memory_limit
+          }
+          requests = {
+            cpu    = lookup(var.argocd_config.container_overrides, "applicationset_controller", var.argocd_config.container_defaults).cpu_request
+            memory = lookup(var.argocd_config.container_overrides, "applicationset_controller", var.argocd_config.container_defaults).memory_request
+          }
+        }
+      })
+
+      notifications = merge({
+        resources = {
+          limits = {
+            cpu    = var.argocd_config.container_defaults.cpu_limit
+            memory = var.argocd_config.container_defaults.memory_limit
+          }
+          requests = {
+            cpu    = var.argocd_config.container_defaults.cpu_request
+            memory = var.argocd_config.container_defaults.memory_request
+          }
+        }
+      })
+
+      redis = merge({
+        resources = {
+          limits = {
+            cpu    = var.argocd_config.container_defaults.cpu_limit
+            memory = var.argocd_config.container_defaults.memory_limit
+          }
+          requests = {
+            cpu    = var.argocd_config.container_defaults.cpu_request
+            memory = var.argocd_config.container_defaults.memory_request
+          }
+        }
+      })
 
       dex = {
         enabled = var.argocd_config.enable_dex
