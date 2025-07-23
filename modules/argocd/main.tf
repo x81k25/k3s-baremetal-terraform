@@ -211,6 +211,8 @@ resource "helm_release" "argocd" {
       controller = merge({
         args = {
           "controller.image-pull-secret-propagation.enabled" = "true"
+          "controller.app.resync"                            = tostring(var.argocd_config.refresh_config.app_resync_seconds)
+          "controller.repo.cache.expiration"                 = var.argocd_config.refresh_config.repo_cache_expiration
         }
         resources = {
           limits = {
@@ -274,6 +276,9 @@ resource "helm_release" "argocd" {
       configs = {
         secret = {
           argocdServerAdminPassword = bcrypt(var.argocd_secrets.admin_pw)
+        }
+        cm = {
+          "timeout.reconciliation" = var.argocd_config.refresh_config.reconciliation_timeout
         }
         repositories = {}
         params = {
@@ -384,6 +389,11 @@ resource "helm_release" "argocd_image_updater" {
           plaintext     = false
         }
       }
+
+      extraArgs = [
+        "--interval",
+        var.argocd_config.refresh_config.image_updater_interval
+      ]
 
       logLevel = var.image_updater_log_level
 

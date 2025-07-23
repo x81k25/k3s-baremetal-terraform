@@ -137,6 +137,17 @@ variable "argocd_config" {
       memory_request = string
       memory_limit   = string
     })), {})
+    refresh_config = optional(object({
+      reconciliation_timeout  = string
+      app_resync_seconds      = number
+      repo_cache_expiration   = string
+      image_updater_interval  = string
+    }), {
+      reconciliation_timeout  = "180s"
+      app_resync_seconds      = 120
+      repo_cache_expiration   = "24h"
+      image_updater_interval  = "2m"
+    })
     git_repositories = map(object({
       url                 = string
       name                = string
@@ -155,6 +166,28 @@ variable "argocd_secrets" {
     ssh_private_key_path = string
   })
   sensitive = true
+}
+
+variable "enable_image_updater" {
+  description = "Enable ArgoCD Image Updater"
+  type        = bool
+  default     = true
+}
+
+variable "image_updater_log_level" {
+  description = "Log level for ArgoCD Image Updater"
+  type        = string
+  default     = "info"
+  validation {
+    condition     = contains(["debug", "info", "warn", "error"], var.image_updater_log_level)
+    error_message = "Log level must be one of: debug, info, warn, error"
+  }
+}
+
+variable "enable_monitoring" {
+  description = "Enable ServiceMonitor for Prometheus scraping"
+  type        = bool
+  default     = false
 }
 
 ################################################################################

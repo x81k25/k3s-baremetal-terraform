@@ -19,8 +19,11 @@ module "argocd" {
   source     = "./modules/argocd"
   depends_on = [module.k3s]
 
-  argocd_config     = local.argocd_config
-  argocd_secrets    = local.argocd_secrets
+  argocd_config          = local.argocd_config
+  argocd_secrets         = local.argocd_secrets
+  enable_image_updater   = var.enable_image_updater
+  image_updater_log_level = var.image_updater_log_level
+  enable_monitoring      = var.enable_monitoring
 }
 
 ################################################################################

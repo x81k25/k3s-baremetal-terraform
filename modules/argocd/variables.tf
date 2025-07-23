@@ -30,6 +30,12 @@ variable "argocd_config" {
       memory_request = string
       memory_limit   = string
     })), {})
+    refresh_config = object({
+      reconciliation_timeout  = string
+      app_resync_seconds      = number
+      repo_cache_expiration   = string
+      image_updater_interval  = string
+    })
     git_repositories = map(object({
       url                 = string
       name                = string
