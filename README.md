@@ -29,7 +29,7 @@ This project contains Terraform configurations to automate the deployment of a f
 
 - **Automated K3s Installation**: Single-node K3s deployment with customizable configuration
 - **Rancher Integration**: Automated deployment of Rancher for cluster management
-- **GitOps Ready**: Integrated ArgoCD for continuous deployment from Git repositories
+- **GitOps Ready**: Integrated ArgoCD for continuous deployment from Git repositories with Stakater Reloader for automatic pod restarts
 - **Database Infrastructure**: PostgreSQL databases with pgAdmin4 web interface
 - **AI/ML Platform**: MLflow tracking server with MinIO artifact store
 - **Data Orchestration**: Dagster platform for data pipeline management and scheduling

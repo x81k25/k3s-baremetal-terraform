@@ -438,5 +438,273 @@ resource "null_resource" "wait_for_argo" {
 }
 
 ################################################################################
+# Stakater Reloader - Automatic pod restarts on ConfigMap/Secret changes
+################################################################################
+
+# Create ServiceAccount for Reloader
+resource "kubernetes_service_account" "reloader" {
+  count = var.reloader_config.enabled ? 1 : 0
+  
+  metadata {
+    name      = "reloader"
+    namespace = kubernetes_namespace.argocd.metadata[0].name
+    labels = {
+      app                          = "reloader"
+      "app.kubernetes.io/name"     = "reloader"
+      "app.kubernetes.io/instance" = "reloader"
+      managed-by                   = "terraform"
+    }
+  }
+}
+
+# Create ClusterRole for Reloader
+resource "kubernetes_cluster_role" "reloader" {
+  count = var.reloader_config.enabled ? 1 : 0
+  
+  metadata {
+    name = "reloader-role"
+    labels = {
+      app                          = "reloader"
+      "app.kubernetes.io/name"     = "reloader"
+      "app.kubernetes.io/instance" = "reloader"
+      managed-by                   = "terraform"
+    }
+  }
+
+  rule {
+    api_groups = [""]
+    resources  = ["secrets", "configmaps"]
+    verbs      = ["list", "get", "watch"]
+  }
+
+  rule {
+    api_groups = ["apps"]
+    resources  = ["deployments", "daemonsets", "statefulsets"]
+    verbs      = ["list", "get", "patch"]
+  }
+
+  rule {
+    api_groups = ["extensions"]
+    resources  = ["deployments", "daemonsets"]
+    verbs      = ["list", "get", "patch"]
+  }
+
+  rule {
+    api_groups = [""]
+    resources  = ["events"]
+    verbs      = ["create"]
+  }
+}
+
+# Create ClusterRoleBinding for Reloader
+resource "kubernetes_cluster_role_binding" "reloader" {
+  count = var.reloader_config.enabled ? 1 : 0
+  
+  metadata {
+    name = "reloader-role-binding"
+    labels = {
+      app                          = "reloader"
+      "app.kubernetes.io/name"     = "reloader"
+      "app.kubernetes.io/instance" = "reloader"
+      managed-by                   = "terraform"
+    }
+  }
+
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = kubernetes_cluster_role.reloader[0].metadata[0].name
+  }
+
+  subject {
+    kind      = "ServiceAccount"
+    name      = kubernetes_service_account.reloader[0].metadata[0].name
+    namespace = kubernetes_namespace.argocd.metadata[0].name
+  }
+}
+
+# Create Deployment for Reloader
+resource "kubernetes_deployment" "reloader" {
+  count = var.reloader_config.enabled ? 1 : 0
+  
+  metadata {
+    name      = "reloader"
+    namespace = kubernetes_namespace.argocd.metadata[0].name
+    labels = {
+      app                          = "reloader"
+      "app.kubernetes.io/name"     = "reloader"
+      "app.kubernetes.io/instance" = "reloader"
+      "app.kubernetes.io/version"  = var.reloader_config.tag
+      managed-by                   = "terraform"
+    }
+  }
+
+  spec {
+    replicas = var.reloader_config.replicas
+
+    selector {
+      match_labels = {
+        app = "reloader"
+      }
+    }
+
+    template {
+      metadata {
+        labels = {
+          app                          = "reloader"
+          "app.kubernetes.io/name"     = "reloader"
+          "app.kubernetes.io/instance" = "reloader"
+        }
+      }
+
+      spec {
+        service_account_name = kubernetes_service_account.reloader[0].metadata[0].name
+
+        container {
+          name  = "reloader"
+          image = "${var.reloader_config.image}:${var.reloader_config.tag}"
+
+          env {
+            name  = "RELOADER_NAMESPACE"
+            value = var.reloader_config.watch_namespace
+          }
+
+          env {
+            name  = "RELOADER_AUTO_RELOAD_ALL"
+            value = tostring(var.reloader_config.auto_reload_all)
+          }
+
+          env {
+            name  = "RELOADER_IGNORE_SECRETS"
+            value = tostring(var.reloader_config.ignore_secrets)
+          }
+
+          env {
+            name  = "RELOADER_IGNORE_CONFIGMAPS"
+            value = tostring(var.reloader_config.ignore_configmaps)
+          }
+
+          env {
+            name  = "RELOADER_LOG_LEVEL"
+            value = var.reloader_config.log_level
+          }
+
+          port {
+            name           = "http"
+            container_port = var.reloader_config.metrics_port
+            protocol       = "TCP"
+          }
+
+          liveness_probe {
+            http_get {
+              path = "/metrics"
+              port = "http"
+            }
+            initial_delay_seconds = 10
+            period_seconds        = 10
+          }
+
+          readiness_probe {
+            http_get {
+              path = "/metrics"
+              port = "http"
+            }
+            initial_delay_seconds = 5
+            period_seconds        = 10
+          }
+
+          image_pull_policy = "IfNotPresent"
+
+          security_context {
+            allow_privilege_escalation = false
+            capabilities {
+              drop = ["ALL"]
+            }
+            read_only_root_filesystem = true
+            run_as_non_root          = true
+            run_as_user              = 65534
+          }
+        }
+
+        security_context {
+          fs_group = 65534
+        }
+      }
+    }
+  }
+
+  depends_on = [
+    kubernetes_service_account.reloader,
+    kubernetes_cluster_role_binding.reloader
+  ]
+}
+
+# Create Service for Reloader metrics
+resource "kubernetes_service" "reloader" {
+  count = var.reloader_config.enabled ? 1 : 0
+  
+  metadata {
+    name      = "reloader"
+    namespace = kubernetes_namespace.argocd.metadata[0].name
+    labels = {
+      app                          = "reloader"
+      "app.kubernetes.io/name"     = "reloader"
+      "app.kubernetes.io/instance" = "reloader"
+      managed-by                   = "terraform"
+    }
+  }
+
+  spec {
+    type = "ClusterIP"
+
+    port {
+      name        = "http"
+      port        = var.reloader_config.metrics_port
+      target_port = "http"
+      protocol    = "TCP"
+    }
+
+    selector = {
+      app = "reloader"
+    }
+  }
+}
+
+# Create ServiceMonitor for Prometheus scraping (if monitoring enabled)
+resource "kubernetes_manifest" "reloader_service_monitor" {
+  count = var.reloader_config.enabled && var.reloader_config.enable_service_monitor ? 1 : 0
+  
+  manifest = {
+    apiVersion = "monitoring.coreos.com/v1"
+    kind       = "ServiceMonitor"
+    metadata = {
+      name      = "reloader"
+      namespace = kubernetes_namespace.argocd.metadata[0].name
+      labels = {
+        app                          = "reloader"
+        "app.kubernetes.io/name"     = "reloader"
+        "app.kubernetes.io/instance" = "reloader"
+        managed-by                   = "terraform"
+      }
+    }
+    spec = {
+      selector = {
+        matchLabels = {
+          app = "reloader"
+        }
+      }
+      endpoints = [
+        {
+          port = "http"
+          path = "/metrics"
+        }
+      ]
+    }
+  }
+
+  depends_on = [kubernetes_service.reloader]
+}
+
+################################################################################
 # end of ./modules/argocd/main.tf
 ################################################################################

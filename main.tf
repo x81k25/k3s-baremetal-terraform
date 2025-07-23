@@ -24,6 +24,7 @@ module "argocd" {
   enable_image_updater   = var.enable_image_updater
   image_updater_log_level = var.image_updater_log_level
   enable_monitoring      = var.enable_monitoring
+  reloader_config        = var.reloader_config
 }
 
 ################################################################################

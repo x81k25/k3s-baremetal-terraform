@@ -86,6 +86,24 @@ variable "enable_monitoring" {
   default     = false
 }
 
+variable "reloader_config" {
+  description = "Stakater Reloader configuration for automatic pod restarts on ConfigMap/Secret changes"
+  type = object({
+    enabled                = bool
+    image                  = string
+    tag                    = string
+    log_level              = string
+    auto_reload_all        = bool
+    ignore_secrets         = bool
+    ignore_configmaps      = bool
+    watch_namespace        = optional(string, "")
+    metrics_enabled        = bool
+    metrics_port           = number
+    replicas               = number
+    enable_service_monitor = bool
+  })
+}
+
 ################################################################################
 # end of variables.tf
 ################################################################################
