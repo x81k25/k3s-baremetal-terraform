@@ -183,10 +183,11 @@ resource "kubernetes_config_map" "reel_driver_training_config" {
   }
 
   data = {
-    REEL_DRIVER_TRNG_PGSQL_HOST     = each.value.pgsql.host
-    REEL_DRIVER_TRNG_PGSQL_PORT     = each.value.pgsql.port
-    REEL_DRIVER_TRNG_PGSQL_DATABASE = each.value.pgsql.database
-    REEL_DRIVER_TRNG_PGSQL_SCHEMA   = each.value.pgsql.schema
+    REEL_DRIVER_TRNG_HYPER_PARAM_SEARCH_STRAT = each.value.hyper_param_search_start
+    REEL_DRIVER_TRNG_PGSQL_HOST               = each.value.pgsql.host
+    REEL_DRIVER_TRNG_PGSQL_PORT               = each.value.pgsql.port
+    REEL_DRIVER_TRNG_PGSQL_DATABASE           = each.value.pgsql.database
+    REEL_DRIVER_TRNG_PGSQL_SCHEMA             = each.value.pgsql.schema
   }
 }
 
