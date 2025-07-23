@@ -480,13 +480,13 @@ resource "kubernetes_cluster_role" "reloader" {
   rule {
     api_groups = ["apps"]
     resources  = ["deployments", "daemonsets", "statefulsets"]
-    verbs      = ["list", "get", "patch"]
+    verbs      = ["list", "get", "patch", "update"]
   }
 
   rule {
     api_groups = ["extensions"]
     resources  = ["deployments", "daemonsets"]
-    verbs      = ["list", "get", "patch"]
+    verbs      = ["list", "get", "patch", "update"]
   }
 
   rule {
