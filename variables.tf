@@ -846,6 +846,17 @@ variable "experiments_config" {
   })
 }
 
+# OSRM service configuration
+variable "osrm_config" {
+  description = "OSRM service configuration for experiments namespace"
+  type = object({
+    osm_download_url = string
+    osm_filename     = string
+    osrm_profile     = string
+    osrm_region      = string
+  })
+}
+
 ################################################################################
 # observability vars
 ################################################################################

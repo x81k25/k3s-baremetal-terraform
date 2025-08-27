@@ -649,5 +649,27 @@ locals {
 }
 
 ################################################################################
+# experiments locals  
+################################################################################
+
+locals {
+  ng_github_secrets = {
+    username            = var.github_secrets.username
+    token_packages_read = var.github_secrets.token_packages_read
+  }
+
+  osrm_config = merge(var.osrm_config, {
+    s3_region = var.minio_config.region
+    s3_bucket = "dev"
+  })
+
+  osrm_secrets = {
+    s3_endpoint   = var.minio_config.dev.endpoint.internal
+    s3_access_key = var.minio_secrets.dev.access_key
+    s3_secret_key = var.minio_secrets.dev.secret_key
+  }
+}
+
+################################################################################
 # end of locals.tf
 ################################################################################

@@ -72,3 +72,40 @@ resource "kubernetes_secret" "ng_github_registry" {
 
   type = "kubernetes.io/dockerconfigjson"
 }
+
+################################################################################
+# OSRM service configuration and secrets
+################################################################################
+
+# Create ConfigMap for OSRM non-sensitive configuration
+resource "kubernetes_config_map" "osrm_config" {
+  metadata {
+    name      = "osrm-config"
+    namespace = kubernetes_namespace.experiments.metadata[0].name
+  }
+
+  data = {
+    OSM_DOWNLOAD_URL = var.osrm_config.osm_download_url
+    OSM_FILENAME     = var.osrm_config.osm_filename
+    OSRM_PROFILE     = var.osrm_config.osrm_profile
+    OSRM_REGION      = var.osrm_config.osrm_region
+    S3_REGION        = var.osrm_config.s3_region
+    S3_BUCKET        = var.osrm_config.s3_bucket
+  }
+}
+
+# Create Secret for OSRM S3 credentials
+resource "kubernetes_secret" "osrm_secrets" {
+  metadata {
+    name      = "osrm-secrets"
+    namespace = kubernetes_namespace.experiments.metadata[0].name
+  }
+
+  data = {
+    S3_ENDPOINT   = var.osrm_secrets.s3_endpoint
+    S3_ACCESS_KEY = var.osrm_secrets.s3_access_key
+    S3_SECRET_KEY = var.osrm_secrets.s3_secret_key
+  }
+
+  type = "Opaque"
+}

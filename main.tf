@@ -124,7 +124,9 @@ module "experiments" {
   depends_on = [module.k3s]
 
   experiments_config = var.experiments_config
-  ng_github_secrets = var.ng_github_secrets
+  ng_github_secrets  = local.ng_github_secrets
+  osrm_config        = local.osrm_config
+  osrm_secrets       = local.osrm_secrets
 }
 
 ################################################################################
