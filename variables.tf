@@ -19,7 +19,6 @@ variable "kubeconfig_path" {
   description = "Path to kubeconfig file"
 }
 
-
 variable "github_secrets" {
   description = "github credentials"
   type = object({
@@ -29,7 +28,7 @@ variable "github_secrets" {
   sensitive = true
 }
 
-variable "ng_github_secrets" {
+variable "github_secrets_ng" {
   description = "ng github credentials"
   type = object({
     username = string
@@ -843,17 +842,6 @@ variable "experiments_config" {
       memory_request = string
       memory_limit   = string
     })
-  })
-}
-
-# OSRM service configuration
-variable "osrm_config" {
-  description = "OSRM service configuration for experiments namespace"
-  type = object({
-    osm_download_url = string
-    osm_filename     = string
-    osrm_profile     = string
-    osrm_region      = string
   })
 }
 
