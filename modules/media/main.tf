@@ -436,6 +436,7 @@ resource "kubernetes_secret" "wireguard_secrets" {
     WIREGUARD_PRIVATE_KEY = var.wireguard_secrets.inteface.private_key
     WIREGUARD_ADDRESS     = var.wireguard_secrets.inteface.addreses
     WIREGUARD_DNS         = var.wireguard_secrets.inteface.dns
+    WIREGUARD_MTU         = var.wireguard_secrets.inteface.mtu
     WIREGUARD_PUBLIC_KEY  = var.wireguard_secrets.peer.public_key
     WIREGUARD_ALLOWED_IPS = var.wireguard_secrets.peer.allowed_ips
     WIREGUARD_ENDPOINT    = var.wireguard_secrets.peer.endpoint
