@@ -113,6 +113,7 @@ variable "wireguard_secrets" {
       private_key = string
       addreses    = string
       dns         = string
+      mtu         = string
     })
     peer = object({
       public_key  = string
