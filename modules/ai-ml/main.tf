@@ -316,5 +316,70 @@ resource "kubernetes_config_map" "gpu_devices" {
 }
 
 ################################################################################
+# cici voice assistant config maps
+################################################################################
+
+# Local LLM (Ollama) configuration
+resource "kubernetes_config_map" "local_llm_config" {
+  metadata {
+    name      = "local-llm-config"
+    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+  }
+
+  data = {
+    OLLAMA_MODEL         = var.local_llm_config.model
+    OLLAMA_HOST_INTERNAL = var.local_llm_config.host.internal
+    OLLAMA_HOST_EXTERNAL = var.local_llm_config.host.external
+    OLLAMA_PORT_INTERNAL = tostring(var.local_llm_config.port.internal)
+    OLLAMA_PORT_EXTERNAL = tostring(var.local_llm_config.port.external)
+  }
+}
+
+# Cici shared configuration per environment
+resource "kubernetes_config_map" "cici_config" {
+  for_each = var.cici_config
+
+  metadata {
+    name      = "cici-config-${each.key}"
+    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+  }
+
+  data = {
+    # inter-service shared config
+    CICI_SAMPLE_RATE  = tostring(each.value.sample_rate)
+    CICI_LOG_LEVEL    = each.value.log_level
+    CICI_DEFAULT_CWD  = each.value.default_cwd
+    CICI_CLAUDE_MODEL = each.value.claude_model
+
+    # local LLM reference
+    CICI_OLLAMA_HOST  = each.value.local_llm.host
+    CICI_OLLAMA_PORT  = tostring(each.value.local_llm.port)
+    CICI_OLLAMA_MODEL = each.value.local_llm.model
+
+    # face service
+    CICI_FACE_HOST_INTERNAL = each.value.face.host.internal
+    CICI_FACE_HOST_EXTERNAL = each.value.face.host.external
+    CICI_FACE_PORT_INTERNAL = tostring(each.value.face.port.internal)
+    CICI_FACE_PORT_EXTERNAL = tostring(each.value.face.port.external)
+
+    # mind service
+    CICI_MIND_HOST_INTERNAL = each.value.mind.host.internal
+    CICI_MIND_PORT_INTERNAL = tostring(each.value.mind.port.internal)
+
+    # ears service
+    CICI_EARS_HOST_INTERNAL = each.value.ears.host.internal
+    CICI_EARS_PORT_INTERNAL = tostring(each.value.ears.port.internal)
+    CICI_EARS_SILENCE_MS    = tostring(each.value.ears.silence_ms)
+    CICI_EARS_DEBUG         = tostring(each.value.ears.debug)
+
+    # mouth service
+    CICI_MOUTH_HOST_INTERNAL     = each.value.mouth.host.internal
+    CICI_MOUTH_PORT_INTERNAL     = tostring(each.value.mouth.port.internal)
+    CICI_MOUTH_PIPER_VOICE       = each.value.mouth.piper_voice
+    CICI_MOUTH_PIPER_SAMPLE_RATE = tostring(each.value.mouth.piper_sample_rate)
+  }
+}
+
+################################################################################
 # end of main.tf
 ################################################################################

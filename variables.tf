@@ -663,6 +663,56 @@ variable "wst_secrets" {
 # ai-ml vars
 ################################################################################
 
+# local LLM configuration (Ollama)
+variable "local_llm_config" {
+  description = "Configuration for local LLM service (Ollama)"
+  type = object({
+    model = string
+    port = object({
+      internal = number
+      external = number
+    })
+  })
+}
+
+# cici voice assistant configuration
+variable "cici_config" {
+  description = "Configuration for cici voice assistant services"
+  type = object({
+    # inter-service shared config
+    sample_rate  = number
+    log_level    = string
+    default_cwd  = string
+    claude_model = string
+    # face - external exposure
+    face = object({
+      port_internal = number
+      dev = object({
+        port_external = number
+      })
+      prod = object({
+        port_external = number
+      })
+    })
+    # mind - internal only
+    mind = object({
+      port_internal = number
+    })
+    # ears - internal only
+    ears = object({
+      port_internal = number
+      silence_ms    = number
+      debug         = bool
+    })
+    # mouth - internal only
+    mouth = object({
+      port_internal     = number
+      piper_voice       = string
+      piper_sample_rate = number
+    })
+  })
+}
+
 # ai-ml namespace resource configuration
 variable "ai_ml_config" {
   description = "Resource configuration for ai-ml namespace"

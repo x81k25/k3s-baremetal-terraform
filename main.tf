@@ -116,6 +116,9 @@ module "ai_ml" {
   reel_driver_training_config = local.reel_driver_training_config
   reel_driver_secrets = local.reel_driver_secrets
   reel_driver_training_secrets = local.reel_driver_training_secrets
+  # cici vars
+  local_llm_config = local.local_llm_config
+  cici_config      = local.cici_config
 }
 
 ################################################################################

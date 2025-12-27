@@ -646,6 +646,83 @@ locals {
       }
     }
   }
+
+  # local LLM config with server_ip for external access
+  local_llm_config = {
+    model = var.local_llm_config.model
+    host = {
+      external = var.server_ip
+      internal = "ollama.ai-ml.svc.cluster.local"
+    }
+    port = {
+      internal = var.local_llm_config.port.internal
+      external = var.local_llm_config.port.external
+    }
+  }
+
+  # cici voice assistant config with derived K8s hosts
+  cici_config = {
+    for env in ["dev", "prod"] : env => {
+      # inter-service shared config
+      sample_rate  = var.cici_config.sample_rate
+      log_level    = var.cici_config.log_level
+      default_cwd  = var.cici_config.default_cwd
+      claude_model = var.cici_config.claude_model
+
+      # local LLM reference
+      local_llm = {
+        host = local.local_llm_config.host.internal
+        port = local.local_llm_config.port.internal
+        model = local.local_llm_config.model
+      }
+
+      # face - external exposure (NodePort)
+      face = {
+        host = {
+          internal = "cici-face-${env}.ai-ml.svc.cluster.local"
+          external = var.server_ip
+        }
+        port = {
+          internal = var.cici_config.face.port_internal
+          external = var.cici_config.face[env].port_external
+        }
+      }
+
+      # mind - internal only
+      mind = {
+        host = {
+          internal = "cici-mind-${env}.ai-ml.svc.cluster.local"
+        }
+        port = {
+          internal = var.cici_config.mind.port_internal
+        }
+      }
+
+      # ears - internal only
+      ears = {
+        host = {
+          internal = "cici-ears-${env}.ai-ml.svc.cluster.local"
+        }
+        port = {
+          internal = var.cici_config.ears.port_internal
+        }
+        silence_ms = var.cici_config.ears.silence_ms
+        debug      = var.cici_config.ears.debug
+      }
+
+      # mouth - internal only
+      mouth = {
+        host = {
+          internal = "cici-mouth-${env}.ai-ml.svc.cluster.local"
+        }
+        port = {
+          internal = var.cici_config.mouth.port_internal
+        }
+        piper_voice       = var.cici_config.mouth.piper_voice
+        piper_sample_rate = var.cici_config.mouth.piper_sample_rate
+      }
+    }
+  }
 }
 
 ################################################################################

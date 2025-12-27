@@ -84,6 +84,16 @@ variable "reel_driver_training_secrets" {
   sensitive = true
 }
 
+variable "local_llm_config" {
+  description = "Local LLM (Ollama) configuration"
+  type = any
+}
+
+variable "cici_config" {
+  description = "Cici voice assistant configuration for all environments"
+  type = any
+}
+
 ################################################################################
 # end of variables.tf
 ################################################################################
