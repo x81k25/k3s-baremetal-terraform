@@ -257,6 +257,63 @@ Sets up machine learning infrastructure:
 - Configures database connections
 - Sets up MinIO artifact storage
 - Manages secrets for authentication
+- Multi-GPU support with workload-specific GPU selection
+
+#### GPU Configuration
+
+The AI/ML module manages multi-GPU infrastructure with GPU Feature Discovery (GFD) for intelligent workload scheduling.
+
+**Current GPU Hardware:**
+
+| GPU | Model | UUID | Memory | Intended Use |
+|-----|-------|------|--------|--------------|
+| 0 | GTX 960 | `GPU-667bf786-...` | 4GB | Speech-to-text, Text-to-speech |
+| 1 | RTX 3060 | `GPU-cfbe0295-...` | 12GB | LLM hosting |
+
+**Configuration in `terraform.tfvars`:**
+
+```hcl
+gpu_config = {
+  gtx960 = {
+    uuid   = "GPU-667bf786-7b0e-d911-5717-f681af20072a"
+    memory = "4096"
+  }
+  rtx3060 = {
+    uuid   = "GPU-cfbe0295-2bfb-12c9-1bc9-b3b4833f2e18"
+    memory = "12288"
+  }
+  quota = 2
+}
+```
+
+**Workload GPU Selection:**
+
+Workloads in the `ai-ml` namespace can select specific GPUs using the `gpu-devices` ConfigMap:
+
+```yaml
+env:
+- name: NVIDIA_VISIBLE_DEVICES
+  valueFrom:
+    configMapKeyRef:
+      name: gpu-devices
+      key: RTX3060_UUID  # or GTX960_UUID
+resources:
+  limits:
+    nvidia.com/gpu: 1
+```
+
+**Validation Commands:**
+
+```bash
+# Check GPU quota
+kubectl describe resourcequota gpu-quota -n ai-ml
+
+# View gpu-devices ConfigMap
+kubectl get configmap gpu-devices -n ai-ml -o yaml
+
+# Check GFD labels on node
+kubectl get nodes -o json | grep nvidia.com
+```
 
 ### Media Module
 
@@ -317,7 +374,7 @@ The resource allocation is designed for a system with sufficient CPU cores and R
 | **Rancher (cattle-system)** | 2.0 | 2.0 | 2.0Gi | 4.0Gi | Rancher management UI |
 | **ArgoCD** | 2.0 | 4.0 | 2.0Gi | 4.0Gi | GitOps continuous deployment |
 | **PostgreSQL** | 4.0 | 8.0 | 6.0Gi | 10.0Gi | Database services with pgAdmin |
-| **AI/ML** | 4.0 | 20.0 | 6.0Gi | 16.0Gi | MLflow, reel-driver ML services |
+| **AI/ML** | 4.0 | 20.0 | 6.0Gi | 16.0Gi | MLflow, reel-driver ML services, 2x GPUs |
 | **Media (prod)** | 4.0 | 8.0 | 6.0Gi | 8.0Gi | Plex, Dagster, ATD production |
 | **Media (stg)** | - | 2.0 | - | 2.0Gi | Staging media services* |
 | **Media (dev)** | - | 2.0 | - | 2.0Gi | Development media services* |

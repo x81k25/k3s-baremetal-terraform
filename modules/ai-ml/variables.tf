@@ -31,6 +31,21 @@ variable "ai_ml_secrets" {
   sensitive = true
 }
 
+variable "gpu_config" {
+  description = "GPU device configuration for workload scheduling"
+  type = object({
+    gtx960 = object({
+      uuid   = string
+      memory = string
+    })
+    rtx3060 = object({
+      uuid   = string
+      memory = string
+    })
+    quota = number
+  })
+}
+
 variable "mlflow_config" {
   description = "holds all env vars for mlflow"
   type = any

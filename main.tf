@@ -103,8 +103,10 @@ module "ai_ml" {
   depends_on = [module.pgsql]
 
   # namespace vars
-  ai_ml_config = var.ai_ml_config
+  ai_ml_config  = var.ai_ml_config
   ai_ml_secrets = local.ai_ml_secrets
+  # gpu vars
+  gpu_config = var.gpu_config
   # mflow vars
   mlflow_config  = local.mlflow_config
   mlflow_secrets = local.mlflow_secrets

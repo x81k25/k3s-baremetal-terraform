@@ -238,13 +238,19 @@ data "kubernetes_resource" "nvidia_runtime_class" {
   }
 }
 
-# Mount the NVIDIA drivers in the DaemonSet
+# Mount the NVIDIA drivers in the DaemonSet with GPU Feature Discovery
 resource "helm_release" "nvidia_device_plugin" {
   name       = "nvidia-device-plugin"
   repository = "https://nvidia.github.io/k8s-device-plugin"
   chart      = "nvidia-device-plugin"
   namespace  = kubernetes_namespace.ai_ml.metadata[0].name
-  version    = "0.14.0"
+  version    = "0.17.1"
+
+  # Enable GPU Feature Discovery for node labeling
+  set {
+    name  = "gfd.enabled"
+    value = "true"
+  }
 
   set {
     name  = "migStrategy"
@@ -262,7 +268,7 @@ resource "helm_release" "nvidia_device_plugin" {
     value = "nvidia"
   }
 
-  # Add volume mounts for NVIDIA libraries
+  # Add volume mounts for NVIDIA libraries and GFD configuration
   values = [
     <<-EOT
     volumeMounts:
@@ -274,6 +280,9 @@ resource "helm_release" "nvidia_device_plugin" {
         hostPath:
           path: /usr/lib/x86_64-linux-gnu/libnvidia-ml.so.1
           type: File
+    gfd:
+      securityContext:
+        privileged: true
     EOT
   ]
 }
@@ -286,8 +295,23 @@ resource "kubernetes_resource_quota" "ai_ml_gpu" {
 
   spec {
     hard = {
-      "nvidia.com/gpu" = 1
+      "nvidia.com/gpu" = var.gpu_config.quota
     }
+  }
+}
+
+# GPU devices ConfigMap for workload GPU selection
+resource "kubernetes_config_map" "gpu_devices" {
+  metadata {
+    name      = "gpu-devices"
+    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+  }
+
+  data = {
+    GTX960_UUID    = var.gpu_config.gtx960.uuid
+    GTX960_MEMORY  = var.gpu_config.gtx960.memory
+    RTX3060_UUID   = var.gpu_config.rtx3060.uuid
+    RTX3060_MEMORY = var.gpu_config.rtx3060.memory
   }
 }
 

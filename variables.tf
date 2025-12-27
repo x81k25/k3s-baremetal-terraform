@@ -682,6 +682,22 @@ variable "ai_ml_config" {
   })
 }
 
+# gpu configuration for workload scheduling
+variable "gpu_config" {
+  description = "GPU device configuration for workload scheduling"
+  type = object({
+    gtx960 = object({
+      uuid   = string
+      memory = string
+    })
+    rtx3060 = object({
+      uuid   = string
+      memory = string
+    })
+    quota = number
+  })
+}
+
 # mlflow vars
 variable "mlflow_vars" {
   description = "env vars for mflow deployment"
