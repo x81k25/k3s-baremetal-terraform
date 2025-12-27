@@ -226,5 +226,71 @@ resource "kubernetes_secret" "reel_driver_training_secrets" {
 }
 
 ################################################################################
+# configure GPU for ai-ml use
+################################################################################
+
+# Create a RuntimeClass for NVIDIA
+data "kubernetes_resource" "nvidia_runtime_class" {
+  api_version = "node.k8s.io/v1"
+  kind        = "RuntimeClass"
+  metadata {
+    name = "nvidia"
+  }
+}
+
+# Mount the NVIDIA drivers in the DaemonSet
+resource "helm_release" "nvidia_device_plugin" {
+  name       = "nvidia-device-plugin"
+  repository = "https://nvidia.github.io/k8s-device-plugin"
+  chart      = "nvidia-device-plugin"
+  namespace  = kubernetes_namespace.ai_ml.metadata[0].name
+  version    = "0.14.0"
+
+  set {
+    name  = "migStrategy"
+    value = "none"
+  }
+
+  set {
+    name  = "compatWithCPUManager"
+    value = "true"
+  }
+
+  # Set the runtime class to use the NVIDIA runtime
+  set {
+    name  = "runtimeClassName"
+    value = "nvidia"
+  }
+
+  # Add volume mounts for NVIDIA libraries
+  values = [
+    <<-EOT
+    volumeMounts:
+      - name: nvidia-driver-libs
+        mountPath: /usr/lib/x86_64-linux-gnu/libnvidia-ml.so.1
+        subPath: libnvidia-ml.so.1
+    volumes:
+      - name: nvidia-driver-libs
+        hostPath:
+          path: /usr/lib/x86_64-linux-gnu/libnvidia-ml.so.1
+          type: File
+    EOT
+  ]
+}
+
+resource "kubernetes_resource_quota" "ai_ml_gpu" {
+  metadata {
+    name      = "gpu-quota"
+    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+  }
+
+  spec {
+    hard = {
+      "nvidia.com/gpu" = 1
+    }
+  }
+}
+
+################################################################################
 # end of main.tf
 ################################################################################

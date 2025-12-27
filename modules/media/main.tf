@@ -424,6 +424,26 @@ resource "kubernetes_secret" "vpn_config" {
   type = "Opaque"
 }
 
+resource "kubernetes_secret" "wireguard_secrets" {
+  for_each = toset(["media-dev", "media-stg", "media-prod"])
+
+  metadata {
+    name      = "wireguard-secrets"
+    namespace = each.key
+  }
+
+  data = {
+    WIREGUARD_PRIVATE_KEY = var.wireguard_secrets.inteface.private_key
+    WIREGUARD_ADDRESS     = var.wireguard_secrets.inteface.addreses
+    WIREGUARD_DNS         = var.wireguard_secrets.inteface.dns
+    WIREGUARD_PUBLIC_KEY  = var.wireguard_secrets.peer.public_key
+    WIREGUARD_ALLOWED_IPS = var.wireguard_secrets.peer.allowed_ips
+    WIREGUARD_ENDPOINT    = var.wireguard_secrets.peer.endpoint
+  }
+
+  type = "Opaque"
+}
+
 ################################################################################
 # plex config
 ################################################################################
@@ -571,72 +591,6 @@ resource "kubernetes_secret" "reel_driver_training_secrets" {
   }
 
   type = "Opaque"
-}
-
-################################################################################
-# configure GPU for media use
-################################################################################
-
-# Create a RuntimeClass for NVIDIA
-data "kubernetes_resource" "nvidia_runtime_class" {
-  api_version = "node.k8s.io/v1"
-  kind        = "RuntimeClass"
-  metadata {
-    name = "nvidia"
-  }
-}
-
-# Mount the NVIDIA drivers in the DaemonSet
-resource "helm_release" "nvidia_device_plugin" {
-  name       = "nvidia-device-plugin"
-  repository = "https://nvidia.github.io/k8s-device-plugin"
-  chart      = "nvidia-device-plugin"
-  namespace  = kubernetes_namespace.media-prod.metadata[0].name
-  version    = "0.14.0"
-
-  set {
-    name  = "migStrategy"
-    value = "none"
-  }
-
-  set {
-    name  = "compatWithCPUManager"
-    value = "true"
-  }
-
-  # Set the runtime class to use the NVIDIA runtime
-  set {
-    name  = "runtimeClassName"
-    value = "nvidia"
-  }
-
-  # Add volume mounts for NVIDIA libraries
-  values = [
-    <<-EOT
-    volumeMounts:
-      - name: nvidia-driver-libs
-        mountPath: /usr/lib/x86_64-linux-gnu/libnvidia-ml.so.1
-        subPath: libnvidia-ml.so.1
-    volumes:
-      - name: nvidia-driver-libs
-        hostPath:
-          path: /usr/lib/x86_64-linux-gnu/libnvidia-ml.so.1
-          type: File
-    EOT
-  ]
-}
-
-resource "kubernetes_resource_quota" "media_prod_gpu" {
-  metadata {
-    name      = "gpu-quota"
-    namespace = "media-prod"
-  }
-
-  spec {
-    hard = {
-      "nvidia.com/gpu" = 1
-    }
-  }
 }
 
 ################################################################################

@@ -69,8 +69,9 @@ module "media" {
   plex_secrets  = var.plex_secrets
   media_secrets = local.media_secrets
   # atd vars
-  vpn_config          = var.vpn_config
-  transmission_config = local.transmission_config
+  vpn_config           = var.vpn_config
+  wireguard_secrets    = var.wireguard_secrets
+  transmission_config  = local.transmission_config
   transmission_secrets = var.transmission_secrets
   # read diff vars
   rear_diff_config  = local.rear_diff_config

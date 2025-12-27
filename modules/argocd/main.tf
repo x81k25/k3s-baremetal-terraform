@@ -216,12 +216,12 @@ resource "helm_release" "argocd" {
         }
         resources = {
           limits = {
-            cpu    = var.argocd_config.container_defaults.cpu_limit
-            memory = var.argocd_config.container_defaults.memory_limit
+            cpu    = lookup(var.argocd_config.container_overrides, "controller", var.argocd_config.container_defaults).cpu_limit
+            memory = lookup(var.argocd_config.container_overrides, "controller", var.argocd_config.container_defaults).memory_limit
           }
           requests = {
-            cpu    = var.argocd_config.container_defaults.cpu_request
-            memory = var.argocd_config.container_defaults.memory_request
+            cpu    = lookup(var.argocd_config.container_overrides, "controller", var.argocd_config.container_defaults).cpu_request
+            memory = lookup(var.argocd_config.container_overrides, "controller", var.argocd_config.container_defaults).memory_request
           }
         }
       })

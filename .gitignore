@@ -47,6 +47,7 @@ Thumbs.db
 *~
 
 # files for development use only
-.dev/
+.bak
+.dev
 .claude
 CLAUDE.md
