@@ -76,18 +76,46 @@ variable "vpn_config" {
 }
 
 variable "wireguard_secrets" {
-  description = "wireguard vpn credentials"
+  description = "wireguard vpn credentials per environment"
   type = object({
-    inteface = object({
-      private_key = string
-      addreses    = string
-      dns         = string
-      mtu         = string
+    prod = object({
+      inteface = object({
+        private_key = string
+        addreses    = string
+        dns         = string
+        mtu         = string
+      })
+      peer = object({
+        public_key  = string
+        allowed_ips = string
+        endpoint    = string
+      })
     })
-    peer = object({
-      public_key  = string
-      allowed_ips = string
-      endpoint    = string
+    stg = object({
+      inteface = object({
+        private_key = string
+        addreses    = string
+        dns         = string
+        mtu         = string
+      })
+      peer = object({
+        public_key  = string
+        allowed_ips = string
+        endpoint    = string
+      })
+    })
+    dev = object({
+      inteface = object({
+        private_key = string
+        addreses    = string
+        dns         = string
+        mtu         = string
+      })
+      peer = object({
+        public_key  = string
+        allowed_ips = string
+        endpoint    = string
+      })
     })
   })
   sensitive = true

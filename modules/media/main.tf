@@ -425,21 +425,21 @@ resource "kubernetes_secret" "vpn_config" {
 }
 
 resource "kubernetes_secret" "wireguard_secrets" {
-  for_each = toset(["media-dev", "media-stg", "media-prod"])
+  for_each = toset(local.environments)
 
   metadata {
     name      = "wireguard-secrets"
-    namespace = each.key
+    namespace = "media-${each.key}"
   }
 
   data = {
-    WIREGUARD_PRIVATE_KEY = var.wireguard_secrets.inteface.private_key
-    WIREGUARD_ADDRESS     = var.wireguard_secrets.inteface.addreses
-    WIREGUARD_DNS         = var.wireguard_secrets.inteface.dns
-    WIREGUARD_MTU         = var.wireguard_secrets.inteface.mtu
-    WIREGUARD_PUBLIC_KEY  = var.wireguard_secrets.peer.public_key
-    WIREGUARD_ALLOWED_IPS = var.wireguard_secrets.peer.allowed_ips
-    WIREGUARD_ENDPOINT    = var.wireguard_secrets.peer.endpoint
+    WIREGUARD_PRIVATE_KEY = var.wireguard_secrets[each.key].inteface.private_key
+    WIREGUARD_ADDRESS     = var.wireguard_secrets[each.key].inteface.addreses
+    WIREGUARD_DNS         = var.wireguard_secrets[each.key].inteface.dns
+    WIREGUARD_MTU         = var.wireguard_secrets[each.key].inteface.mtu
+    WIREGUARD_PUBLIC_KEY  = var.wireguard_secrets[each.key].peer.public_key
+    WIREGUARD_ALLOWED_IPS = var.wireguard_secrets[each.key].peer.allowed_ips
+    WIREGUARD_ENDPOINT    = var.wireguard_secrets[each.key].peer.endpoint
   }
 
   type = "Opaque"
