@@ -73,9 +73,9 @@ module "media" {
   wireguard_secrets    = var.wireguard_secrets
   transmission_config  = local.transmission_config
   transmission_secrets = var.transmission_secrets
-  # read diff vars
+  # rear diff vars
   rear_diff_config  = local.rear_diff_config
-  rear_diff_secrets = var.rear_diff_secrets
+  rear_diff_secrets = local.rear_diff_secrets
   # center-console vars
   center_console_config = var.center_console_config
   # dagster vars

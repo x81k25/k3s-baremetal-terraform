@@ -218,6 +218,8 @@ resource "kubernetes_config_map" "dagster_config" {
     DAGSTER_PG_HOST   = var.dagster_config.pgsql[each.key].host
     DAGSTER_PG_PORT   = var.dagster_config.pgsql[each.key].port
     DAGSTER_PG_DB     = var.dagster_config.pgsql[each.key].database
+    DAGSTER_MINIO_ENDPOINT = var.reel_driver_config[each.key].minio.endpoint
+    DAGSTER_MINIO_PORT     = var.reel_driver_config[each.key].minio.port
   }
 }
 
@@ -233,8 +235,10 @@ resource "kubernetes_secret" "dagster_secrets" {
   type = "Opaque"
 
   data = {
-    DAGSTER_PG_USERNAME = var.dagster_secrets[each.key].username
-    DAGSTER_PG_PASSWORD = var.dagster_secrets[each.key].password
+    DAGSTER_PG_USERNAME    = var.dagster_secrets[each.key].username
+    DAGSTER_PG_PASSWORD    = var.dagster_secrets[each.key].password
+    DAGSTER_MINIO_ACCESS_KEY = var.reel_driver_secrets[each.key].minio.access_key
+    DAGSTER_MINIO_SECRET_KEY = var.reel_driver_secrets[each.key].minio.secrest_key
   }
 }
 
@@ -474,12 +478,14 @@ resource "kubernetes_config_map" "rear_diff_config" {
   }
 
   data = {
-    REAR_DIFF_HOST           = each.value.host
-    REAR_DIFF_PORT_EXTERNAL  = each.value.port_external
-    REAR_DIFF_PREFIX         = each.value.prefix
-    REAR_DIFF_PGSQL_HOST     = each.value.pgsql.host
-    REAR_DIFF_PGSQL_PORT     = each.value.pgsql.port
-    REAR_DIFF_PGSQL_DATABASE = each.value.pgsql.database
+    REAR_DIFF_HOST               = each.value.host
+    REAR_DIFF_PORT_EXTERNAL      = each.value.port_external
+    REAR_DIFF_PREFIX             = each.value.prefix
+    REAR_DIFF_PGSQL_HOST         = each.value.pgsql.host
+    REAR_DIFF_PGSQL_PORT         = each.value.pgsql.port
+    REAR_DIFF_PGSQL_DATABASE     = each.value.pgsql.database
+    REAR_DIFF_TRANSMISSION_HOST  = each.value.transmission.host
+    REAR_DIFF_TRANSMISSION_PORT  = each.value.transmission.port
   }
 }
 
@@ -493,8 +499,10 @@ resource "kubernetes_secret" "rear_diff_secrets" {
   }
 
   data = {
-    REAR_DIFF_PGSQL_USERNAME = var.rear_diff_secrets[each.key].pgsql.username
-    REAR_DIFF_PGSQL_PASSWORD = var.rear_diff_secrets[each.key].pgsql.password
+    REAR_DIFF_PGSQL_USERNAME        = var.rear_diff_secrets[each.key].pgsql.username
+    REAR_DIFF_PGSQL_PASSWORD        = var.rear_diff_secrets[each.key].pgsql.password
+    REAR_DIFF_TRANSMISSION_USERNAME = var.rear_diff_secrets[each.key].transmission.username
+    REAR_DIFF_TRANSMISSION_PASSWORD = var.rear_diff_secrets[each.key].transmission.password
   }
 
   type = "Opaque"

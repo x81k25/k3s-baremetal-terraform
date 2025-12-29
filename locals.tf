@@ -343,6 +343,10 @@ locals {
         port     = var.pgsql_default_config.prod.port
         database = var.pgsql_default_config.database
       }
+      transmission = {
+        host = var.server_ip
+        port = var.transmission_vars.prod.port
+      }
     }
     stg = {
       host          = var.server_ip
@@ -353,6 +357,10 @@ locals {
         port     = var.pgsql_default_config.stg.port
         database = var.pgsql_default_config.database
       }
+      transmission = {
+        host = var.server_ip
+        port = var.transmission_vars.stg.port
+      }
     }
     dev = {
       host          = var.server_ip
@@ -361,7 +369,44 @@ locals {
       pgsql = {
         host     = var.pgsql_default_config.dev.host
         port     = var.pgsql_default_config.dev.port
-        database = var.pgsql_default_config.database        
+        database = var.pgsql_default_config.database
+      }
+      transmission = {
+        host = var.server_ip
+        port = var.transmission_vars.dev.port
+      }
+    }
+  }
+
+  rear_diff_secrets = {
+    prod = {
+      pgsql = {
+        username = var.rear_diff_secrets.prod.pgsql.username
+        password = var.rear_diff_secrets.prod.pgsql.password
+      }
+      transmission = {
+        username = var.transmission_secrets.prod.username
+        password = var.transmission_secrets.prod.password
+      }
+    }
+    stg = {
+      pgsql = {
+        username = var.rear_diff_secrets.stg.pgsql.username
+        password = var.rear_diff_secrets.stg.pgsql.password
+      }
+      transmission = {
+        username = var.transmission_secrets.stg.username
+        password = var.transmission_secrets.stg.password
+      }
+    }
+    dev = {
+      pgsql = {
+        username = var.rear_diff_secrets.dev.pgsql.username
+        password = var.rear_diff_secrets.dev.pgsql.password
+      }
+      transmission = {
+        username = var.transmission_secrets.dev.username
+        password = var.transmission_secrets.dev.password
       }
     }
   }

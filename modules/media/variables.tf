@@ -205,6 +205,10 @@ variable "rear_diff_config" {
         port     = string
         database = string
       })
+      transmission = object({
+        host = string
+        port = string
+      })
     })
     stg = object({
       host = string
@@ -214,6 +218,10 @@ variable "rear_diff_config" {
         host     = string
         port     = string
         database = string
+      })
+      transmission = object({
+        host = string
+        port = string
       })
     })
     dev = object({
@@ -225,17 +233,25 @@ variable "rear_diff_config" {
         port     = string
         database = string
       })
+      transmission = object({
+        host = string
+        port = string
+      })
     })
   })
 }
 
 variable "rear_diff_secrets" {
-  description = "parameters to connect rear differential API to DB"
+  description = "parameters to connect rear differential API to DB and Transmission"
   type = object({
     prod = object({
       pgsql = object({
-          username = string
-          password = string
+        username = string
+        password = string
+      })
+      transmission = object({
+        username = string
+        password = string
       })
     })
     stg = object({
@@ -243,9 +259,17 @@ variable "rear_diff_secrets" {
         username = string
         password = string
       })
+      transmission = object({
+        username = string
+        password = string
+      })
     })
     dev = object({
       pgsql = object({
+        username = string
+        password = string
+      })
+      transmission = object({
         username = string
         password = string
       })
