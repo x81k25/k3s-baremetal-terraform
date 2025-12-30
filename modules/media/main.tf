@@ -325,6 +325,33 @@ resource "kubernetes_config_map" "transmission_config" {
   }
 }
 
+# Create ConfigMap for transmission settings - all environments
+resource "kubernetes_config_map" "transmission_settings" {
+  for_each = toset(local.environments)
+
+  metadata {
+    name      = "transmission-settings"
+    namespace = "media-${each.key}"
+  }
+
+  data = {
+    TRANSMISSION_SPEED_LIMIT_DOWN         = tostring(var.transmission_config[each.key].env_vars.speed_limit_down)
+    TRANSMISSION_SPEED_LIMIT_DOWN_ENABLED = tostring(var.transmission_config[each.key].env_vars.speed_limit_down_enabled)
+    TRANSMISSION_SPEED_LIMIT_UP           = tostring(var.transmission_config[each.key].env_vars.speed_limit_up)
+    TRANSMISSION_SPEED_LIMIT_UP_ENABLED   = tostring(var.transmission_config[each.key].env_vars.speed_limit_up_enabled)
+    TRANSMISSION_DOWNLOAD_QUEUE_ENABLED   = tostring(var.transmission_config[each.key].env_vars.download_queue_enabled)
+    TRANSMISSION_DOWNLOAD_QUEUE_SIZE      = tostring(var.transmission_config[each.key].env_vars.download_queue_size)
+    TRANSMISSION_SEED_QUEUE_ENABLED       = tostring(var.transmission_config[each.key].env_vars.seed_queue_enabled)
+    TRANSMISSION_SEED_QUEUE_SIZE          = tostring(var.transmission_config[each.key].env_vars.seed_queue_size)
+    TRANSMISSION_QUEUE_STALLED_ENABLED    = tostring(var.transmission_config[each.key].env_vars.queue_stalled_enabled)
+    TRANSMISSION_QUEUE_STALLED_MINUTES    = tostring(var.transmission_config[each.key].env_vars.queue_stalled_minutes)
+    TRANSMISSION_PEER_LIMIT_GLOBAL        = tostring(var.transmission_config[each.key].env_vars.peer_limit_global)
+    TRANSMISSION_PEER_LIMIT_PER_TORRENT   = tostring(var.transmission_config[each.key].env_vars.peer_limit_per_torrent)
+    TRANSMISSION_CACHE_SIZE_MB            = tostring(var.transmission_config[each.key].env_vars.cache_size_mb)
+    TRANSMISSION_PREALLOCATION            = tostring(var.transmission_config[each.key].env_vars.preallocation)
+  }
+}
+
 
 # Create Secret for AT sensitive config - all environments
 resource "kubernetes_secret" "at_secrets" {

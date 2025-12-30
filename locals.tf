@@ -181,14 +181,62 @@ locals {
     prod = {
       host = var.server_ip
       port = var.transmission_vars.prod.port
+      env_vars = {
+        speed_limit_down         = var.transmission_env_config.prod.speed_limit_down
+        speed_limit_down_enabled = var.transmission_env_config.prod.speed_limit_down_enabled
+        speed_limit_up           = var.transmission_env_config.prod.speed_limit_up
+        speed_limit_up_enabled   = var.transmission_env_config.prod.speed_limit_up_enabled
+        download_queue_enabled   = var.transmission_env_config.prod.download_queue_enabled
+        download_queue_size      = var.transmission_env_config.prod.download_queue_size
+        seed_queue_enabled       = var.transmission_env_config.prod.seed_queue_enabled
+        seed_queue_size          = var.transmission_env_config.prod.seed_queue_size
+        queue_stalled_enabled    = var.transmission_env_config.prod.queue_stalled_enabled
+        queue_stalled_minutes    = var.transmission_env_config.prod.queue_stalled_minutes
+        peer_limit_global        = var.transmission_env_config.prod.peer_limit_global
+        peer_limit_per_torrent   = var.transmission_env_config.prod.peer_limit_per_torrent
+        cache_size_mb            = var.transmission_env_config.prod.cache_size_mb
+        preallocation            = var.transmission_env_config.prod.preallocation
+      }
     }
     stg = {
       host = var.server_ip
       port = var.transmission_vars.stg.port
+      env_vars = {
+        speed_limit_down         = var.transmission_env_config.stg.speed_limit_down
+        speed_limit_down_enabled = var.transmission_env_config.stg.speed_limit_down_enabled
+        speed_limit_up           = var.transmission_env_config.stg.speed_limit_up
+        speed_limit_up_enabled   = var.transmission_env_config.stg.speed_limit_up_enabled
+        download_queue_enabled   = var.transmission_env_config.stg.download_queue_enabled
+        download_queue_size      = var.transmission_env_config.stg.download_queue_size
+        seed_queue_enabled       = var.transmission_env_config.stg.seed_queue_enabled
+        seed_queue_size          = var.transmission_env_config.stg.seed_queue_size
+        queue_stalled_enabled    = var.transmission_env_config.stg.queue_stalled_enabled
+        queue_stalled_minutes    = var.transmission_env_config.stg.queue_stalled_minutes
+        peer_limit_global        = var.transmission_env_config.stg.peer_limit_global
+        peer_limit_per_torrent   = var.transmission_env_config.stg.peer_limit_per_torrent
+        cache_size_mb            = var.transmission_env_config.stg.cache_size_mb
+        preallocation            = var.transmission_env_config.stg.preallocation
+      }
     }
     dev = {
       host = var.server_ip
       port = var.transmission_vars.dev.port
+      env_vars = {
+        speed_limit_down         = var.transmission_env_config.dev.speed_limit_down
+        speed_limit_down_enabled = var.transmission_env_config.dev.speed_limit_down_enabled
+        speed_limit_up           = var.transmission_env_config.dev.speed_limit_up
+        speed_limit_up_enabled   = var.transmission_env_config.dev.speed_limit_up_enabled
+        download_queue_enabled   = var.transmission_env_config.dev.download_queue_enabled
+        download_queue_size      = var.transmission_env_config.dev.download_queue_size
+        seed_queue_enabled       = var.transmission_env_config.dev.seed_queue_enabled
+        seed_queue_size          = var.transmission_env_config.dev.seed_queue_size
+        queue_stalled_enabled    = var.transmission_env_config.dev.queue_stalled_enabled
+        queue_stalled_minutes    = var.transmission_env_config.dev.queue_stalled_minutes
+        peer_limit_global        = var.transmission_env_config.dev.peer_limit_global
+        peer_limit_per_torrent   = var.transmission_env_config.dev.peer_limit_per_torrent
+        cache_size_mb            = var.transmission_env_config.dev.cache_size_mb
+        preallocation            = var.transmission_env_config.dev.preallocation
+      }
     }
   }
 

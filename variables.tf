@@ -577,6 +577,60 @@ variable "transmission_vars" {
   })
 }
 
+variable "transmission_env_config" {
+  description = "Transmission daemon settings per environment"
+  type = object({
+    prod = object({
+      speed_limit_down         = number
+      speed_limit_down_enabled = bool
+      speed_limit_up           = number
+      speed_limit_up_enabled   = bool
+      download_queue_enabled   = bool
+      download_queue_size      = number
+      seed_queue_enabled       = bool
+      seed_queue_size          = number
+      queue_stalled_enabled    = bool
+      queue_stalled_minutes    = number
+      peer_limit_global        = number
+      peer_limit_per_torrent   = number
+      cache_size_mb            = number
+      preallocation            = number
+    })
+    stg = object({
+      speed_limit_down         = number
+      speed_limit_down_enabled = bool
+      speed_limit_up           = number
+      speed_limit_up_enabled   = bool
+      download_queue_enabled   = bool
+      download_queue_size      = number
+      seed_queue_enabled       = bool
+      seed_queue_size          = number
+      queue_stalled_enabled    = bool
+      queue_stalled_minutes    = number
+      peer_limit_global        = number
+      peer_limit_per_torrent   = number
+      cache_size_mb            = number
+      preallocation            = number
+    })
+    dev = object({
+      speed_limit_down         = number
+      speed_limit_down_enabled = bool
+      speed_limit_up           = number
+      speed_limit_up_enabled   = bool
+      download_queue_enabled   = bool
+      download_queue_size      = number
+      seed_queue_enabled       = bool
+      seed_queue_size          = number
+      queue_stalled_enabled    = bool
+      queue_stalled_minutes    = number
+      peer_limit_global        = number
+      peer_limit_per_torrent   = number
+      cache_size_mb            = number
+      preallocation            = number
+    })
+  })
+}
+
 variable "transmission_secrets" {
   description = "Transmission authentication credentials per environment"
   type = object({
