@@ -257,6 +257,11 @@ variable "rear_diff_config" {
         host = string
         port = string
       })
+      dirs = object({
+        download_dir = string
+        movie_dir    = string
+        tv_show_dir  = string
+      })
     })
     stg = object({
       host = string
@@ -271,6 +276,11 @@ variable "rear_diff_config" {
         host = string
         port = string
       })
+      dirs = object({
+        download_dir = string
+        movie_dir    = string
+        tv_show_dir  = string
+      })
     })
     dev = object({
       host = string
@@ -284,6 +294,11 @@ variable "rear_diff_config" {
       transmission = object({
         host = string
         port = string
+      })
+      dirs = object({
+        download_dir = string
+        movie_dir    = string
+        tv_show_dir  = string
       })
     })
   })
