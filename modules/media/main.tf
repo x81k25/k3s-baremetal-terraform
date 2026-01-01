@@ -505,14 +505,15 @@ resource "kubernetes_config_map" "rear_diff_config" {
   }
 
   data = {
-    REAR_DIFF_HOST               = each.value.host
-    REAR_DIFF_PORT_EXTERNAL      = each.value.port_external
-    REAR_DIFF_PREFIX             = each.value.prefix
-    REAR_DIFF_PGSQL_HOST         = each.value.pgsql.host
-    REAR_DIFF_PGSQL_PORT         = each.value.pgsql.port
-    REAR_DIFF_PGSQL_DATABASE     = each.value.pgsql.database
-    REAR_DIFF_TRANSMISSION_HOST  = each.value.transmission.host
-    REAR_DIFF_TRANSMISSION_PORT  = each.value.transmission.port
+    REAR_DIFF_HOST                      = each.value.host
+    REAR_DIFF_PORT_EXTERNAL             = each.value.port_external
+    REAR_DIFF_PREFIX                    = each.value.prefix
+    REAR_DIFF_PGSQL_HOST                = each.value.pgsql.host
+    REAR_DIFF_PGSQL_PORT                = each.value.pgsql.port
+    REAR_DIFF_PGSQL_DATABASE            = each.value.pgsql.database
+    REAR_DIFF_TRANSMISSION_HOST         = each.value.transmission.host
+    REAR_DIFF_TRANSMISSION_PORT         = each.value.transmission.port
+    REAR_DIFF_FILE_DELETION_ENABLED     = tostring(each.value.file_deletion_enabled)
     REAR_DIFF_MEDIA_CACHE_PATH          = each.value.paths.media_cache_path
     REAR_DIFF_MEDIA_LIBRARY_PATH_MOVIES = each.value.paths.media_library_path_movies
     REAR_DIFF_MEDIA_LIBRARY_PATH_TV     = each.value.paths.media_library_path_tv

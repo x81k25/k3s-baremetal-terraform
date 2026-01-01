@@ -383,9 +383,10 @@ locals {
 
   rear_diff_config = {
     prod = {
-      host          = var.server_ip
-      port_external = var.rear_diff_vars.prod.port_external
-      prefix        = var.rear_diff_vars.prefix
+      host                  = var.server_ip
+      port_external         = var.rear_diff_vars.prod.port_external
+      prefix                = var.rear_diff_vars.prefix
+      file_deletion_enabled = var.rear_diff_vars.file_deletion_enabled
       pgsql = {
         host     = var.pgsql_default_config.prod.host
         port     = var.pgsql_default_config.prod.port
@@ -402,9 +403,10 @@ locals {
       }
     }
     stg = {
-      host          = var.server_ip
-      port_external = var.rear_diff_vars.stg.port_external
-      prefix        = var.rear_diff_vars.prefix
+      host                  = var.server_ip
+      port_external         = var.rear_diff_vars.stg.port_external
+      prefix                = var.rear_diff_vars.prefix
+      file_deletion_enabled = var.rear_diff_vars.file_deletion_enabled
       pgsql = {
         host     = var.pgsql_default_config.stg.host
         port     = var.pgsql_default_config.stg.port
@@ -421,9 +423,10 @@ locals {
       }
     }
     dev = {
-      host          = var.server_ip
-      port_external = var.rear_diff_vars.dev.port_external
-      prefix        = var.rear_diff_vars.prefix
+      host                  = var.server_ip
+      port_external         = var.rear_diff_vars.dev.port_external
+      prefix                = var.rear_diff_vars.prefix
+      file_deletion_enabled = var.rear_diff_vars.file_deletion_enabled
       pgsql = {
         host     = var.pgsql_default_config.dev.host
         port     = var.pgsql_default_config.dev.port

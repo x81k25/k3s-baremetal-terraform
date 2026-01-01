@@ -504,7 +504,8 @@ variable "plex_secrets" {
 variable "rear_diff_vars"  {
   description = "rear diff config env vars"
   type = object({
-    prefix = string
+    prefix                = string
+    file_deletion_enabled = bool
     prod = object({
       port_external = string
     })
