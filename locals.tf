@@ -395,10 +395,10 @@ locals {
         host = var.server_ip
         port = var.transmission_vars.prod.port
       }
-      dirs = {
-        download_dir = var.at_vars.prod.download_dir
-        movie_dir    = var.at_vars.prod.movie_dir
-        tv_show_dir  = var.at_vars.prod.tv_show_dir
+      paths = {
+        media_cache_path          = var.at_vars.prod.download_dir
+        media_library_path_movies = var.at_vars.prod.movie_dir
+        media_library_path_tv     = var.at_vars.prod.tv_show_dir
       }
     }
     stg = {
@@ -414,10 +414,10 @@ locals {
         host = var.server_ip
         port = var.transmission_vars.stg.port
       }
-      dirs = {
-        download_dir = var.at_vars.stg.download_dir
-        movie_dir    = var.at_vars.stg.movie_dir
-        tv_show_dir  = var.at_vars.stg.tv_show_dir
+      paths = {
+        media_cache_path          = var.at_vars.stg.download_dir
+        media_library_path_movies = var.at_vars.stg.movie_dir
+        media_library_path_tv     = var.at_vars.stg.tv_show_dir
       }
     }
     dev = {
@@ -433,10 +433,10 @@ locals {
         host = var.server_ip
         port = var.transmission_vars.dev.port
       }
-      dirs = {
-        download_dir = var.at_vars.dev.download_dir
-        movie_dir    = var.at_vars.dev.movie_dir
-        tv_show_dir  = var.at_vars.dev.tv_show_dir
+      paths = {
+        media_cache_path          = var.at_vars.dev.download_dir
+        media_library_path_movies = var.at_vars.dev.movie_dir
+        media_library_path_tv     = var.at_vars.dev.tv_show_dir
       }
     }
   }

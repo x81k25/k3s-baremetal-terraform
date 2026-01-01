@@ -513,9 +513,9 @@ resource "kubernetes_config_map" "rear_diff_config" {
     REAR_DIFF_PGSQL_DATABASE     = each.value.pgsql.database
     REAR_DIFF_TRANSMISSION_HOST  = each.value.transmission.host
     REAR_DIFF_TRANSMISSION_PORT  = each.value.transmission.port
-    REAR_DIFF_DOWNLOAD_DIR       = each.value.dirs.download_dir
-    REAR_DIFF_MOVIE_DIR          = each.value.dirs.movie_dir
-    REAR_DIFF_TV_SHOW_DIR        = each.value.dirs.tv_show_dir
+    REAR_DIFF_MEDIA_CACHE_PATH          = each.value.paths.media_cache_path
+    REAR_DIFF_MEDIA_LIBRARY_PATH_MOVIES = each.value.paths.media_library_path_movies
+    REAR_DIFF_MEDIA_LIBRARY_PATH_TV     = each.value.paths.media_library_path_tv
   }
 }
 

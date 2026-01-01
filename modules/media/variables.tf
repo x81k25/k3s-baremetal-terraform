@@ -257,10 +257,10 @@ variable "rear_diff_config" {
         host = string
         port = string
       })
-      dirs = object({
-        download_dir = string
-        movie_dir    = string
-        tv_show_dir  = string
+      paths = object({
+        media_cache_path          = string
+        media_library_path_movies = string
+        media_library_path_tv     = string
       })
     })
     stg = object({
@@ -276,10 +276,10 @@ variable "rear_diff_config" {
         host = string
         port = string
       })
-      dirs = object({
-        download_dir = string
-        movie_dir    = string
-        tv_show_dir  = string
+      paths = object({
+        media_cache_path          = string
+        media_library_path_movies = string
+        media_library_path_tv     = string
       })
     })
     dev = object({
@@ -295,10 +295,10 @@ variable "rear_diff_config" {
         host = string
         port = string
       })
-      dirs = object({
-        download_dir = string
-        movie_dir    = string
-        tv_show_dir  = string
+      paths = object({
+        media_cache_path          = string
+        media_library_path_movies = string
+        media_library_path_tv     = string
       })
     })
   })
