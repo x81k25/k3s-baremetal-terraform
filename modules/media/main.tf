@@ -555,7 +555,26 @@ resource "kubernetes_config_map" "center_console_config" {
   data = {
     CENTER_CONSOLE_API_TIMEOUT   = each.value.api_timeout
     CENTER_CONSOLE_PORT_EXTERNAL = each.value.port_external
+    CENTER_CONSOLE_MLFLOW_HOST   = each.value.mlflow.host
+    CENTER_CONSOLE_MLFLOW_PORT   = each.value.mlflow.port
   }
+}
+
+# Create Secrets for sensitive center-console env vars
+resource "kubernetes_secret" "center_console_secrets" {
+  for_each = toset(local.environments)
+
+  metadata {
+    name      = "center-console-secrets"
+    namespace = "media-${each.key}"
+  }
+
+  data = {
+    CENTER_CONSOLE_MLFLOW_USERNAME = var.center_console_secrets[each.key].mlflow.username
+    CENTER_CONSOLE_MLFLOW_PASSWORD = var.center_console_secrets[each.key].mlflow.password
+  }
+
+  type = "Opaque"
 }
 
 ################################################################################

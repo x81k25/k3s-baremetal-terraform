@@ -486,6 +486,26 @@ locals {
       }
     }
   }
+
+  center_console_config = {
+    for env in ["prod", "stg", "dev"] : env => {
+      port_external = var.center_console_config[env].port_external
+      api_timeout   = var.center_console_config[env].api_timeout
+      mlflow = {
+        host = var.mflow_conifg[env].host.internal
+        port = var.mflow_conifg[env].port.internal
+      }
+    }
+  }
+
+  center_console_secrets = {
+    for env in ["prod", "stg", "dev"] : env => {
+      mlflow = {
+        username = var.mlflow_secrets[env].username
+        password = var.mlflow_secrets[env].password
+      }
+    }
+  }
 }
 
 ################################################################################

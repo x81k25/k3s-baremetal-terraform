@@ -353,17 +353,54 @@ variable "center_console_config" {
   type = object({
     prod = object({
       port_external = string
-      api_timeout = string
+      api_timeout   = string
+      mlflow = object({
+        host = string
+        port = string
+      })
     })
     stg = object({
       port_external = string
-      api_timeout = string
+      api_timeout   = string
+      mlflow = object({
+        host = string
+        port = string
+      })
     })
     dev = object({
       port_external = string
-      api_timeout = string
+      api_timeout   = string
+      mlflow = object({
+        host = string
+        port = string
+      })
     })
   })
+}
+
+variable "center_console_secrets" {
+  description = "secrets for center-console UI tool"
+  type = object({
+    prod = object({
+      mlflow = object({
+        username = string
+        password = string
+      })
+    })
+    stg = object({
+      mlflow = object({
+        username = string
+        password = string
+      })
+    })
+    dev = object({
+      mlflow = object({
+        username = string
+        password = string
+      })
+    })
+  })
+  sensitive = true
 }
 
 

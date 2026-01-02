@@ -77,7 +77,8 @@ module "media" {
   rear_diff_config  = local.rear_diff_config
   rear_diff_secrets = local.rear_diff_secrets
   # center-console vars
-  center_console_config = var.center_console_config
+  center_console_config  = local.center_console_config
+  center_console_secrets = local.center_console_secrets
   # dagster vars
   dagster_config  = local.dagster_config
   dagster_secrets = var.dagster_secrets
