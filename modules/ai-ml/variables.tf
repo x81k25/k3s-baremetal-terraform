@@ -95,5 +95,69 @@ variable "cici_config" {
 }
 
 ################################################################################
+# dagster k8s_job_op inherited configs (mirrored from media namespaces)
+################################################################################
+
+variable "environment" {
+  description = "Environment names (dev, stg, prod)"
+  type = any
+}
+
+variable "dagster_config" {
+  description = "Dagster configuration"
+  type = any
+}
+
+variable "dagster_secrets" {
+  description = "Dagster secrets"
+  type = any
+  sensitive = true
+}
+
+variable "at_config" {
+  description = "Automatic Transmission pipeline configuration"
+  type = any
+}
+
+variable "at_secrets" {
+  description = "Automatic Transmission pipeline secrets"
+  type = any
+  sensitive = true
+}
+
+variable "wst_config" {
+  description = "Wiring schematics configuration"
+  type = any
+}
+
+variable "wst_secrets" {
+  description = "Wiring schematics secrets"
+  type = any
+  sensitive = true
+}
+
+variable "transmission_config" {
+  description = "Transmission daemon configuration"
+  type = any
+}
+
+variable "transmission_secrets" {
+  description = "Transmission daemon secrets"
+  type = any
+  sensitive = true
+}
+
+variable "rear_diff_config" {
+  description = "Rear differential API configuration"
+  type = any
+}
+
+variable "rear_diff_secrets" {
+  description = "Rear differential API secrets"
+  type = any
+  sensitive = true
+}
+
+################################################################################
 # end of variables.tf
 ################################################################################

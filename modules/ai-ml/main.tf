@@ -183,11 +183,12 @@ resource "kubernetes_config_map" "reel_driver_training_config" {
   }
 
   data = {
-    REEL_DRIVER_TRNG_HYPER_PARAM_SEARCH_STRAT = each.value.hyper_param_search_start
-    REEL_DRIVER_TRNG_PGSQL_HOST               = each.value.pgsql.host
-    REEL_DRIVER_TRNG_PGSQL_PORT               = each.value.pgsql.port
-    REEL_DRIVER_TRNG_PGSQL_DATABASE           = each.value.pgsql.database
-    REEL_DRIVER_TRNG_PGSQL_SCHEMA             = each.value.pgsql.schema
+    OPTUNA_N_TRIALS              = each.value.optuna_n_trials
+    XGBOOST_N_ESTIMATORS_MAX     = each.value.xgboost_n_estimators_max
+    REEL_DRIVER_TRNG_PGSQL_HOST     = each.value.pgsql.host
+    REEL_DRIVER_TRNG_PGSQL_PORT     = each.value.pgsql.port
+    REEL_DRIVER_TRNG_PGSQL_DATABASE = each.value.pgsql.database
+    REEL_DRIVER_TRNG_PGSQL_SCHEMA   = each.value.pgsql.schema
   }
 }
 
@@ -377,6 +378,258 @@ resource "kubernetes_config_map" "cici_config" {
     CICI_MOUTH_PORT_INTERNAL     = tostring(each.value.mouth.port.internal)
     CICI_MOUTH_PIPER_VOICE       = each.value.mouth.piper_voice
     CICI_MOUTH_PIPER_SAMPLE_RATE = tostring(each.value.mouth.piper_sample_rate)
+  }
+}
+
+################################################################################
+# dagster k8s_job_op inherited configs
+# These ConfigMaps/Secrets mirror those in media-* namespaces so that
+# k8s_job_op pods launched in ai-ml namespace can find them
+################################################################################
+
+# Environment ConfigMap (uses dev values as dummy for k8s_job_op pods)
+resource "kubernetes_config_map" "environment" {
+  metadata {
+    name      = "environment"
+    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+  }
+
+  data = {
+    ENVIRONMENT = var.environment["dev"]
+  }
+}
+
+# Dagster ConfigMap (uses dev values as dummy for k8s_job_op pods)
+resource "kubernetes_config_map" "dagster_config" {
+  metadata {
+    name      = "dagster-config"
+    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+  }
+
+  data = {
+    HOME_PATH              = var.dagster_config.path["dev"].home
+    WORKSPACE_PATH         = var.dagster_config.path["dev"].workspace
+    DAGSTER_TIMEZONE       = var.dagster_config.path["dev"].timezone
+    DAGSTER_PG_HOST        = var.dagster_config.pgsql["dev"].host
+    DAGSTER_PG_PORT        = var.dagster_config.pgsql["dev"].port
+    DAGSTER_PG_DB          = var.dagster_config.pgsql["dev"].database
+    DAGSTER_MINIO_ENDPOINT = var.reel_driver_config["dev"].minio.endpoint
+    DAGSTER_MINIO_PORT     = var.reel_driver_config["dev"].minio.port
+  }
+}
+
+# Dagster Secrets (uses dev values as dummy for k8s_job_op pods)
+resource "kubernetes_secret" "dagster_secrets" {
+  metadata {
+    name      = "dagster-secrets"
+    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+  }
+
+  type = "Opaque"
+
+  data = {
+    DAGSTER_PG_USERNAME      = var.dagster_secrets["dev"].username
+    DAGSTER_PG_PASSWORD      = var.dagster_secrets["dev"].password
+    DAGSTER_MINIO_ACCESS_KEY = var.reel_driver_secrets["dev"].minio.access_key
+    DAGSTER_MINIO_SECRET_KEY = var.reel_driver_secrets["dev"].minio.secrest_key
+  }
+}
+
+# Dagster timeout ConfigMap (per environment)
+resource "kubernetes_config_map" "dagster_timeout_config" {
+  for_each = toset(local.environments)
+
+  metadata {
+    name      = "dagster-timeout-config-${each.key}"
+    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+  }
+
+  data = {
+    DAGSTER_RUN_MONITORING_MAX_RUNTIME_SECONDS = "3600"
+    DAGSTER_RUN_MONITORING_POLL_INTERVAL       = "30"
+  }
+}
+
+# AT Config (uses dev values as dummy for k8s_job_op pods)
+resource "kubernetes_config_map" "at_config" {
+  metadata {
+    name      = "at-config"
+    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+  }
+
+  data = {
+    AT_BATCH_SIZE                     = var.at_config["dev"].batch_size
+    AT_LOG_LEVEL                      = var.at_config["dev"].log_level
+    AT_STALE_METADATA_THRESHOLD       = var.at_config["dev"].stale_metadata_threshold
+    AT_REEL_DRIVER_THRESHOLD          = var.at_config["dev"].reel_driver_threshold
+    AT_TARGET_ACTIVE_ITEMS            = var.at_config["dev"].target_active_items
+    AT_TRANSFERRED_ITEM_CLEANUP_DELAY = var.at_config["dev"].transferred_item_cleanup_delay
+    AT_HUNG_ITEM_CLEANUP_DELAY        = var.at_config["dev"].hung_item_cleanup_delay
+    AT_PGSQL_ENDPOINT                 = var.at_config["dev"].pgsql.host
+    AT_PGSQL_PORT                     = var.at_config["dev"].pgsql.port
+    AT_PGSQL_DATABASE                 = var.at_config["dev"].pgsql.database
+    AT_PGSQL_SCHEMA                   = var.at_config["dev"].pgsql.schema
+    AT_MOVIE_SEARCH_API_BASE_URL      = var.at_config["dev"].movie_search_api_base_url
+    AT_MOVIE_DETAILS_API_BASE_URL     = var.at_config["dev"].movie_details_api_base_url
+    AT_MOVIE_RATINGS_API_BASE_URL     = var.at_config["dev"].movie_ratings_api_base_url
+  }
+}
+
+# AT Secrets (uses dev values as dummy for k8s_job_op pods)
+resource "kubernetes_secret" "at_secrets" {
+  metadata {
+    name      = "at-secrets"
+    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+  }
+
+  type = "Opaque"
+
+  data = {
+    AT_PGSQL_USERNAME = var.at_secrets["dev"].pgsql.username
+    AT_PGSQL_PASSWORD = var.at_secrets["dev"].pgsql.password
+  }
+}
+
+# WST Config (uses dev values as dummy for k8s_job_op pods)
+resource "kubernetes_config_map" "wst_config" {
+  metadata {
+    name      = "wst-config"
+    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+  }
+
+  data = {
+    WST_PGSQL_HOST     = var.wst_config.pgsql["dev"].host
+    WST_PGSQL_PORT     = var.wst_config.pgsql["dev"].port
+    WST_PGSQL_DATABASE = var.wst_config.pgsql["dev"].database
+  }
+}
+
+# WST Secrets (uses dev values as dummy for k8s_job_op pods)
+resource "kubernetes_secret" "wst_secrets" {
+  metadata {
+    name      = "wst-secrets"
+    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+  }
+
+  type = "Opaque"
+
+  data = {
+    WST_PGSQL_USERNAME = var.wst_secrets.pgsql["dev"].username
+    WST_PGSQL_PASSWORD = var.wst_secrets.pgsql["dev"].password
+  }
+}
+
+# Transmission Config (uses dev values as dummy for k8s_job_op pods)
+resource "kubernetes_config_map" "transmission_config" {
+  metadata {
+    name      = "transmission-config"
+    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+  }
+
+  data = {
+    TRANSMISSION_HOST = var.transmission_config["dev"].host
+    TRANSMISSION_PORT = var.transmission_config["dev"].port
+  }
+}
+
+# Transmission Secrets (uses dev values as dummy for k8s_job_op pods)
+resource "kubernetes_secret" "transmission_secrets" {
+  metadata {
+    name      = "transmission-secrets"
+    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+  }
+
+  type = "Opaque"
+
+  data = {
+    TRANSMISSION_USERNAME = var.transmission_secrets["dev"].username
+    TRANSMISSION_PASSWORD = var.transmission_secrets["dev"].password
+  }
+}
+
+# Rear Diff Config (uses dev values as dummy for k8s_job_op pods)
+resource "kubernetes_config_map" "rear_diff_config" {
+  metadata {
+    name      = "rear-diff-config"
+    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+  }
+
+  data = {
+    REAR_DIFF_HOST                       = var.rear_diff_config["dev"].host
+    REAR_DIFF_PORT_EXTERNAL              = var.rear_diff_config["dev"].port_external
+    REAR_DIFF_PREFIX                     = var.rear_diff_config["dev"].prefix
+    REAR_DIFF_PGSQL_HOST                 = var.rear_diff_config["dev"].pgsql.host
+    REAR_DIFF_PGSQL_PORT                 = var.rear_diff_config["dev"].pgsql.port
+    REAR_DIFF_PGSQL_DATABASE             = var.rear_diff_config["dev"].pgsql.database
+    REAR_DIFF_TRANSMISSION_HOST          = var.rear_diff_config["dev"].transmission.host
+    REAR_DIFF_TRANSMISSION_PORT          = var.rear_diff_config["dev"].transmission.port
+    REAR_DIFF_FILE_DELETION_ENABLED      = tostring(var.rear_diff_config["dev"].file_deletion_enabled)
+    REAR_DIFF_MEDIA_CACHE_PATH           = var.rear_diff_config["dev"].paths.media_cache_path
+    REAR_DIFF_MEDIA_LIBRARY_PATH_MOVIES  = var.rear_diff_config["dev"].paths.media_library_path_movies
+    REAR_DIFF_MEDIA_LIBRARY_PATH_TV      = var.rear_diff_config["dev"].paths.media_library_path_tv
+    REAR_DIFF_MOVIE_SEARCH_API_BASE_URL  = var.rear_diff_config["dev"].api_urls.movie_search
+    REAR_DIFF_MOVIE_DETAILS_API_BASE_URL = var.rear_diff_config["dev"].api_urls.movie_details
+    REAR_DIFF_MOVIE_RATINGS_API_BASE_URL = var.rear_diff_config["dev"].api_urls.movie_ratings
+    REAR_DIFF_TV_SEARCH_API_BASE_URL     = var.rear_diff_config["dev"].api_urls.tv_search
+    REAR_DIFF_TV_DETAILS_API_BASE_URL    = var.rear_diff_config["dev"].api_urls.tv_details
+    REAR_DIFF_TV_RATINGS_API_BASE_URL    = var.rear_diff_config["dev"].api_urls.tv_ratings
+  }
+}
+
+# Rear Diff Secrets (uses dev values as dummy for k8s_job_op pods)
+resource "kubernetes_secret" "rear_diff_secrets" {
+  metadata {
+    name      = "rear-diff-secrets"
+    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+  }
+
+  type = "Opaque"
+
+  data = {
+    REAR_DIFF_PGSQL_USERNAME        = var.rear_diff_secrets["dev"].pgsql.username
+    REAR_DIFF_PGSQL_PASSWORD        = var.rear_diff_secrets["dev"].pgsql.password
+    REAR_DIFF_TRANSMISSION_USERNAME = var.rear_diff_secrets["dev"].transmission.username
+    REAR_DIFF_TRANSMISSION_PASSWORD = var.rear_diff_secrets["dev"].transmission.password
+    REAR_DIFF_MOVIE_SEARCH_API_KEY  = var.rear_diff_secrets["dev"].movie_search_api_key
+    REAR_DIFF_MOVIE_DETAILS_API_KEY = var.rear_diff_secrets["dev"].movie_details_api_key
+    REAR_DIFF_MOVIE_RATINGS_API_KEY = var.rear_diff_secrets["dev"].movie_ratings_api_key
+    REAR_DIFF_TV_SEARCH_API_KEY     = var.rear_diff_secrets["dev"].tv_search_api_key
+    REAR_DIFF_TV_DETAILS_API_KEY    = var.rear_diff_secrets["dev"].tv_details_api_key
+    REAR_DIFF_TV_RATINGS_API_KEY    = var.rear_diff_secrets["dev"].tv_ratings_api_key
+  }
+}
+
+# Reel Driver Config (uses dev values as dummy for k8s_job_op pods)
+# Note: reel-driver-config-{env} ConfigMaps already exist above for actual reel-driver workloads
+resource "kubernetes_config_map" "reel_driver_config_shared" {
+  metadata {
+    name      = "reel-driver-config"
+    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+  }
+
+  data = {
+    REEL_DRIVER_MLFLOW_HOST       = var.reel_driver_config["dev"].mflow.host
+    REEL_DRIVER_MLFLOW_PORT       = var.reel_driver_config["dev"].mflow.port
+    REEL_DRIVER_MLFLOW_EXPERIMENT = var.reel_driver_config["dev"].mflow.experiment
+    REEL_DRIVER_MLFLOW_MODEL      = var.reel_driver_config["dev"].mflow.model
+    REEL_DRIVER_MINIO_ENDPOINT    = var.reel_driver_config["dev"].minio.endpoint
+    REEL_DRIVER_MINIO_PORT        = var.reel_driver_config["dev"].minio.port
+  }
+}
+
+# Reel Driver Secrets (uses dev values as dummy for k8s_job_op pods)
+# Note: reel-driver-secrets-{env} Secrets already exist above for actual reel-driver workloads
+resource "kubernetes_secret" "reel_driver_secrets_shared" {
+  metadata {
+    name      = "reel-driver-secrets"
+    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+  }
+
+  type = "Opaque"
+
+  data = {
+    REEL_DRIVER_MINIO_ACCESS_KEY = var.reel_driver_secrets["dev"].minio.access_key
+    REEL_DRIVER_MINIO_SECRET_KEY = var.reel_driver_secrets["dev"].minio.secrest_key
   }
 }
 

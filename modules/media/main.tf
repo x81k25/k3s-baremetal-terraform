@@ -517,6 +517,12 @@ resource "kubernetes_config_map" "rear_diff_config" {
     REAR_DIFF_MEDIA_CACHE_PATH          = each.value.paths.media_cache_path
     REAR_DIFF_MEDIA_LIBRARY_PATH_MOVIES = each.value.paths.media_library_path_movies
     REAR_DIFF_MEDIA_LIBRARY_PATH_TV     = each.value.paths.media_library_path_tv
+    REAR_DIFF_MOVIE_SEARCH_API_BASE_URL = each.value.api_urls.movie_search
+    REAR_DIFF_MOVIE_DETAILS_API_BASE_URL = each.value.api_urls.movie_details
+    REAR_DIFF_MOVIE_RATINGS_API_BASE_URL = each.value.api_urls.movie_ratings
+    REAR_DIFF_TV_SEARCH_API_BASE_URL    = each.value.api_urls.tv_search
+    REAR_DIFF_TV_DETAILS_API_BASE_URL   = each.value.api_urls.tv_details
+    REAR_DIFF_TV_RATINGS_API_BASE_URL   = each.value.api_urls.tv_ratings
   }
 }
 
@@ -534,6 +540,12 @@ resource "kubernetes_secret" "rear_diff_secrets" {
     REAR_DIFF_PGSQL_PASSWORD        = var.rear_diff_secrets[each.key].pgsql.password
     REAR_DIFF_TRANSMISSION_USERNAME = var.rear_diff_secrets[each.key].transmission.username
     REAR_DIFF_TRANSMISSION_PASSWORD = var.rear_diff_secrets[each.key].transmission.password
+    REAR_DIFF_MOVIE_SEARCH_API_KEY  = var.rear_diff_secrets[each.key].movie_search_api_key
+    REAR_DIFF_MOVIE_DETAILS_API_KEY = var.rear_diff_secrets[each.key].movie_details_api_key
+    REAR_DIFF_MOVIE_RATINGS_API_KEY = var.rear_diff_secrets[each.key].movie_ratings_api_key
+    REAR_DIFF_TV_SEARCH_API_KEY     = var.rear_diff_secrets[each.key].tv_search_api_key
+    REAR_DIFF_TV_DETAILS_API_KEY    = var.rear_diff_secrets[each.key].tv_details_api_key
+    REAR_DIFF_TV_RATINGS_API_KEY    = var.rear_diff_secrets[each.key].tv_ratings_api_key
   }
 
   type = "Opaque"
@@ -610,11 +622,12 @@ resource "kubernetes_config_map" "reel_driver_training_config" {
   }
 
   data = {
-    REEL_DRIVER_TRNG_HYPER_PARAM_SEARCH_START = var.reel_driver_training_config[each.key].hyper_param_search_start
-    REEL_DRIVER_TRNG_PGSQL_HOST               = var.reel_driver_training_config[each.key].pgsql.host
-    REEL_DRIVER_TRNG_PGSQL_PORT               = var.reel_driver_training_config[each.key].pgsql.port
-    REEL_DRIVER_TRNG_PGSQL_DATABASE           = var.reel_driver_training_config[each.key].pgsql.database
-    REEL_DRIVER_TRNG_PGSQL_SCHEMA             = var.reel_driver_training_config[each.key].pgsql.schema
+    OPTUNA_N_TRIALS                 = var.reel_driver_training_config[each.key].optuna_n_trials
+    XGBOOST_N_ESTIMATORS_MAX        = var.reel_driver_training_config[each.key].xgboost_n_estimators_max
+    REEL_DRIVER_TRNG_PGSQL_HOST     = var.reel_driver_training_config[each.key].pgsql.host
+    REEL_DRIVER_TRNG_PGSQL_PORT     = var.reel_driver_training_config[each.key].pgsql.port
+    REEL_DRIVER_TRNG_PGSQL_DATABASE = var.reel_driver_training_config[each.key].pgsql.database
+    REEL_DRIVER_TRNG_PGSQL_SCHEMA   = var.reel_driver_training_config[each.key].pgsql.schema
   }
 }
 

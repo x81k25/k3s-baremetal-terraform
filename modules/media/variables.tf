@@ -263,6 +263,14 @@ variable "rear_diff_config" {
         media_library_path_movies = string
         media_library_path_tv     = string
       })
+      api_urls = object({
+        movie_search  = string
+        movie_details = string
+        movie_ratings = string
+        tv_search     = string
+        tv_details    = string
+        tv_ratings    = string
+      })
     })
     stg = object({
       host                  = string
@@ -283,6 +291,14 @@ variable "rear_diff_config" {
         media_library_path_movies = string
         media_library_path_tv     = string
       })
+      api_urls = object({
+        movie_search  = string
+        movie_details = string
+        movie_ratings = string
+        tv_search     = string
+        tv_details    = string
+        tv_ratings    = string
+      })
     })
     dev = object({
       host                  = string
@@ -302,6 +318,14 @@ variable "rear_diff_config" {
         media_cache_path          = string
         media_library_path_movies = string
         media_library_path_tv     = string
+      })
+      api_urls = object({
+        movie_search  = string
+        movie_details = string
+        movie_ratings = string
+        tv_search     = string
+        tv_details    = string
+        tv_ratings    = string
       })
     })
   })
@@ -319,6 +343,12 @@ variable "rear_diff_secrets" {
         username = string
         password = string
       })
+      movie_search_api_key  = string
+      movie_details_api_key = string
+      movie_ratings_api_key = string
+      tv_search_api_key     = string
+      tv_details_api_key    = string
+      tv_ratings_api_key    = string
     })
     stg = object({
       pgsql = object({
@@ -329,6 +359,12 @@ variable "rear_diff_secrets" {
         username = string
         password = string
       })
+      movie_search_api_key  = string
+      movie_details_api_key = string
+      movie_ratings_api_key = string
+      tv_search_api_key     = string
+      tv_details_api_key    = string
+      tv_ratings_api_key    = string
     })
     dev = object({
       pgsql = object({
@@ -339,6 +375,12 @@ variable "rear_diff_secrets" {
         username = string
         password = string
       })
+      movie_search_api_key  = string
+      movie_details_api_key = string
+      movie_ratings_api_key = string
+      tv_search_api_key     = string
+      tv_details_api_key    = string
+      tv_ratings_api_key    = string
     })
   })
   sensitive = true

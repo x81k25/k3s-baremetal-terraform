@@ -978,13 +978,16 @@ variable "reel_driver_training_config" {
   description = "env vars used by the reel-driver training containers"
   type = object({
     prod = object({
-      hyper_param_search_start = string
+      optuna_n_trials          = number
+      xgboost_n_estimators_max = number
     })
     stg = object({
-      hyper_param_search_start = string
+      optuna_n_trials          = number
+      xgboost_n_estimators_max = number
     })
     dev = object({
-      hyper_param_search_start = string
+      optuna_n_trials          = number
+      xgboost_n_estimators_max = number
     })
   })
 }

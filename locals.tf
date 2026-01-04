@@ -401,6 +401,14 @@ locals {
         media_library_path_movies = var.at_vars.prod.movie_dir
         media_library_path_tv     = var.at_vars.prod.tv_show_dir
       }
+      api_urls = {
+        movie_search  = var.at_vars.movie_search_api_base_url
+        movie_details = var.at_vars.movie_details_api_base_url
+        movie_ratings = var.at_vars.movie_ratings_api_base_url
+        tv_search     = var.at_vars.tv_search_api_base_utl
+        tv_details    = var.at_vars.tv_details_api_base_url
+        tv_ratings    = var.at_vars.tv_ratings_api_base_url
+      }
     }
     stg = {
       host                  = var.server_ip
@@ -420,6 +428,14 @@ locals {
         media_cache_path          = var.at_vars.stg.download_dir
         media_library_path_movies = var.at_vars.stg.movie_dir
         media_library_path_tv     = var.at_vars.stg.tv_show_dir
+      }
+      api_urls = {
+        movie_search  = var.at_vars.movie_search_api_base_url
+        movie_details = var.at_vars.movie_details_api_base_url
+        movie_ratings = var.at_vars.movie_ratings_api_base_url
+        tv_search     = var.at_vars.tv_search_api_base_utl
+        tv_details    = var.at_vars.tv_details_api_base_url
+        tv_ratings    = var.at_vars.tv_ratings_api_base_url
       }
     }
     dev = {
@@ -441,6 +457,14 @@ locals {
         media_library_path_movies = var.at_vars.dev.movie_dir
         media_library_path_tv     = var.at_vars.dev.tv_show_dir
       }
+      api_urls = {
+        movie_search  = var.at_vars.movie_search_api_base_url
+        movie_details = var.at_vars.movie_details_api_base_url
+        movie_ratings = var.at_vars.movie_ratings_api_base_url
+        tv_search     = var.at_vars.tv_search_api_base_utl
+        tv_details    = var.at_vars.tv_details_api_base_url
+        tv_ratings    = var.at_vars.tv_ratings_api_base_url
+      }
     }
   }
 
@@ -454,6 +478,12 @@ locals {
         username = var.transmission_secrets.prod.username
         password = var.transmission_secrets.prod.password
       }
+      movie_search_api_key  = var.at_secret_vars.movie_search_api_key
+      movie_details_api_key = var.at_secret_vars.movie_details_api_key
+      movie_ratings_api_key = var.at_secret_vars.movie_ratings_api_key
+      tv_search_api_key     = var.at_secret_vars.tv_search_api_key
+      tv_details_api_key    = var.at_secret_vars.tv_details_api_key
+      tv_ratings_api_key    = var.at_secret_vars.tv_ratings_api_key
     }
     stg = {
       pgsql = {
@@ -464,6 +494,12 @@ locals {
         username = var.transmission_secrets.stg.username
         password = var.transmission_secrets.stg.password
       }
+      movie_search_api_key  = var.at_secret_vars.movie_search_api_key
+      movie_details_api_key = var.at_secret_vars.movie_details_api_key
+      movie_ratings_api_key = var.at_secret_vars.movie_ratings_api_key
+      tv_search_api_key     = var.at_secret_vars.tv_search_api_key
+      tv_details_api_key    = var.at_secret_vars.tv_details_api_key
+      tv_ratings_api_key    = var.at_secret_vars.tv_ratings_api_key
     }
     dev = {
       pgsql = {
@@ -474,6 +510,12 @@ locals {
         username = var.transmission_secrets.dev.username
         password = var.transmission_secrets.dev.password
       }
+      movie_search_api_key  = var.at_secret_vars.movie_search_api_key
+      movie_details_api_key = var.at_secret_vars.movie_details_api_key
+      movie_ratings_api_key = var.at_secret_vars.movie_ratings_api_key
+      tv_search_api_key     = var.at_secret_vars.tv_search_api_key
+      tv_details_api_key    = var.at_secret_vars.tv_details_api_key
+      tv_ratings_api_key    = var.at_secret_vars.tv_ratings_api_key
     }
   }
 
@@ -708,7 +750,8 @@ locals {
   
   reel_driver_training_config = {
     prod = {
-      hyper_param_search_start = var.reel_driver_training_config.prod.hyper_param_search_start
+      optuna_n_trials          = var.reel_driver_training_config.prod.optuna_n_trials
+      xgboost_n_estimators_max = var.reel_driver_training_config.prod.xgboost_n_estimators_max
       pgsql = {
         host     = var.pgsql_default_config.prod.host
         port     = var.pgsql_default_config.prod.port
@@ -717,7 +760,8 @@ locals {
       }
     }
     stg = {
-      hyper_param_search_start = var.reel_driver_training_config.stg.hyper_param_search_start
+      optuna_n_trials          = var.reel_driver_training_config.stg.optuna_n_trials
+      xgboost_n_estimators_max = var.reel_driver_training_config.stg.xgboost_n_estimators_max
       pgsql = {
         host     = var.pgsql_default_config.stg.host
         port     = var.pgsql_default_config.stg.port
@@ -725,8 +769,9 @@ locals {
         schema   = var.pgsql_default_config.schema
       }
     }
-    dev ={
-      hyper_param_search_start = var.reel_driver_training_config.dev.hyper_param_search_start
+    dev = {
+      optuna_n_trials          = var.reel_driver_training_config.dev.optuna_n_trials
+      xgboost_n_estimators_max = var.reel_driver_training_config.dev.xgboost_n_estimators_max
       pgsql = {
         host     = var.pgsql_default_config.dev.host
         port     = var.pgsql_default_config.dev.port

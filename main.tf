@@ -120,6 +120,18 @@ module "ai_ml" {
   # cici vars
   local_llm_config = local.local_llm_config
   cici_config      = local.cici_config
+  # dagster k8s_job_op inherited configs (from media namespaces)
+  environment          = var.environment
+  dagster_config       = local.dagster_config
+  dagster_secrets      = var.dagster_secrets
+  at_config            = local.at_config
+  at_secrets           = local.at_secrets
+  wst_config           = local.wst_config
+  wst_secrets          = var.wst_secrets
+  transmission_config  = local.transmission_config
+  transmission_secrets = var.transmission_secrets
+  rear_diff_config     = local.rear_diff_config
+  rear_diff_secrets    = local.rear_diff_secrets
 }
 
 ################################################################################
