@@ -37,6 +37,15 @@ variable "github_secrets_ng" {
   sensitive = true
 }
 
+variable "gitlab_secrets" {
+  description = "gitlab credentials for container registry"
+  type = object({
+    username = string
+    token    = string
+  })
+  sensitive = true
+}
+
 variable "pgsql_default_config" {
   description = "global pgsql env vars used for mutliple operations"
   type = object({

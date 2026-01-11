@@ -199,6 +199,28 @@ resource "kubernetes_secret" "ghcr_pull_image_secret" {
   }
 }
 
+resource "kubernetes_secret" "gitlab_registry" {
+  for_each = toset(["media-dev", "media-stg", "media-prod"])
+
+  metadata {
+    name      = "gitlab-registry"
+    namespace = each.key
+  }
+
+  type = "kubernetes.io/dockerconfigjson"
+
+  data = {
+    ".dockerconfigjson" = jsonencode({
+      auths = {
+        "192.168.50.2:5050" = {
+          username = var.media_secrets.gitlab.username
+          password = var.media_secrets.gitlab.token
+        }
+      }
+    })
+  }
+}
+
 ################################################################################
 # Dagster configuration 
 ################################################################################
