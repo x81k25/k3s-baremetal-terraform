@@ -80,6 +80,26 @@ resource "kubernetes_secret" "ghcr_pull_image_secret" {
   type = "kubernetes.io/dockerconfigjson"
 }
 
+resource "kubernetes_secret" "gitlab_registry" {
+  metadata {
+    name      = "gitlab-registry"
+    namespace = "pgsql"
+  }
+
+  data = {
+    ".dockerconfigjson" = jsonencode({
+      auths = {
+        "192.168.50.2:5050" = {
+          username = var.pgsql_secrets.gitlab.username
+          password = var.pgsql_secrets.gitlab.token
+        }
+      }
+    })
+  }
+
+  type = "kubernetes.io/dockerconfigjson"
+}
+
 
 ################################################################################
 # pgsql config pass

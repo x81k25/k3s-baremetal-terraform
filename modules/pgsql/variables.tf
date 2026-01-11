@@ -29,8 +29,12 @@ variable "pgsql_secrets" {
   description = "PostgreSQL module secrets"
   type = object({
     github = object({
-      username = string
+      username            = string
       token_packages_read = string
+    })
+    gitlab = object({
+      username = string
+      token    = string
     })
   })
   sensitive = true

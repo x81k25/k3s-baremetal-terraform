@@ -24,8 +24,12 @@ locals {
 locals {
   pgsql_secrets = {
     github = {
-      username = var.github_secrets.username
+      username            = var.github_secrets.username
       token_packages_read = var.github_secrets.token_packages_read
+    }
+    gitlab = {
+      username = var.gitlab_secrets.username
+      token    = var.gitlab_secrets.token
     }
   }
 
@@ -145,8 +149,12 @@ locals {
 locals {
   media_secrets = {
     github = {
-      username = var.github_secrets.username
+      username            = var.github_secrets.username
       token_packages_read = var.github_secrets.token_packages_read
+    }
+    gitlab = {
+      username = var.gitlab_secrets.username
+      token    = var.gitlab_secrets.token
     }
   }
 
