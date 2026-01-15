@@ -85,6 +85,27 @@ resource "kubernetes_secret" "ghcr_pull_image_secret" {
   type = "kubernetes.io/dockerconfigjson"
 }
 
+# Create GitLab Container Registry secret
+resource "kubernetes_secret" "gitlab_registry" {
+  metadata {
+    name      = "gitlab-registry"
+    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+  }
+
+  data = {
+    ".dockerconfigjson" = jsonencode({
+      auths = {
+        "192.168.50.2:5050" = {
+          username = var.ai_ml_secrets.gitlab.username
+          password = var.ai_ml_secrets.gitlab.token
+        }
+      }
+    })
+  }
+
+  type = "kubernetes.io/dockerconfigjson"
+}
+
 # Create ConfigMaps for non-sensitive mlflow env vars
 resource "kubernetes_config_map" "mlflow_config" {
   for_each = var.mlflow_config

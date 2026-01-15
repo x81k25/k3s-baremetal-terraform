@@ -27,6 +27,10 @@ variable "ai_ml_secrets" {
       username = string
       token_packages_read = string
     })
+    gitlab = object({
+      username = string
+      token    = string
+    })
   })
   sensitive = true
 }

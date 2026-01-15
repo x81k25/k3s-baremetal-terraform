@@ -568,6 +568,10 @@ locals {
       username = var.github_secrets.username
       token_packages_read = var.github_secrets.token_packages_read
     }
+    gitlab = {
+      username = var.gitlab_secrets.username
+      token    = var.gitlab_secrets.token
+    }
   }
   
   mlflow_config = {
