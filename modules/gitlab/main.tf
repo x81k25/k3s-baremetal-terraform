@@ -3,7 +3,7 @@
 ################################################################################
 
 # Create gitlab namespace
-resource "kubernetes_namespace" "gitlab" {
+resource "kubernetes_namespace_v1" "gitlab" {
   metadata {
     name = "gitlab"
     labels = {
@@ -17,10 +17,10 @@ resource "kubernetes_namespace" "gitlab" {
 # namespace resource quotas
 ################################################################################
 
-resource "kubernetes_resource_quota" "gitlab_quota" {
+resource "kubernetes_resource_quota_v1" "gitlab_quota" {
   metadata {
     name      = "gitlab-resource-quota"
-    namespace = kubernetes_namespace.gitlab.metadata[0].name
+    namespace = kubernetes_namespace_v1.gitlab.metadata[0].name
   }
 
   spec {
@@ -37,10 +37,10 @@ resource "kubernetes_resource_quota" "gitlab_quota" {
 # namespace limit ranges - default container limits
 ################################################################################
 
-resource "kubernetes_limit_range" "gitlab_limits" {
+resource "kubernetes_limit_range_v1" "gitlab_limits" {
   metadata {
     name      = "gitlab-limit-range"
-    namespace = kubernetes_namespace.gitlab.metadata[0].name
+    namespace = kubernetes_namespace_v1.gitlab.metadata[0].name
   }
 
   spec {
@@ -63,10 +63,10 @@ resource "kubernetes_limit_range" "gitlab_limits" {
 # Token format: glrt-xxxx (generated via GitLab UI: Admin > CI/CD > Runners)
 ################################################################################
 
-resource "kubernetes_secret" "gitlab_runner_token" {
+resource "kubernetes_secret_v1" "gitlab_runner_token" {
   metadata {
     name      = "gitlab-runner-token"
-    namespace = kubernetes_namespace.gitlab.metadata[0].name
+    namespace = kubernetes_namespace_v1.gitlab.metadata[0].name
     labels = {
       app        = "gitlab-runner"
       managed-by = "terraform"
@@ -84,10 +84,10 @@ resource "kubernetes_secret" "gitlab_runner_token" {
 # gitlab runner configmap
 ################################################################################
 
-resource "kubernetes_config_map" "gitlab_runner_config" {
+resource "kubernetes_config_map_v1" "gitlab_runner_config" {
   metadata {
     name      = "gitlab-runner-config"
-    namespace = kubernetes_namespace.gitlab.metadata[0].name
+    namespace = kubernetes_namespace_v1.gitlab.metadata[0].name
     labels = {
       app        = "gitlab-runner"
       managed-by = "terraform"
@@ -100,7 +100,6 @@ resource "kubernetes_config_map" "gitlab_runner_config" {
     runner_executor = "kubernetes"
   }
 }
-
 ################################################################################
 # end of main.tf
 ################################################################################

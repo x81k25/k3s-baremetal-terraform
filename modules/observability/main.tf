@@ -3,7 +3,7 @@
 ################################################################################
 
 # Create observability namespace
-resource "kubernetes_namespace" "observability" {
+resource "kubernetes_namespace_v1" "observability" {
   metadata {
     name = "observability"
     labels = {
@@ -17,10 +17,10 @@ resource "kubernetes_namespace" "observability" {
 # namespace resource quotas
 ################################################################################
 
-resource "kubernetes_resource_quota" "observability_quota" {
+resource "kubernetes_resource_quota_v1" "observability_quota" {
   metadata {
     name      = "observability-resource-quota"
-    namespace = kubernetes_namespace.observability.metadata[0].name
+    namespace = kubernetes_namespace_v1.observability.metadata[0].name
   }
 
   spec {
@@ -37,10 +37,10 @@ resource "kubernetes_resource_quota" "observability_quota" {
 # namespace limit ranges - default container limits
 ################################################################################
 
-resource "kubernetes_limit_range" "observability_limits" {
+resource "kubernetes_limit_range_v1" "observability_limits" {
   metadata {
     name      = "observability-limit-range"
-    namespace = kubernetes_namespace.observability.metadata[0].name
+    namespace = kubernetes_namespace_v1.observability.metadata[0].name
   }
 
   spec {
@@ -59,10 +59,10 @@ resource "kubernetes_limit_range" "observability_limits" {
 }
 
 # Create Loki credentials secret
-resource "kubernetes_secret" "loki_credentials" {
+resource "kubernetes_secret_v1" "loki_credentials" {
   metadata {
     name      = "loki-credentials"
-    namespace = kubernetes_namespace.observability.metadata[0].name
+    namespace = kubernetes_namespace_v1.observability.metadata[0].name
     labels = {
       app        = "loki"
       managed-by = "terraform"
@@ -78,10 +78,10 @@ resource "kubernetes_secret" "loki_credentials" {
 }
 
 # Create Grafana credentials secret
-resource "kubernetes_secret" "grafana_credentials" {
+resource "kubernetes_secret_v1" "grafana_credentials" {
   metadata {
     name      = "grafana-credentials"
-    namespace = kubernetes_namespace.observability.metadata[0].name
+    namespace = kubernetes_namespace_v1.observability.metadata[0].name
     labels = {
       app        = "grafana"
       managed-by = "terraform"
@@ -95,7 +95,6 @@ resource "kubernetes_secret" "grafana_credentials" {
     password = var.grafana_sensitive.password
   }
 }
-
 ################################################################################
 # end of main.tf
 ################################################################################

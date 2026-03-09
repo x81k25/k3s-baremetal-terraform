@@ -3,7 +3,7 @@
 ################################################################################
 
 # Create namespace for ArgoCD
-resource "kubernetes_namespace" "argocd" {
+resource "kubernetes_namespace_v1" "argocd" {
   metadata {
     name = var.argocd_config.namespace
     labels = {
@@ -16,10 +16,10 @@ resource "kubernetes_namespace" "argocd" {
 # namespace resource quotas
 ################################################################################
 
-resource "kubernetes_resource_quota" "argocd_quota" {
+resource "kubernetes_resource_quota_v1" "argocd_quota" {
   metadata {
     name      = "argocd-resource-quota"
-    namespace = kubernetes_namespace.argocd.metadata[0].name
+    namespace = kubernetes_namespace_v1.argocd.metadata[0].name
   }
 
   spec {
@@ -36,10 +36,10 @@ resource "kubernetes_resource_quota" "argocd_quota" {
 # namespace limit ranges - default container limits
 ################################################################################
 
-resource "kubernetes_limit_range" "argocd_limits" {
+resource "kubernetes_limit_range_v1" "argocd_limits" {
   metadata {
     name      = "argocd-limit-range"
-    namespace = kubernetes_namespace.argocd.metadata[0].name
+    namespace = kubernetes_namespace_v1.argocd.metadata[0].name
   }
 
   spec {
@@ -63,23 +63,23 @@ resource "kubernetes_limit_range" "argocd_limits" {
 ################################################################################
 
 # secrets
-resource "kubernetes_secret" "argocd_admin_password" {
+resource "kubernetes_secret_v1" "argocd_admin_password" {
   metadata {
     name      = "argocd-initial-admin-secret"
-    namespace = kubernetes_namespace.argocd.metadata[0].name
+    namespace = kubernetes_namespace_v1.argocd.metadata[0].name
   }
 
   data = {
     "password" = bcrypt(var.argocd_secrets.admin_pw)
   }
 
-  depends_on = [kubernetes_namespace.argocd]
+  depends_on = [kubernetes_namespace_v1.argocd]
 }
 
-resource "kubernetes_secret" "argocd_repo_k8s_manifests" {
+resource "kubernetes_secret_v1" "argocd_repo_k8s_manifests" {
   metadata {
     name      = "repo-k8s-manifests"
-    namespace = kubernetes_namespace.argocd.metadata[0].name
+    namespace = kubernetes_namespace_v1.argocd.metadata[0].name
     labels = {
       "argocd.argoproj.io/secret-type" = "repository"
     }
@@ -91,13 +91,13 @@ resource "kubernetes_secret" "argocd_repo_k8s_manifests" {
     sshPrivateKey = file(var.argocd_secrets.ssh_private_key_path)
   }
 
-  depends_on = [kubernetes_namespace.argocd]
+  depends_on = [kubernetes_namespace_v1.argocd]
 }
 
-resource "kubernetes_secret" "ghcr_pull_image_secret" {
+resource "kubernetes_secret_v1" "ghcr_pull_image_secret" {
   metadata {
     name      = "ghcr-pull-image-secret"
-    namespace = kubernetes_namespace.argocd.metadata[0].name
+    namespace = kubernetes_namespace_v1.argocd.metadata[0].name
     labels = {
       "argocd.argoproj.io/secret-type" = "repository"
     }
@@ -116,14 +116,14 @@ resource "kubernetes_secret" "ghcr_pull_image_secret" {
     })
   }
 
-  depends_on = [kubernetes_namespace.argocd]
+  depends_on = [kubernetes_namespace_v1.argocd]
 }
 
 # Create a generic secret for ArgoCD Image Updater with token format
-resource "kubernetes_secret" "ghcr_image_updater_token" {
+resource "kubernetes_secret_v1" "ghcr_image_updater_token" {
   metadata {
     name      = "ghcr-image-updater-token"
-    namespace = kubernetes_namespace.argocd.metadata[0].name
+    namespace = kubernetes_namespace_v1.argocd.metadata[0].name
   }
 
   type = "Opaque"
@@ -132,16 +132,16 @@ resource "kubernetes_secret" "ghcr_image_updater_token" {
     token = "${var.argocd_secrets.github.username}:${var.argocd_secrets.github.token_packages_read}"
   }
 
-  depends_on = [kubernetes_namespace.argocd]
+  depends_on = [kubernetes_namespace_v1.argocd]
 }
 
 
 
 # SSH key for Git repository access
-resource "kubernetes_secret" "argocd_ssh_key" {
+resource "kubernetes_secret_v1" "argocd_ssh_key" {
   metadata {
     name      = "argocd-ssh-key"
-    namespace = kubernetes_namespace.argocd.metadata[0].name
+    namespace = kubernetes_namespace_v1.argocd.metadata[0].name
     labels = {
       "argocd.argoproj.io/secret-type" = "repository"
     }
@@ -151,7 +151,7 @@ resource "kubernetes_secret" "argocd_ssh_key" {
     sshPrivateKey = file(var.argocd_secrets.ssh_private_key_path)
   }
 
-  depends_on = [kubernetes_namespace.argocd]
+  depends_on = [kubernetes_namespace_v1.argocd]
 }
 
 
@@ -165,7 +165,7 @@ resource "helm_release" "argocd" {
   repository = "https://argoproj.github.io/argo-helm"
   chart      = "argo-cd"
   version    = var.argocd_config.version
-  namespace  = kubernetes_namespace.argocd.metadata[0].name
+  namespace  = kubernetes_namespace_v1.argocd.metadata[0].name
 
   # Basic configuration
   values = [
@@ -299,11 +299,11 @@ resource "helm_release" "argocd" {
   }
 
   depends_on = [
-    kubernetes_namespace.argocd,
-    kubernetes_secret.argocd_admin_password,
+    kubernetes_namespace_v1.argocd,
+    kubernetes_secret_v1.argocd_admin_password,
     kubernetes_manifest.kustomize_crd,
-    kubernetes_secret.argocd_repo_k8s_manifests,
-    kubernetes_secret.argocd_ssh_key
+    kubernetes_secret_v1.argocd_repo_k8s_manifests,
+    kubernetes_secret_v1.argocd_ssh_key
   ]
 }
 
@@ -367,7 +367,7 @@ resource "helm_release" "argocd_image_updater" {
   repository = "https://argoproj.github.io/argo-helm"
   chart      = "argocd-image-updater"
   version    = "0.9.1"
-  namespace  = kubernetes_namespace.argocd.metadata[0].name
+  namespace  = kubernetes_namespace_v1.argocd.metadata[0].name
 
   values = [
     yamlencode({
@@ -384,7 +384,7 @@ resource "helm_release" "argocd_image_updater" {
         ]
         argocd = {
           grpcWeb       = true
-          serverAddress = "argocd-server.${kubernetes_namespace.argocd.metadata[0].name}.svc.cluster.local"
+          serverAddress = "argocd-server.${kubernetes_namespace_v1.argocd.metadata[0].name}.svc.cluster.local"
           insecure      = true
           plaintext     = false
         }
@@ -417,8 +417,8 @@ resource "helm_release" "argocd_image_updater" {
 
   depends_on = [
     helm_release.argocd,
-    kubernetes_secret.ghcr_pull_image_secret,
-    kubernetes_secret.ghcr_image_updater_token
+    kubernetes_secret_v1.ghcr_pull_image_secret,
+    kubernetes_secret_v1.ghcr_image_updater_token
   ]
 }
 
@@ -429,7 +429,7 @@ resource "null_resource" "wait_for_argo" {
       kubectl wait --for=condition=available \
         --timeout=300s \
         --kubeconfig=${var.argocd_config.kubeconfig_path} \
-        -n ${kubernetes_namespace.argocd.metadata[0].name} \
+        -n ${kubernetes_namespace_v1.argocd.metadata[0].name} \
         deployment/argocd-server
     EOF
   }
@@ -442,12 +442,12 @@ resource "null_resource" "wait_for_argo" {
 ################################################################################
 
 # Create ServiceAccount for Reloader
-resource "kubernetes_service_account" "reloader" {
+resource "kubernetes_service_account_v1" "reloader" {
   count = var.reloader_config.enabled ? 1 : 0
   
   metadata {
     name      = "reloader"
-    namespace = kubernetes_namespace.argocd.metadata[0].name
+    namespace = kubernetes_namespace_v1.argocd.metadata[0].name
     labels = {
       app                          = "reloader"
       "app.kubernetes.io/name"     = "reloader"
@@ -458,7 +458,7 @@ resource "kubernetes_service_account" "reloader" {
 }
 
 # Create ClusterRole for Reloader
-resource "kubernetes_cluster_role" "reloader" {
+resource "kubernetes_cluster_role_v1" "reloader" {
   count = var.reloader_config.enabled ? 1 : 0
   
   metadata {
@@ -497,7 +497,7 @@ resource "kubernetes_cluster_role" "reloader" {
 }
 
 # Create ClusterRoleBinding for Reloader
-resource "kubernetes_cluster_role_binding" "reloader" {
+resource "kubernetes_cluster_role_binding_v1" "reloader" {
   count = var.reloader_config.enabled ? 1 : 0
   
   metadata {
@@ -513,23 +513,23 @@ resource "kubernetes_cluster_role_binding" "reloader" {
   role_ref {
     api_group = "rbac.authorization.k8s.io"
     kind      = "ClusterRole"
-    name      = kubernetes_cluster_role.reloader[0].metadata[0].name
+    name      = kubernetes_cluster_role_v1.reloader[0].metadata[0].name
   }
 
   subject {
     kind      = "ServiceAccount"
-    name      = kubernetes_service_account.reloader[0].metadata[0].name
-    namespace = kubernetes_namespace.argocd.metadata[0].name
+    name      = kubernetes_service_account_v1.reloader[0].metadata[0].name
+    namespace = kubernetes_namespace_v1.argocd.metadata[0].name
   }
 }
 
 # Create Deployment for Reloader
-resource "kubernetes_deployment" "reloader" {
+resource "kubernetes_deployment_v1" "reloader" {
   count = var.reloader_config.enabled ? 1 : 0
   
   metadata {
     name      = "reloader"
-    namespace = kubernetes_namespace.argocd.metadata[0].name
+    namespace = kubernetes_namespace_v1.argocd.metadata[0].name
     labels = {
       app                          = "reloader"
       "app.kubernetes.io/name"     = "reloader"
@@ -558,7 +558,7 @@ resource "kubernetes_deployment" "reloader" {
       }
 
       spec {
-        service_account_name = kubernetes_service_account.reloader[0].metadata[0].name
+        service_account_name = kubernetes_service_account_v1.reloader[0].metadata[0].name
 
         container {
           name  = "reloader"
@@ -634,18 +634,18 @@ resource "kubernetes_deployment" "reloader" {
   }
 
   depends_on = [
-    kubernetes_service_account.reloader,
-    kubernetes_cluster_role_binding.reloader
+    kubernetes_service_account_v1.reloader,
+    kubernetes_cluster_role_binding_v1.reloader
   ]
 }
 
 # Create Service for Reloader metrics
-resource "kubernetes_service" "reloader" {
+resource "kubernetes_service_v1" "reloader" {
   count = var.reloader_config.enabled ? 1 : 0
   
   metadata {
     name      = "reloader"
-    namespace = kubernetes_namespace.argocd.metadata[0].name
+    namespace = kubernetes_namespace_v1.argocd.metadata[0].name
     labels = {
       app                          = "reloader"
       "app.kubernetes.io/name"     = "reloader"
@@ -679,7 +679,7 @@ resource "kubernetes_manifest" "reloader_service_monitor" {
     kind       = "ServiceMonitor"
     metadata = {
       name      = "reloader"
-      namespace = kubernetes_namespace.argocd.metadata[0].name
+      namespace = kubernetes_namespace_v1.argocd.metadata[0].name
       labels = {
         app                          = "reloader"
         "app.kubernetes.io/name"     = "reloader"
@@ -702,9 +702,8 @@ resource "kubernetes_manifest" "reloader_service_monitor" {
     }
   }
 
-  depends_on = [kubernetes_service.reloader]
+  depends_on = [kubernetes_service_v1.reloader]
 }
-
 ################################################################################
 # end of ./modules/argocd/main.tf
 ################################################################################

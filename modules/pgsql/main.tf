@@ -6,7 +6,7 @@ locals {
   environments = ["dev", "stg", "prod"]
 }
 
-resource "kubernetes_namespace" "pgsql" {
+resource "kubernetes_namespace_v1" "pgsql" {
   metadata {
     name = "pgsql"
     labels = {
@@ -19,10 +19,10 @@ resource "kubernetes_namespace" "pgsql" {
 # namespace resource quotas
 ################################################################################
 
-resource "kubernetes_resource_quota" "pgsql_quota" {
+resource "kubernetes_resource_quota_v1" "pgsql_quota" {
   metadata {
     name      = "pgsql-resource-quota"
-    namespace = kubernetes_namespace.pgsql.metadata[0].name
+    namespace = kubernetes_namespace_v1.pgsql.metadata[0].name
   }
 
   spec {
@@ -39,10 +39,10 @@ resource "kubernetes_resource_quota" "pgsql_quota" {
 # namespace limit ranges - default container limits
 ################################################################################
 
-resource "kubernetes_limit_range" "pgsql_limits" {
+resource "kubernetes_limit_range_v1" "pgsql_limits" {
   metadata {
     name      = "pgsql-limit-range"
-    namespace = kubernetes_namespace.pgsql.metadata[0].name
+    namespace = kubernetes_namespace_v1.pgsql.metadata[0].name
   }
 
   spec {
@@ -60,7 +60,7 @@ resource "kubernetes_limit_range" "pgsql_limits" {
   }
 }
 
-resource "kubernetes_secret" "ghcr_pull_image_secret" {
+resource "kubernetes_secret_v1" "ghcr_pull_image_secret" {
   metadata {
     name      = "ghcr-pull-image-secret"
     namespace = "pgsql"
@@ -80,7 +80,7 @@ resource "kubernetes_secret" "ghcr_pull_image_secret" {
   type = "kubernetes.io/dockerconfigjson"
 }
 
-resource "kubernetes_secret" "gitlab_registry" {
+resource "kubernetes_secret_v1" "gitlab_registry" {
   metadata {
     name      = "gitlab-registry"
     namespace = "pgsql"
@@ -105,10 +105,10 @@ resource "kubernetes_secret" "gitlab_registry" {
 # pgsql config pass
 ################################################################################
 
-resource "kubernetes_secret" "pgsql_prod_config" {
+resource "kubernetes_secret_v1" "pgsql_prod_config" {
   metadata {
     name      = "pgsql-prod-config"
-    namespace = kubernetes_namespace.pgsql.metadata[0].name
+    namespace = kubernetes_namespace_v1.pgsql.metadata[0].name
   }
 
   data = {
@@ -120,10 +120,10 @@ resource "kubernetes_secret" "pgsql_prod_config" {
   type = "Opaque"
 }
 
-resource "kubernetes_secret" "pgsql_stg_config" {
+resource "kubernetes_secret_v1" "pgsql_stg_config" {
   metadata {
     name      = "pgsql-stg-config"
-    namespace = kubernetes_namespace.pgsql.metadata[0].name
+    namespace = kubernetes_namespace_v1.pgsql.metadata[0].name
   }
 
   data = {
@@ -135,10 +135,10 @@ resource "kubernetes_secret" "pgsql_stg_config" {
   type = "Opaque"
 }
 
-resource "kubernetes_secret" "pgsql_dev_config" {
+resource "kubernetes_secret_v1" "pgsql_dev_config" {
   metadata {
     name      = "pgsql-dev-config"
-    namespace = kubernetes_namespace.pgsql.metadata[0].name
+    namespace = kubernetes_namespace_v1.pgsql.metadata[0].name
   }
 
   data = {
@@ -155,7 +155,7 @@ resource "kubernetes_secret" "pgsql_dev_config" {
 ################################################################################
 
 # env vars
-resource "kubernetes_config_map" "flway_config_prod" {
+resource "kubernetes_config_map_v1" "flway_config_prod" {
 
   metadata {
     name      = "flyway-config-prod"
@@ -169,7 +169,7 @@ resource "kubernetes_config_map" "flway_config_prod" {
   }
 }
 
-resource "kubernetes_config_map" "flway_config_stg" {
+resource "kubernetes_config_map_v1" "flway_config_stg" {
 
   metadata {
     name      = "flyway-config-stg"
@@ -183,7 +183,7 @@ resource "kubernetes_config_map" "flway_config_stg" {
   }
 }
 
-resource "kubernetes_config_map" "flway_config_dev" {
+resource "kubernetes_config_map_v1" "flway_config_dev" {
 
   metadata {
     name      = "flyway-config-dev"
@@ -198,7 +198,7 @@ resource "kubernetes_config_map" "flway_config_dev" {
 }
 
 # secrets for flyway
-resource "kubernetes_secret" "flyway_secrets_prod" {
+resource "kubernetes_secret_v1" "flyway_secrets_prod" {
 
   metadata {
     name      = "flyway-secrets-prod"
@@ -213,7 +213,7 @@ resource "kubernetes_secret" "flyway_secrets_prod" {
   }
 }
 
-resource "kubernetes_secret" "flyway_secrets_stg" {
+resource "kubernetes_secret_v1" "flyway_secrets_stg" {
 
   metadata {
     name      = "flyway-secrets-stg"
@@ -228,10 +228,10 @@ resource "kubernetes_secret" "flyway_secrets_stg" {
   }
 }
 
-resource "kubernetes_secret" "flyway_secrets_dev" {
+resource "kubernetes_secret_v1" "flyway_secrets_dev" {
   metadata {
     name      = "flyway-secrets-dev"
-    namespace = kubernetes_namespace.pgsql.metadata[0].name
+    namespace = kubernetes_namespace_v1.pgsql.metadata[0].name
   }
 
   data = {
@@ -247,7 +247,7 @@ resource "kubernetes_secret" "flyway_secrets_dev" {
 ################################################################################
 
 # Create ConfigMaps for non-sensitive minio env vars
-resource "kubernetes_config_map" "minio_config" {
+resource "kubernetes_config_map_v1" "minio_config" {
   for_each = var.minio_config
 
   metadata {
@@ -268,7 +268,7 @@ resource "kubernetes_config_map" "minio_config" {
 }
 
 # Create Secrets for sensitive minio env vars
-resource "kubernetes_secret" "minio_secrets" {
+resource "kubernetes_secret_v1" "minio_secrets" {
   for_each = toset(local.environments)
 
   metadata {
@@ -288,10 +288,10 @@ resource "kubernetes_secret" "minio_secrets" {
 # pgadmin config pass
 ################################################################################
 
-resource "kubernetes_secret" "pgadmin_credentials" {
+resource "kubernetes_secret_v1" "pgadmin_credentials" {
   metadata {
     name      = "pgadmin-credentials"
-    namespace = kubernetes_namespace.pgsql.metadata[0].name
+    namespace = kubernetes_namespace_v1.pgsql.metadata[0].name
   }
 
   data = {
@@ -301,7 +301,6 @@ resource "kubernetes_secret" "pgadmin_credentials" {
 
   type = "Opaque"
 }
-
 ################################################################################
 # end of main.tf
 ################################################################################

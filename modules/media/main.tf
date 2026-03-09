@@ -6,7 +6,7 @@ locals {
   environments = ["dev", "stg", "prod"]
 }
 
-resource "kubernetes_namespace" "media-prod" {
+resource "kubernetes_namespace_v1" "media-prod" {
   metadata {
     name = "media-prod"
     labels = {
@@ -15,7 +15,7 @@ resource "kubernetes_namespace" "media-prod" {
   }
 }
 
-resource "kubernetes_namespace" "media-stg" {
+resource "kubernetes_namespace_v1" "media-stg" {
   metadata {
     name = "media-stg"
     labels = {
@@ -24,7 +24,7 @@ resource "kubernetes_namespace" "media-stg" {
   }
 }
 
-resource "kubernetes_namespace" "media-dev" {
+resource "kubernetes_namespace_v1" "media-dev" {
   metadata {
     name = "media-dev"
     labels = {
@@ -37,10 +37,10 @@ resource "kubernetes_namespace" "media-dev" {
 # namespace resource quotas
 ################################################################################
 
-resource "kubernetes_resource_quota" "media_prod_quota" {
+resource "kubernetes_resource_quota_v1" "media_prod_quota" {
   metadata {
     name      = "media-prod-resource-quota"
-    namespace = kubernetes_namespace.media-prod.metadata[0].name
+    namespace = kubernetes_namespace_v1.media-prod.metadata[0].name
   }
 
   spec {
@@ -53,10 +53,10 @@ resource "kubernetes_resource_quota" "media_prod_quota" {
   }
 }
 
-resource "kubernetes_resource_quota" "media_stg_quota" {
+resource "kubernetes_resource_quota_v1" "media_stg_quota" {
   metadata {
     name      = "media-stg-resource-quota"
-    namespace = kubernetes_namespace.media-stg.metadata[0].name
+    namespace = kubernetes_namespace_v1.media-stg.metadata[0].name
   }
 
   spec {
@@ -69,10 +69,10 @@ resource "kubernetes_resource_quota" "media_stg_quota" {
   }
 }
 
-resource "kubernetes_resource_quota" "media_dev_quota" {
+resource "kubernetes_resource_quota_v1" "media_dev_quota" {
   metadata {
     name      = "media-dev-resource-quota"
-    namespace = kubernetes_namespace.media-dev.metadata[0].name
+    namespace = kubernetes_namespace_v1.media-dev.metadata[0].name
   }
 
   spec {
@@ -89,10 +89,10 @@ resource "kubernetes_resource_quota" "media_dev_quota" {
 # namespace limit ranges - default container limits
 ################################################################################
 
-resource "kubernetes_limit_range" "media_prod_limits" {
+resource "kubernetes_limit_range_v1" "media_prod_limits" {
   metadata {
     name      = "media-prod-limit-range"
-    namespace = kubernetes_namespace.media-prod.metadata[0].name
+    namespace = kubernetes_namespace_v1.media-prod.metadata[0].name
   }
 
   spec {
@@ -110,10 +110,10 @@ resource "kubernetes_limit_range" "media_prod_limits" {
   }
 }
 
-resource "kubernetes_limit_range" "media_stg_limits" {
+resource "kubernetes_limit_range_v1" "media_stg_limits" {
   metadata {
     name      = "media-stg-limit-range"
-    namespace = kubernetes_namespace.media-stg.metadata[0].name
+    namespace = kubernetes_namespace_v1.media-stg.metadata[0].name
   }
 
   spec {
@@ -131,10 +131,10 @@ resource "kubernetes_limit_range" "media_stg_limits" {
   }
 }
 
-resource "kubernetes_limit_range" "media_dev_limits" {
+resource "kubernetes_limit_range_v1" "media_dev_limits" {
   metadata {
     name      = "media-dev-limit-range"
-    namespace = kubernetes_namespace.media-dev.metadata[0].name
+    namespace = kubernetes_namespace_v1.media-dev.metadata[0].name
   }
 
   spec {
@@ -159,7 +159,7 @@ resource "kubernetes_limit_range" "media_dev_limits" {
 ################################################################################
 
 # Create ConfigMap to hold the environment value
-resource "kubernetes_config_map" "environment" {
+resource "kubernetes_config_map_v1" "environment" {
   for_each = var.environment
 
   metadata {
@@ -177,7 +177,7 @@ resource "kubernetes_config_map" "environment" {
 # - sets env vars and secrets used for various services in the media namespaces
 ################################################################################
 
-resource "kubernetes_secret" "ghcr_pull_image_secret" {
+resource "kubernetes_secret_v1" "ghcr_pull_image_secret" {
   for_each = toset(["media-dev", "media-stg", "media-prod"])
 
   metadata {
@@ -199,7 +199,7 @@ resource "kubernetes_secret" "ghcr_pull_image_secret" {
   }
 }
 
-resource "kubernetes_secret" "gitlab_registry" {
+resource "kubernetes_secret_v1" "gitlab_registry" {
   for_each = toset(["media-dev", "media-stg", "media-prod"])
 
   metadata {
@@ -225,7 +225,7 @@ resource "kubernetes_secret" "gitlab_registry" {
 # Dagster configuration 
 ################################################################################
 
-resource "kubernetes_config_map" "dagster_config" {
+resource "kubernetes_config_map_v1" "dagster_config" {
   for_each = var.dagster_config.path
 
   metadata {
@@ -246,7 +246,7 @@ resource "kubernetes_config_map" "dagster_config" {
 }
 
 # Dagster database secrets - dev
-resource "kubernetes_secret" "dagster_secrets" {
+resource "kubernetes_secret_v1" "dagster_secrets" {
   for_each = toset(local.environments)
 
   metadata {
@@ -265,7 +265,7 @@ resource "kubernetes_secret" "dagster_secrets" {
 }
 
 # Also create GHCR token secret for environment variable use
-resource "kubernetes_secret" "ghcr_token" {
+resource "kubernetes_secret_v1" "ghcr_token" {
   for_each = toset(["media-dev", "media-stg", "media-prod"])
 
   metadata {
@@ -287,7 +287,7 @@ resource "kubernetes_secret" "ghcr_token" {
 ################################################################################
 
 # Create ConfigMap for AT config - all environments
-resource "kubernetes_config_map" "at_config" {
+resource "kubernetes_config_map_v1" "at_config" {
   for_each = toset(local.environments)
 
   metadata {
@@ -333,7 +333,7 @@ resource "kubernetes_config_map" "at_config" {
 }
 
 # Create ConfigMap for transmission config - all environments
-resource "kubernetes_config_map" "transmission_config" {
+resource "kubernetes_config_map_v1" "transmission_config" {
   for_each = toset(local.environments)
 
   metadata {
@@ -348,7 +348,7 @@ resource "kubernetes_config_map" "transmission_config" {
 }
 
 # Create ConfigMap for transmission settings - all environments
-resource "kubernetes_config_map" "transmission_settings" {
+resource "kubernetes_config_map_v1" "transmission_settings" {
   for_each = toset(local.environments)
 
   metadata {
@@ -376,7 +376,7 @@ resource "kubernetes_config_map" "transmission_settings" {
 
 
 # Create Secret for AT sensitive config - all environments
-resource "kubernetes_secret" "at_secrets" {
+resource "kubernetes_secret_v1" "at_secrets" {
   for_each = toset(local.environments)
 
   metadata {
@@ -401,7 +401,7 @@ resource "kubernetes_secret" "at_secrets" {
 }
 
 # Create Secret for transmission credentials - all environments
-resource "kubernetes_secret" "transmission_secrets" {
+resource "kubernetes_secret_v1" "transmission_secrets" {
   for_each = toset(local.environments)
 
   metadata {
@@ -424,7 +424,7 @@ resource "kubernetes_secret" "transmission_secrets" {
 ################################################################################
 
 # Create ConfigMaps for non-sensitive env vars
-resource "kubernetes_config_map" "wst_config" {
+resource "kubernetes_config_map_v1" "wst_config" {
   for_each = var.wst_config.pgsql
 
   metadata {
@@ -440,7 +440,7 @@ resource "kubernetes_config_map" "wst_config" {
 }
 
 # Create Secrets for sensitive env vars - use toset() to iterate over environments
-resource "kubernetes_secret" "wst_secrets" {
+resource "kubernetes_secret_v1" "wst_secrets" {
   for_each = toset(local.environments)
 
   metadata {
@@ -460,7 +460,7 @@ resource "kubernetes_secret" "wst_secrets" {
 # atd config
 ################################################################################
 
-resource "kubernetes_secret" "vpn_config" {
+resource "kubernetes_secret_v1" "vpn_config" {
   for_each = toset(["media-dev", "media-stg", "media-prod"])
 
   metadata {
@@ -477,7 +477,7 @@ resource "kubernetes_secret" "vpn_config" {
   type = "Opaque"
 }
 
-resource "kubernetes_secret" "wireguard_secrets" {
+resource "kubernetes_secret_v1" "wireguard_secrets" {
   for_each = toset(local.environments)
 
   metadata {
@@ -486,13 +486,12 @@ resource "kubernetes_secret" "wireguard_secrets" {
   }
 
   data = {
-    WIREGUARD_PRIVATE_KEY = var.wireguard_secrets[each.key].inteface.private_key
-    WIREGUARD_ADDRESS     = var.wireguard_secrets[each.key].inteface.addreses
-    WIREGUARD_DNS         = var.wireguard_secrets[each.key].inteface.dns
-    WIREGUARD_MTU         = var.wireguard_secrets[each.key].inteface.mtu
-    WIREGUARD_PUBLIC_KEY  = var.wireguard_secrets[each.key].peer.public_key
-    WIREGUARD_ALLOWED_IPS = var.wireguard_secrets[each.key].peer.allowed_ips
-    WIREGUARD_ENDPOINT    = var.wireguard_secrets[each.key].peer.endpoint
+    WIREGUARD_PRIVATE_KEY = var.wireguard_secrets.devices[each.key].private_key
+    WIREGUARD_ADDRESS     = var.wireguard_secrets.devices[each.key].addresses
+    WIREGUARD_DNS         = var.wireguard_secrets.dns
+    WIREGUARD_MTU         = var.wireguard_secrets.mtu
+    WIREGUARD_ALLOWED_IPS = var.wireguard_secrets.allowed_ips
+    WIREGUARD_SERVERS     = jsonencode(var.wireguard_secrets.servers)
   }
 
   type = "Opaque"
@@ -502,7 +501,7 @@ resource "kubernetes_secret" "wireguard_secrets" {
 # plex config
 ################################################################################
 
-resource "kubernetes_secret" "plex_secret" {
+resource "kubernetes_secret_v1" "plex_secret" {
   metadata {
     name      = "plex-config"
     namespace = "media-prod"
@@ -518,7 +517,7 @@ resource "kubernetes_secret" "plex_secret" {
 ################################################################################
 
 # Create ConfigMaps for non-sensitive env vars
-resource "kubernetes_config_map" "rear_diff_config" {
+resource "kubernetes_config_map_v1" "rear_diff_config" {
   for_each = var.rear_diff_config
 
   metadata {
@@ -549,7 +548,7 @@ resource "kubernetes_config_map" "rear_diff_config" {
 }
 
 # Create Secrets for sensitive env vars - use toset() to iterate over environments
-resource "kubernetes_secret" "rear_diff_secrets" {
+resource "kubernetes_secret_v1" "rear_diff_secrets" {
   for_each = toset(local.environments)
 
   metadata {
@@ -578,7 +577,7 @@ resource "kubernetes_secret" "rear_diff_secrets" {
 ################################################################################
 
 # Create ConfigMaps for non-sensitive env vars
-resource "kubernetes_config_map" "center_console_config" {
+resource "kubernetes_config_map_v1" "center_console_config" {
   for_each = var.center_console_config
 
   metadata {
@@ -595,7 +594,7 @@ resource "kubernetes_config_map" "center_console_config" {
 }
 
 # Create Secrets for sensitive center-console env vars
-resource "kubernetes_secret" "center_console_secrets" {
+resource "kubernetes_secret_v1" "center_console_secrets" {
   for_each = toset(local.environments)
 
   metadata {
@@ -616,7 +615,7 @@ resource "kubernetes_secret" "center_console_secrets" {
 ################################################################################
 
 # Create ConfigMaps for non-sensitive reel-driver env vars
-resource "kubernetes_config_map" "reel_driver_config" {
+resource "kubernetes_config_map_v1" "reel_driver_config" {
   for_each = toset(local.environments)
 
   metadata {
@@ -635,7 +634,7 @@ resource "kubernetes_config_map" "reel_driver_config" {
 }
 
 # Create ConfigMaps for reel-driver training configuration
-resource "kubernetes_config_map" "reel_driver_training_config" {
+resource "kubernetes_config_map_v1" "reel_driver_training_config" {
   for_each = toset(local.environments)
 
   metadata {
@@ -654,7 +653,7 @@ resource "kubernetes_config_map" "reel_driver_training_config" {
 }
 
 # Create Secrets for sensitive reel-driver env vars
-resource "kubernetes_secret" "reel_driver_secrets" {
+resource "kubernetes_secret_v1" "reel_driver_secrets" {
   for_each = toset(local.environments)
 
   metadata {
@@ -671,7 +670,7 @@ resource "kubernetes_secret" "reel_driver_secrets" {
 }
 
 # Create Secrets for reel-driver training credentials
-resource "kubernetes_secret" "reel_driver_training_secrets" {
+resource "kubernetes_secret_v1" "reel_driver_training_secrets" {
   for_each = toset(local.environments)
 
   metadata {
@@ -686,7 +685,6 @@ resource "kubernetes_secret" "reel_driver_training_secrets" {
 
   type = "Opaque"
 }
-
 ################################################################################
 # end of main.tf
 ################################################################################

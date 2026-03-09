@@ -6,7 +6,7 @@ locals {
   environments = ["dev", "stg", "prod"]
 }
 
-resource "kubernetes_namespace" "ai_ml" {
+resource "kubernetes_namespace_v1" "ai_ml" {
   metadata {
     name = "ai-ml"
     labels = {
@@ -19,10 +19,10 @@ resource "kubernetes_namespace" "ai_ml" {
 # namespace resource quotas
 ################################################################################
 
-resource "kubernetes_resource_quota" "ai_ml_quota" {
+resource "kubernetes_resource_quota_v1" "ai_ml_quota" {
   metadata {
     name      = "ai-ml-resource-quota"
-    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+    namespace = kubernetes_namespace_v1.ai_ml.metadata[0].name
   }
 
   spec {
@@ -39,10 +39,10 @@ resource "kubernetes_resource_quota" "ai_ml_quota" {
 # namespace limit ranges - default container limits
 ################################################################################
 
-resource "kubernetes_limit_range" "ai_ml_limits" {
+resource "kubernetes_limit_range_v1" "ai_ml_limits" {
   metadata {
     name      = "ai-ml-limit-range"
-    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+    namespace = kubernetes_namespace_v1.ai_ml.metadata[0].name
   }
 
   spec {
@@ -65,10 +65,10 @@ resource "kubernetes_limit_range" "ai_ml_limits" {
 ################################################################################
 
 # Create GitHub Container Registry secret
-resource "kubernetes_secret" "ghcr_pull_image_secret" {
+resource "kubernetes_secret_v1" "ghcr_pull_image_secret" {
   metadata {
     name      = "ghcr-pull-image-secret"
-    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+    namespace = kubernetes_namespace_v1.ai_ml.metadata[0].name
   }
 
   data = {
@@ -86,10 +86,10 @@ resource "kubernetes_secret" "ghcr_pull_image_secret" {
 }
 
 # Create GitLab Container Registry secret
-resource "kubernetes_secret" "gitlab_registry" {
+resource "kubernetes_secret_v1" "gitlab_registry" {
   metadata {
     name      = "gitlab-registry"
-    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+    namespace = kubernetes_namespace_v1.ai_ml.metadata[0].name
   }
 
   data = {
@@ -107,12 +107,12 @@ resource "kubernetes_secret" "gitlab_registry" {
 }
 
 # Create ConfigMaps for non-sensitive mlflow env vars
-resource "kubernetes_config_map" "mlflow_config" {
+resource "kubernetes_config_map_v1" "mlflow_config" {
   for_each = var.mlflow_config
 
   metadata {
     name      = "mlflow-config-${each.key}"
-    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+    namespace = kubernetes_namespace_v1.ai_ml.metadata[0].name
   }
 
   data = {
@@ -133,12 +133,12 @@ resource "kubernetes_config_map" "mlflow_config" {
 }
 
 # Create Secrets for sensitive mlflow env vars
-resource "kubernetes_secret" "mlflow_secrets" {
+resource "kubernetes_secret_v1" "mlflow_secrets" {
   for_each = toset(local.environments)
 
   metadata {
     name      = "mlflow-secrets-${each.key}"
-    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+    namespace = kubernetes_namespace_v1.ai_ml.metadata[0].name
   }
 
   data = {
@@ -158,12 +158,12 @@ resource "kubernetes_secret" "mlflow_secrets" {
 ################################################################################
 
 # Create ConfigMaps for non-sensitive reel-driver env vars
-resource "kubernetes_config_map" "reel_driver_config" {
+resource "kubernetes_config_map_v1" "reel_driver_config" {
   for_each = var.reel_driver_config
 
   metadata {
     name      = "reel-driver-config-${each.key}"
-    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+    namespace = kubernetes_namespace_v1.ai_ml.metadata[0].name
   }
 
   data = {
@@ -177,12 +177,12 @@ resource "kubernetes_config_map" "reel_driver_config" {
 }
 
 # Create ConfigMaps for reel-driver API configuration
-resource "kubernetes_config_map" "reel_driver_api_config" {
+resource "kubernetes_config_map_v1" "reel_driver_api_config" {
   for_each = var.reel_driver_api_config
 
   metadata {
     name      = "reel-driver-api-config-${each.key}"
-    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+    namespace = kubernetes_namespace_v1.ai_ml.metadata[0].name
   }
 
   data = {
@@ -195,12 +195,12 @@ resource "kubernetes_config_map" "reel_driver_api_config" {
 }
 
 # Create ConfigMaps for reel-driver training configuration
-resource "kubernetes_config_map" "reel_driver_training_config" {
+resource "kubernetes_config_map_v1" "reel_driver_training_config" {
   for_each = var.reel_driver_training_config
 
   metadata {
     name      = "reel-driver-training-config-${each.key}"
-    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+    namespace = kubernetes_namespace_v1.ai_ml.metadata[0].name
   }
 
   data = {
@@ -214,12 +214,12 @@ resource "kubernetes_config_map" "reel_driver_training_config" {
 }
 
 # Create Secrets for sensitive reel-driver env vars
-resource "kubernetes_secret" "reel_driver_secrets" {
+resource "kubernetes_secret_v1" "reel_driver_secrets" {
   for_each = toset(local.environments)
 
   metadata {
     name      = "reel-driver-secrets-${each.key}"
-    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+    namespace = kubernetes_namespace_v1.ai_ml.metadata[0].name
   }
 
   data = {
@@ -231,12 +231,12 @@ resource "kubernetes_secret" "reel_driver_secrets" {
 }
 
 # Create Secrets for reel-driver training credentials
-resource "kubernetes_secret" "reel_driver_training_secrets" {
+resource "kubernetes_secret_v1" "reel_driver_training_secrets" {
   for_each = toset(local.environments)
 
   metadata {
     name      = "reel-driver-training-secrets-${each.key}"
-    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+    namespace = kubernetes_namespace_v1.ai_ml.metadata[0].name
   }
 
   data = {
@@ -265,7 +265,7 @@ resource "helm_release" "nvidia_device_plugin" {
   name       = "nvidia-device-plugin"
   repository = "https://nvidia.github.io/k8s-device-plugin"
   chart      = "nvidia-device-plugin"
-  namespace  = kubernetes_namespace.ai_ml.metadata[0].name
+  namespace  = kubernetes_namespace_v1.ai_ml.metadata[0].name
   version    = "0.17.1"
 
   # Enable GPU Feature Discovery for node labeling
@@ -309,10 +309,10 @@ resource "helm_release" "nvidia_device_plugin" {
   ]
 }
 
-resource "kubernetes_resource_quota" "ai_ml_gpu" {
+resource "kubernetes_resource_quota_v1" "ai_ml_gpu" {
   metadata {
     name      = "gpu-quota"
-    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+    namespace = kubernetes_namespace_v1.ai_ml.metadata[0].name
   }
 
   spec {
@@ -323,10 +323,10 @@ resource "kubernetes_resource_quota" "ai_ml_gpu" {
 }
 
 # GPU devices ConfigMap for workload GPU selection
-resource "kubernetes_config_map" "gpu_devices" {
+resource "kubernetes_config_map_v1" "gpu_devices" {
   metadata {
     name      = "gpu-devices"
-    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+    namespace = kubernetes_namespace_v1.ai_ml.metadata[0].name
   }
 
   data = {
@@ -342,10 +342,10 @@ resource "kubernetes_config_map" "gpu_devices" {
 ################################################################################
 
 # Local LLM (Ollama) configuration
-resource "kubernetes_config_map" "local_llm_config" {
+resource "kubernetes_config_map_v1" "local_llm_config" {
   metadata {
     name      = "local-llm-config"
-    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+    namespace = kubernetes_namespace_v1.ai_ml.metadata[0].name
   }
 
   data = {
@@ -358,12 +358,12 @@ resource "kubernetes_config_map" "local_llm_config" {
 }
 
 # Cici shared configuration per environment
-resource "kubernetes_config_map" "cici_config" {
+resource "kubernetes_config_map_v1" "cici_config" {
   for_each = var.cici_config
 
   metadata {
     name      = "cici-config-${each.key}"
-    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+    namespace = kubernetes_namespace_v1.ai_ml.metadata[0].name
   }
 
   data = {
@@ -409,10 +409,10 @@ resource "kubernetes_config_map" "cici_config" {
 ################################################################################
 
 # Environment ConfigMap (uses dev values as dummy for k8s_job_op pods)
-resource "kubernetes_config_map" "environment" {
+resource "kubernetes_config_map_v1" "environment" {
   metadata {
     name      = "environment"
-    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+    namespace = kubernetes_namespace_v1.ai_ml.metadata[0].name
   }
 
   data = {
@@ -421,10 +421,10 @@ resource "kubernetes_config_map" "environment" {
 }
 
 # Dagster ConfigMap (uses dev values as dummy for k8s_job_op pods)
-resource "kubernetes_config_map" "dagster_config" {
+resource "kubernetes_config_map_v1" "dagster_config" {
   metadata {
     name      = "dagster-config"
-    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+    namespace = kubernetes_namespace_v1.ai_ml.metadata[0].name
   }
 
   data = {
@@ -440,10 +440,10 @@ resource "kubernetes_config_map" "dagster_config" {
 }
 
 # Dagster Secrets (uses dev values as dummy for k8s_job_op pods)
-resource "kubernetes_secret" "dagster_secrets" {
+resource "kubernetes_secret_v1" "dagster_secrets" {
   metadata {
     name      = "dagster-secrets"
-    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+    namespace = kubernetes_namespace_v1.ai_ml.metadata[0].name
   }
 
   type = "Opaque"
@@ -457,12 +457,12 @@ resource "kubernetes_secret" "dagster_secrets" {
 }
 
 # Dagster timeout ConfigMap (per environment)
-resource "kubernetes_config_map" "dagster_timeout_config" {
+resource "kubernetes_config_map_v1" "dagster_timeout_config" {
   for_each = toset(local.environments)
 
   metadata {
     name      = "dagster-timeout-config-${each.key}"
-    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+    namespace = kubernetes_namespace_v1.ai_ml.metadata[0].name
   }
 
   data = {
@@ -472,10 +472,10 @@ resource "kubernetes_config_map" "dagster_timeout_config" {
 }
 
 # AT Config (uses dev values as dummy for k8s_job_op pods)
-resource "kubernetes_config_map" "at_config" {
+resource "kubernetes_config_map_v1" "at_config" {
   metadata {
     name      = "at-config"
-    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+    namespace = kubernetes_namespace_v1.ai_ml.metadata[0].name
   }
 
   data = {
@@ -497,10 +497,10 @@ resource "kubernetes_config_map" "at_config" {
 }
 
 # AT Secrets (uses dev values as dummy for k8s_job_op pods)
-resource "kubernetes_secret" "at_secrets" {
+resource "kubernetes_secret_v1" "at_secrets" {
   metadata {
     name      = "at-secrets"
-    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+    namespace = kubernetes_namespace_v1.ai_ml.metadata[0].name
   }
 
   type = "Opaque"
@@ -512,10 +512,10 @@ resource "kubernetes_secret" "at_secrets" {
 }
 
 # WST Config (uses dev values as dummy for k8s_job_op pods)
-resource "kubernetes_config_map" "wst_config" {
+resource "kubernetes_config_map_v1" "wst_config" {
   metadata {
     name      = "wst-config"
-    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+    namespace = kubernetes_namespace_v1.ai_ml.metadata[0].name
   }
 
   data = {
@@ -526,10 +526,10 @@ resource "kubernetes_config_map" "wst_config" {
 }
 
 # WST Secrets (uses dev values as dummy for k8s_job_op pods)
-resource "kubernetes_secret" "wst_secrets" {
+resource "kubernetes_secret_v1" "wst_secrets" {
   metadata {
     name      = "wst-secrets"
-    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+    namespace = kubernetes_namespace_v1.ai_ml.metadata[0].name
   }
 
   type = "Opaque"
@@ -541,10 +541,10 @@ resource "kubernetes_secret" "wst_secrets" {
 }
 
 # Transmission Config (uses dev values as dummy for k8s_job_op pods)
-resource "kubernetes_config_map" "transmission_config" {
+resource "kubernetes_config_map_v1" "transmission_config" {
   metadata {
     name      = "transmission-config"
-    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+    namespace = kubernetes_namespace_v1.ai_ml.metadata[0].name
   }
 
   data = {
@@ -554,10 +554,10 @@ resource "kubernetes_config_map" "transmission_config" {
 }
 
 # Transmission Secrets (uses dev values as dummy for k8s_job_op pods)
-resource "kubernetes_secret" "transmission_secrets" {
+resource "kubernetes_secret_v1" "transmission_secrets" {
   metadata {
     name      = "transmission-secrets"
-    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+    namespace = kubernetes_namespace_v1.ai_ml.metadata[0].name
   }
 
   type = "Opaque"
@@ -569,10 +569,10 @@ resource "kubernetes_secret" "transmission_secrets" {
 }
 
 # Rear Diff Config (uses dev values as dummy for k8s_job_op pods)
-resource "kubernetes_config_map" "rear_diff_config" {
+resource "kubernetes_config_map_v1" "rear_diff_config" {
   metadata {
     name      = "rear-diff-config"
-    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+    namespace = kubernetes_namespace_v1.ai_ml.metadata[0].name
   }
 
   data = {
@@ -598,10 +598,10 @@ resource "kubernetes_config_map" "rear_diff_config" {
 }
 
 # Rear Diff Secrets (uses dev values as dummy for k8s_job_op pods)
-resource "kubernetes_secret" "rear_diff_secrets" {
+resource "kubernetes_secret_v1" "rear_diff_secrets" {
   metadata {
     name      = "rear-diff-secrets"
-    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+    namespace = kubernetes_namespace_v1.ai_ml.metadata[0].name
   }
 
   type = "Opaque"
@@ -622,10 +622,10 @@ resource "kubernetes_secret" "rear_diff_secrets" {
 
 # Reel Driver Config (uses dev values as dummy for k8s_job_op pods)
 # Note: reel-driver-config-{env} ConfigMaps already exist above for actual reel-driver workloads
-resource "kubernetes_config_map" "reel_driver_config_shared" {
+resource "kubernetes_config_map_v1" "reel_driver_config_shared" {
   metadata {
     name      = "reel-driver-config"
-    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+    namespace = kubernetes_namespace_v1.ai_ml.metadata[0].name
   }
 
   data = {
@@ -640,10 +640,10 @@ resource "kubernetes_config_map" "reel_driver_config_shared" {
 
 # Reel Driver Secrets (uses dev values as dummy for k8s_job_op pods)
 # Note: reel-driver-secrets-{env} Secrets already exist above for actual reel-driver workloads
-resource "kubernetes_secret" "reel_driver_secrets_shared" {
+resource "kubernetes_secret_v1" "reel_driver_secrets_shared" {
   metadata {
     name      = "reel-driver-secrets"
-    namespace = kubernetes_namespace.ai_ml.metadata[0].name
+    namespace = kubernetes_namespace_v1.ai_ml.metadata[0].name
   }
 
   type = "Opaque"
@@ -653,7 +653,6 @@ resource "kubernetes_secret" "reel_driver_secrets_shared" {
     REEL_DRIVER_MINIO_SECRET_KEY = var.reel_driver_secrets["dev"].minio.secrest_key
   }
 }
-
 ################################################################################
 # end of main.tf
 ################################################################################

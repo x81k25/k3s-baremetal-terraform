@@ -1,7 +1,7 @@
 # ArgoCD namespace
 output "namespace" {
   description = "The namespace where ArgoCD is installed"
-  value       = kubernetes_namespace.argocd.metadata[0].name
+  value       = kubernetes_namespace_v1.argocd.metadata[0].name
 }
 
 # ArgoCD server URL
@@ -21,7 +21,7 @@ output "server_service" {
   description = "ArgoCD server service details"
   value = {
     name      = "argocd-server"
-    namespace = kubernetes_namespace.argocd.metadata[0].name
+    namespace = kubernetes_namespace_v1.argocd.metadata[0].name
     type      = var.argocd_config.ingress.enabled ? "ClusterIP" : "LoadBalancer"
   }
 }

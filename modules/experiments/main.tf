@@ -1,4 +1,4 @@
-resource "kubernetes_namespace" "experiments" {
+resource "kubernetes_namespace_v1" "experiments" {
   metadata {
     name = "experiments"
     labels = {
@@ -11,10 +11,10 @@ resource "kubernetes_namespace" "experiments" {
 # namespace resource quotas
 ################################################################################
 
-resource "kubernetes_resource_quota" "experiments_quota" {
+resource "kubernetes_resource_quota_v1" "experiments_quota" {
   metadata {
     name      = "experiments-resource-quota"
-    namespace = kubernetes_namespace.experiments.metadata[0].name
+    namespace = kubernetes_namespace_v1.experiments.metadata[0].name
   }
 
   spec {
@@ -31,10 +31,10 @@ resource "kubernetes_resource_quota" "experiments_quota" {
 # namespace limit ranges - default container limits
 ################################################################################
 
-resource "kubernetes_limit_range" "experiments_limits" {
+resource "kubernetes_limit_range_v1" "experiments_limits" {
   metadata {
     name      = "experiments-limit-range"
-    namespace = kubernetes_namespace.experiments.metadata[0].name
+    namespace = kubernetes_namespace_v1.experiments.metadata[0].name
   }
 
   spec {
@@ -53,10 +53,10 @@ resource "kubernetes_limit_range" "experiments_limits" {
 }
 
 # Create GitHub Container Registry secret
-resource "kubernetes_secret" "github_registry" {
+resource "kubernetes_secret_v1" "github_registry" {
   metadata {
     name      = "github-registry"
-    namespace = kubernetes_namespace.experiments.metadata[0].name
+    namespace = kubernetes_namespace_v1.experiments.metadata[0].name
   }
 
   data = {
@@ -74,10 +74,10 @@ resource "kubernetes_secret" "github_registry" {
 }
 
 # Create GitHub Container Registry secret for ng creds
-resource "kubernetes_secret" "github_registry_ng" {
+resource "kubernetes_secret_v1" "github_registry_ng" {
   metadata {
     name      = "github-registry-ng"
-    namespace = kubernetes_namespace.experiments.metadata[0].name
+    namespace = kubernetes_namespace_v1.experiments.metadata[0].name
   }
 
   data = {
@@ -93,7 +93,6 @@ resource "kubernetes_secret" "github_registry_ng" {
 
   type = "kubernetes.io/dockerconfigjson"
 }
-
 ################################################################################
 # end of modules/expirments/main.tf
 ################################################################################
