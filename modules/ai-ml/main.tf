@@ -291,6 +291,7 @@ resource "helm_release" "nvidia_device_plugin" {
   }
 
   # Add volume mounts for NVIDIA libraries and GFD configuration
+  # Enable time-slicing to share GPUs across multiple pods
   values = [
     <<-EOT
     volumeMounts:
@@ -305,6 +306,15 @@ resource "helm_release" "nvidia_device_plugin" {
     gfd:
       securityContext:
         privileged: true
+    config:
+      map:
+        default: |-
+          version: v1
+          sharing:
+            timeSlicing:
+              resources:
+              - name: nvidia.com/gpu
+                replicas: 5
     EOT
   ]
 }
