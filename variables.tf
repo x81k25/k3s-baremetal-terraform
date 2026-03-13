@@ -803,10 +803,12 @@ variable "gpu_config" {
   description = "GPU device configuration for workload scheduling"
   type = object({
     gtx960 = object({
+      name   = string
       uuid   = string
       memory = string
     })
     rtx3060 = object({
+      name   = string
       uuid   = string
       memory = string
     })

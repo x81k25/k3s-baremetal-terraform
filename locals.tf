@@ -839,8 +839,8 @@ locals {
   local_llm_config = {
     model = var.local_llm_config.model
     host = {
-      external = var.server_ip
-      internal = "ollama.ai-ml.svc.cluster.local"
+      external = "http://${var.server_ip}"
+      internal = "http://local-llm.ai-ml.svc.cluster.local"
     }
     port = {
       internal = var.local_llm_config.port.internal

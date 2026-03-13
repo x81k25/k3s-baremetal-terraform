@@ -290,8 +290,7 @@ resource "helm_release" "nvidia_device_plugin" {
     value = "nvidia"
   }
 
-  # Add volume mounts for NVIDIA libraries and GFD configuration
-  # Enable time-slicing to share GPUs across multiple pods
+  # Time-slice GPUs for shared access across multiple pods
   values = [
     <<-EOT
     volumeMounts:
@@ -333,6 +332,9 @@ resource "kubernetes_resource_quota_v1" "ai_ml_gpu" {
 }
 
 # GPU devices ConfigMap for workload GPU selection
+# Single source of truth for GPU identity — workloads reference these keys
+# to set NVIDIA_VISIBLE_DEVICES, which pins each pod to a specific GPU.
+# With UUID isolation, the pinned GPU always appears as device index 0.
 resource "kubernetes_config_map_v1" "gpu_devices" {
   metadata {
     name      = "gpu-devices"
@@ -340,8 +342,10 @@ resource "kubernetes_config_map_v1" "gpu_devices" {
   }
 
   data = {
+    GTX960_NAME    = var.gpu_config.gtx960.name
     GTX960_UUID    = var.gpu_config.gtx960.uuid
     GTX960_MEMORY  = var.gpu_config.gtx960.memory
+    RTX3060_NAME   = var.gpu_config.rtx3060.name
     RTX3060_UUID   = var.gpu_config.rtx3060.uuid
     RTX3060_MEMORY = var.gpu_config.rtx3060.memory
   }
@@ -384,9 +388,9 @@ resource "kubernetes_config_map_v1" "cici_config" {
     CICI_CLAUDE_MODEL = each.value.claude_model
 
     # local LLM reference
-    CICI_OLLAMA_HOST  = each.value.local_llm.host
-    CICI_OLLAMA_PORT  = tostring(each.value.local_llm.port)
-    CICI_OLLAMA_MODEL = each.value.local_llm.model
+    CICI_LOCAL_LLM_HOST  = each.value.local_llm.host
+    CICI_LOCAL_LLM_PORT  = tostring(each.value.local_llm.port)
+    CICI_LOCAL_LLM_MODEL = each.value.local_llm.model
 
     # face service
     CICI_FACE_HOST_INTERNAL = each.value.face.host.internal
