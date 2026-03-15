@@ -743,39 +743,39 @@ variable "local_llm_config" {
 
 # cici voice assistant configuration
 variable "cici_config" {
-  description = "Configuration for cici voice assistant services"
+  description = "Flat configuration for cici voice assistant — single source of truth for all service coordinates and tuning"
   type = object({
-    # inter-service shared config
+    # service coordinates
+    mind_host             = string
+    mind_port             = number
+    mind_nodeport         = number
+    ears_host             = string
+    ears_port             = number
+    ears_nodeport         = number
+    ears_metrics_port     = number
+    ears_metrics_nodeport = number
+    mouth_host            = string
+    mouth_port            = number
+    mouth_nodeport        = number
+    face_host             = string
+    face_port             = number
+    face_nodeport         = number
+    # shared config
     sample_rate  = number
     log_level    = string
     default_cwd  = string
     claude_model = string
-    # face - external exposure
-    face = object({
-      port_internal = number
-      dev = object({
-        port_external = number
-      })
-      prod = object({
-        port_external = number
-      })
-    })
-    # mind - internal only
-    mind = object({
-      port_internal = number
-    })
-    # ears - internal only
-    ears = object({
-      port_internal = number
-      silence_ms    = number
-      debug         = bool
-    })
-    # mouth - internal only
-    mouth = object({
-      port_internal     = number
-      piper_voice       = string
-      piper_sample_rate = number
-    })
+    home_dir     = string
+    # local LLM
+    local_llm_host  = string
+    local_llm_port  = number
+    local_llm_model = string
+    # ears tuning
+    ears_silence_ms = number
+    ears_debug      = bool
+    # mouth tuning
+    piper_voice       = string
+    piper_sample_rate = number
   })
 }
 

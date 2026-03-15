@@ -371,48 +371,61 @@ resource "kubernetes_config_map_v1" "local_llm_config" {
   }
 }
 
-# Cici shared configuration per environment
-resource "kubernetes_config_map_v1" "cici_config" {
-  for_each = var.cici_config
+moved {
+  from = kubernetes_config_map_v1.cici_config["dev"]
+  to   = kubernetes_config_map_v1.cici_config
+}
 
+# NOTE: after apply, manually remove orphaned prod state entry:
+#   sudo terraform state rm 'module.ai_ml.kubernetes_config_map_v1.cici_config["prod"]'
+#   kubectl delete configmap cici-config-prod -n ai-ml
+
+# Cici shared configmap — consumed by all cici pods via envFrom
+# Keys match the env var names each service reads directly
+resource "kubernetes_config_map_v1" "cici_config" {
   metadata {
-    name      = "cici-config-${each.key}"
+    name      = "cici-config"
     namespace = kubernetes_namespace_v1.ai_ml.metadata[0].name
   }
 
   data = {
-    # inter-service shared config
-    CICI_SAMPLE_RATE  = tostring(each.value.sample_rate)
-    CICI_LOG_LEVEL    = each.value.log_level
-    CICI_DEFAULT_CWD  = each.value.default_cwd
-    CICI_CLAUDE_MODEL = each.value.claude_model
+    # service coordinates (internal cluster ports)
+    MIND_HOST  = var.cici_config.mind_host
+    MIND_PORT  = tostring(var.cici_config.mind_port)
+    EARS_HOST  = var.cici_config.ears_host
+    EARS_PORT  = tostring(var.cici_config.ears_port)
+    MOUTH_HOST = var.cici_config.mouth_host
+    MOUTH_PORT = tostring(var.cici_config.mouth_port)
+    FACE_HOST  = var.cici_config.face_host
+    FACE_PORT  = tostring(var.cici_config.face_port)
+    EARS_METRICS_PORT = tostring(var.cici_config.ears_metrics_port)
 
-    # local LLM reference
-    CICI_LOCAL_LLM_HOST  = each.value.local_llm.host
-    CICI_LOCAL_LLM_PORT  = tostring(each.value.local_llm.port)
-    CICI_LOCAL_LLM_MODEL = each.value.local_llm.model
+    # external NodePorts (for reference / ops diagnostics)
+    MIND_NODEPORT  = tostring(var.cici_config.mind_nodeport)
+    EARS_NODEPORT  = tostring(var.cici_config.ears_nodeport)
+    MOUTH_NODEPORT = tostring(var.cici_config.mouth_nodeport)
+    FACE_NODEPORT  = tostring(var.cici_config.face_nodeport)
+    EARS_METRICS_NODEPORT = tostring(var.cici_config.ears_metrics_nodeport)
 
-    # face service
-    CICI_FACE_HOST_INTERNAL = each.value.face.host.internal
-    CICI_FACE_HOST_EXTERNAL = each.value.face.host.external
-    CICI_FACE_PORT_INTERNAL = tostring(each.value.face.port.internal)
-    CICI_FACE_PORT_EXTERNAL = tostring(each.value.face.port.external)
+    # shared config
+    SAMPLE_RATE  = tostring(var.cici_config.sample_rate)
+    LOG_LEVEL    = var.cici_config.log_level
+    DEFAULT_CWD  = var.cici_config.default_cwd
+    CLAUDE_MODEL = var.cici_config.claude_model
+    HOME         = var.cici_config.home_dir
 
-    # mind service
-    CICI_MIND_HOST_INTERNAL = each.value.mind.host.internal
-    CICI_MIND_PORT_INTERNAL = tostring(each.value.mind.port.internal)
+    # local LLM
+    LOCAL_LLM_HOST  = var.cici_config.local_llm_host
+    LOCAL_LLM_PORT  = tostring(var.cici_config.local_llm_port)
+    LOCAL_LLM_MODEL = var.cici_config.local_llm_model
 
-    # ears service
-    CICI_EARS_HOST_INTERNAL = each.value.ears.host.internal
-    CICI_EARS_PORT_INTERNAL = tostring(each.value.ears.port.internal)
-    CICI_EARS_SILENCE_MS    = tostring(each.value.ears.silence_ms)
-    CICI_EARS_DEBUG         = tostring(each.value.ears.debug)
+    # ears tuning
+    EARS_SILENCE_DURATION_MS = tostring(var.cici_config.ears_silence_ms)
+    EARS_DEBUG               = tostring(var.cici_config.ears_debug)
 
-    # mouth service
-    CICI_MOUTH_HOST_INTERNAL     = each.value.mouth.host.internal
-    CICI_MOUTH_PORT_INTERNAL     = tostring(each.value.mouth.port.internal)
-    CICI_MOUTH_PIPER_VOICE       = each.value.mouth.piper_voice
-    CICI_MOUTH_PIPER_SAMPLE_RATE = tostring(each.value.mouth.piper_sample_rate)
+    # mouth tuning
+    PIPER_VOICE       = var.cici_config.piper_voice
+    PIPER_SAMPLE_RATE = tostring(var.cici_config.piper_sample_rate)
   }
 }
 
