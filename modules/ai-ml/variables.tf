@@ -23,10 +23,6 @@ variable "ai_ml_config" {
 variable "ai_ml_secrets" {
   description = "namespace-level secrets for ai-ml services"
   type = object({
-    github = object({
-      username = string
-      token_packages_read = string
-    })
     gitlab = object({
       username = string
       token    = string
@@ -38,16 +34,10 @@ variable "ai_ml_secrets" {
 variable "gpu_config" {
   description = "GPU device configuration for workload scheduling"
   type = object({
-    gtx960 = object({
-      name   = string
+    gpus = map(object({
       uuid   = string
       memory = string
-    })
-    rtx3060 = object({
-      name   = string
-      uuid   = string
-      memory = string
-    })
+    }))
     quota = number
   })
 }
@@ -96,7 +86,7 @@ variable "local_llm_config" {
 }
 
 variable "cici_config" {
-  description = "Cici voice assistant configuration for all environments"
+  description = "Cici voice assistant configuration — flat map, single environment"
   type = any
 }
 

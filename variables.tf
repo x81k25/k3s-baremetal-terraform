@@ -19,24 +19,6 @@ variable "kubeconfig_path" {
   description = "Path to kubeconfig file"
 }
 
-variable "github_secrets" {
-  description = "github credentials"
-  type = object({
-    username = string
-    token_packages_read = string
-  })
-  sensitive = true
-}
-
-variable "github_secrets_ng" {
-  description = "ng github credentials"
-  type = object({
-    username = string
-    token_packages_read = string
-  })
-  sensitive = true
-}
-
 variable "gitlab_secrets" {
   description = "gitlab credentials for container registry"
   type = object({
@@ -802,16 +784,10 @@ variable "ai_ml_config" {
 variable "gpu_config" {
   description = "GPU device configuration for workload scheduling"
   type = object({
-    gtx960 = object({
-      name   = string
+    gpus = map(object({
       uuid   = string
       memory = string
-    })
-    rtx3060 = object({
-      name   = string
-      uuid   = string
-      memory = string
-    })
+    }))
     quota = number
   })
 }

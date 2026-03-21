@@ -94,42 +94,16 @@ resource "kubernetes_secret_v1" "argocd_repo_k8s_manifests" {
   depends_on = [kubernetes_namespace_v1.argocd]
 }
 
-resource "kubernetes_secret_v1" "ghcr_pull_image_secret" {
+resource "kubernetes_secret_v1" "gitlab_image_updater_token" {
   metadata {
-    name      = "ghcr-pull-image-secret"
-    namespace = kubernetes_namespace_v1.argocd.metadata[0].name
-    labels = {
-      "argocd.argoproj.io/secret-type" = "repository"
-    }
-  }
-
-  type = "kubernetes.io/dockerconfigjson"
-
-  data = {
-    ".dockerconfigjson" = jsonencode({
-      auths = {
-        "ghcr.io" = {
-          username = var.argocd_secrets.github.username
-          password = var.argocd_secrets.github.token_packages_read
-        }
-      }
-    })
-  }
-
-  depends_on = [kubernetes_namespace_v1.argocd]
-}
-
-# Create a generic secret for ArgoCD Image Updater with token format
-resource "kubernetes_secret_v1" "ghcr_image_updater_token" {
-  metadata {
-    name      = "ghcr-image-updater-token"
+    name      = "gitlab-image-updater-token"
     namespace = kubernetes_namespace_v1.argocd.metadata[0].name
   }
 
   type = "Opaque"
 
   data = {
-    token = "${var.argocd_secrets.github.username}:${var.argocd_secrets.github.token_packages_read}"
+    token = "${var.argocd_secrets.gitlab.username}:${var.argocd_secrets.gitlab.token}"
   }
 
   depends_on = [kubernetes_namespace_v1.argocd]
@@ -281,10 +255,6 @@ resource "helm_release" "argocd" {
           "timeout.reconciliation" = var.argocd_config.refresh_config.reconciliation_timeout
         }
         repositories = {}
-        params = {
-          "dockercredentials.enableAutoCredentialsPlugin" = "true"
-          "dockercredentials.pullSecrets"                 = "[ghcr-pull-image-token]"
-        }
       }
     })
   ]
@@ -374,12 +344,12 @@ resource "helm_release" "argocd_image_updater" {
       config = {
         registries = [
           {
-            name        = "GitHub Container Registry"
-            api_url     = "https://ghcr.io"
-            prefix      = "ghcr.io"
+            name        = "GitLab Container Registry"
+            api_url     = "http://192.168.50.2:5050"
+            prefix      = "192.168.50.2:5050"
             ping        = true
-            credentials = "secret:argocd/ghcr-image-updater-token#token"
-            insecure    = false
+            credentials = "secret:argocd/gitlab-image-updater-token#token"
+            insecure    = true
           }
         ]
         argocd = {
@@ -417,8 +387,7 @@ resource "helm_release" "argocd_image_updater" {
 
   depends_on = [
     helm_release.argocd,
-    kubernetes_secret_v1.ghcr_pull_image_secret,
-    kubernetes_secret_v1.ghcr_image_updater_token
+    kubernetes_secret_v1.gitlab_image_updater_token
   ]
 }
 

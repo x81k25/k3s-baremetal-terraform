@@ -177,28 +177,6 @@ resource "kubernetes_config_map_v1" "environment" {
 # - sets env vars and secrets used for various services in the media namespaces
 ################################################################################
 
-resource "kubernetes_secret_v1" "ghcr_pull_image_secret" {
-  for_each = toset(["media-dev", "media-stg", "media-prod"])
-
-  metadata {
-    name      = "ghcr-pull-image-secret"
-    namespace = each.key
-  }
-
-  type = "kubernetes.io/dockerconfigjson"
-
-  data = {
-    ".dockerconfigjson" = jsonencode({
-      auths = {
-        "ghcr.io" = {
-          username = var.media_secrets.github.username
-          password = var.media_secrets.github.token_packages_read
-        }
-      }
-    })
-  }
-}
-
 resource "kubernetes_secret_v1" "gitlab_registry" {
   for_each = toset(["media-dev", "media-stg", "media-prod"])
 
@@ -262,22 +240,6 @@ resource "kubernetes_secret_v1" "dagster_secrets" {
     DAGSTER_MINIO_ACCESS_KEY = var.reel_driver_secrets[each.key].minio.access_key
     DAGSTER_MINIO_SECRET_KEY = var.reel_driver_secrets[each.key].minio.secrest_key
   }
-}
-
-# Also create GHCR token secret for environment variable use
-resource "kubernetes_secret_v1" "ghcr_token" {
-  for_each = toset(["media-dev", "media-stg", "media-prod"])
-
-  metadata {
-    name      = "ghcr-token"
-    namespace = each.key
-  }
-
-  data = {
-    GHCR_PULL_IMAGE_TOKEN = var.media_secrets.github.token_packages_read
-  }
-
-  type = "Opaque"
 }
 
 ################################################################################

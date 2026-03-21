@@ -8,11 +8,11 @@ locals {
   })
 
   argocd_secrets = {
-    admin_pw = var.argocd_secrets.admin_pw
+    admin_pw             = var.argocd_secrets.admin_pw
     ssh_private_key_path = var.argocd_secrets.ssh_private_key_path
-    github = {
-      username = var.github_secrets.username
-      token_packages_read = var.github_secrets.token_packages_read
+    gitlab = {
+      username = var.gitlab_secrets.username
+      token    = var.gitlab_secrets.token
     }
   }
 }
@@ -23,10 +23,6 @@ locals {
 
 locals {
   pgsql_secrets = {
-    github = {
-      username            = var.github_secrets.username
-      token_packages_read = var.github_secrets.token_packages_read
-    }
     gitlab = {
       username = var.gitlab_secrets.username
       token    = var.gitlab_secrets.token
@@ -148,10 +144,6 @@ locals {
 
 locals {
   media_secrets = {
-    github = {
-      username            = var.github_secrets.username
-      token_packages_read = var.github_secrets.token_packages_read
-    }
     gitlab = {
       username = var.gitlab_secrets.username
       token    = var.gitlab_secrets.token
@@ -564,10 +556,6 @@ locals {
 
 locals {
   ai_ml_secrets = {
-    github = {
-      username = var.github_secrets.username
-      token_packages_read = var.github_secrets.token_packages_read
-    }
     gitlab = {
       username = var.gitlab_secrets.username
       token    = var.gitlab_secrets.token
@@ -848,86 +836,8 @@ locals {
     }
   }
 
-  # cici voice assistant config with derived K8s hosts
-  cici_config = {
-    for env in ["dev", "prod"] : env => {
-      # inter-service shared config
-      sample_rate  = var.cici_config.sample_rate
-      log_level    = var.cici_config.log_level
-      default_cwd  = var.cici_config.default_cwd
-      claude_model = var.cici_config.claude_model
-
-      # local LLM reference
-      local_llm = {
-        host = local.local_llm_config.host.internal
-        port = local.local_llm_config.port.internal
-        model = local.local_llm_config.model
-      }
-
-      # face - external exposure (NodePort)
-      face = {
-        host = {
-          internal = "cici-face-${env}.ai-ml.svc.cluster.local"
-          external = var.server_ip
-        }
-        port = {
-          internal = var.cici_config.face.port_internal
-          external = var.cici_config.face[env].port_external
-        }
-      }
-
-      # mind - internal only
-      mind = {
-        host = {
-          internal = "cici-mind-${env}.ai-ml.svc.cluster.local"
-        }
-        port = {
-          internal = var.cici_config.mind.port_internal
-        }
-      }
-
-      # ears - internal only
-      ears = {
-        host = {
-          internal = "cici-ears-${env}.ai-ml.svc.cluster.local"
-        }
-        port = {
-          internal = var.cici_config.ears.port_internal
-        }
-        silence_ms = var.cici_config.ears.silence_ms
-        debug      = var.cici_config.ears.debug
-      }
-
-      # mouth - internal only
-      mouth = {
-        host = {
-          internal = "cici-mouth-${env}.ai-ml.svc.cluster.local"
-        }
-        port = {
-          internal = var.cici_config.mouth.port_internal
-        }
-        piper_voice       = var.cici_config.mouth.piper_voice
-        piper_sample_rate = var.cici_config.mouth.piper_sample_rate
-      }
-    }
-  }
-}
-
-################################################################################
-# experiments locals  
-################################################################################
-
-locals {
-  experiments_secrets = {
-    github = {
-      username            = var.github_secrets.username
-      token_packages_read = var.github_secrets.token_packages_read
-    }
-    github_secrets_ng = {
-      username            = var.github_secrets_ng.username
-      token_packages_read = var.github_secrets_ng.token_packages_read
-    }
-  }
+  # cici voice assistant config — flat passthrough, single environment
+  cici_config = var.cici_config
 }
 
 ################################################################################

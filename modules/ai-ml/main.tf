@@ -64,27 +64,6 @@ resource "kubernetes_limit_range_v1" "ai_ml_limits" {
 # env vars & secrets
 ################################################################################
 
-# Create GitHub Container Registry secret
-resource "kubernetes_secret_v1" "ghcr_pull_image_secret" {
-  metadata {
-    name      = "ghcr-pull-image-secret"
-    namespace = kubernetes_namespace_v1.ai_ml.metadata[0].name
-  }
-
-  data = {
-    ".dockerconfigjson" = jsonencode({
-      auths = {
-        "ghcr.io" = {
-          username = var.ai_ml_secrets.github.username
-          password = var.ai_ml_secrets.github.token_packages_read
-        }
-      }
-    })
-  }
-
-  type = "kubernetes.io/dockerconfigjson"
-}
-
 # Create GitLab Container Registry secret
 resource "kubernetes_secret_v1" "gitlab_registry" {
   metadata {
@@ -331,24 +310,21 @@ resource "kubernetes_resource_quota_v1" "ai_ml_gpu" {
   }
 }
 
-# GPU devices ConfigMap for workload GPU selection
-# Single source of truth for GPU identity — workloads reference these keys
-# to set NVIDIA_VISIBLE_DEVICES, which pins each pod to a specific GPU.
-# With UUID isolation, the pinned GPU always appears as device index 0.
+# GPU devices ConfigMap — single source of truth for GPU identity.
+# Workloads are agnostic by default (no NVIDIA_VISIBLE_DEVICES pinning).
+# Individual workloads can opt into pinning via these keys if VRAM contention arises.
 resource "kubernetes_config_map_v1" "gpu_devices" {
   metadata {
     name      = "gpu-devices"
     namespace = kubernetes_namespace_v1.ai_ml.metadata[0].name
   }
 
-  data = {
-    GTX960_NAME    = var.gpu_config.gtx960.name
-    GTX960_UUID    = var.gpu_config.gtx960.uuid
-    GTX960_MEMORY  = var.gpu_config.gtx960.memory
-    RTX3060_NAME   = var.gpu_config.rtx3060.name
-    RTX3060_UUID   = var.gpu_config.rtx3060.uuid
-    RTX3060_MEMORY = var.gpu_config.rtx3060.memory
-  }
+  data = merge([
+    for name, gpu in var.gpu_config.gpus : {
+      "${upper(replace(name, "-", "_"))}_UUID"   = gpu.uuid
+      "${upper(replace(name, "-", "_"))}_MEMORY" = gpu.memory
+    }
+  ]...)
 }
 
 ################################################################################

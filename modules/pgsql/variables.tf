@@ -28,10 +28,6 @@ variable "pgsql_namespace_config" {
 variable "pgsql_secrets" {
   description = "PostgreSQL module secrets"
   type = object({
-    github = object({
-      username            = string
-      token_packages_read = string
-    })
     gitlab = object({
       username = string
       token    = string

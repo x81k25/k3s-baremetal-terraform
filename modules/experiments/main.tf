@@ -52,47 +52,6 @@ resource "kubernetes_limit_range_v1" "experiments_limits" {
   }
 }
 
-# Create GitHub Container Registry secret
-resource "kubernetes_secret_v1" "github_registry" {
-  metadata {
-    name      = "github-registry"
-    namespace = kubernetes_namespace_v1.experiments.metadata[0].name
-  }
-
-  data = {
-    ".dockerconfigjson" = jsonencode({
-      auths = {
-        "ghcr.io" = {
-          username = var.experiments_secrets.github.username
-          password = var.experiments_secrets.github.token_packages_read
-        }
-      }
-    })
-  }
-
-  type = "kubernetes.io/dockerconfigjson"
-}
-
-# Create GitHub Container Registry secret for ng creds
-resource "kubernetes_secret_v1" "github_registry_ng" {
-  metadata {
-    name      = "github-registry-ng"
-    namespace = kubernetes_namespace_v1.experiments.metadata[0].name
-  }
-
-  data = {
-    ".dockerconfigjson" = jsonencode({
-      auths = {
-        "ghcr.io" = {
-          username = var.experiments_secrets.github_secrets_ng.username
-          password = var.experiments_secrets.github_secrets_ng.token_packages_read
-        }
-      }
-    })
-  }
-
-  type = "kubernetes.io/dockerconfigjson"
-}
 ################################################################################
 # end of modules/expirments/main.tf
 ################################################################################

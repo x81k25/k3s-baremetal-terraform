@@ -143,7 +143,6 @@ module "experiments" {
   depends_on = [module.k3s]
 
   experiments_config  = var.experiments_config
-  experiments_secrets = local.experiments_secrets
 }
 
 ################################################################################

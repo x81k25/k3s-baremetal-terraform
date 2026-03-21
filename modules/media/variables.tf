@@ -85,10 +85,6 @@ variable "plex_secrets" {
 
 variable "media_secrets" {
   type = object({
-    github = object({
-      username            = string
-      token_packages_read = string
-    })
     gitlab = object({
       username = string
       token    = string

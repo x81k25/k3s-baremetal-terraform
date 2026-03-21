@@ -15,18 +15,3 @@ variable "experiments_config" {
     })
   })
 }
-
-variable "experiments_secrets" {
-  description = "namespace-level secrets for experiments services"
-  type = object({
-    github = object({
-      username = string
-      token_packages_read = string
-    })
-    github_secrets_ng = object({
-      username = string
-      token_packages_read = string
-    })
-  })
-  sensitive = true
-}

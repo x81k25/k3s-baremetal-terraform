@@ -60,26 +60,6 @@ resource "kubernetes_limit_range_v1" "pgsql_limits" {
   }
 }
 
-resource "kubernetes_secret_v1" "ghcr_pull_image_secret" {
-  metadata {
-    name      = "ghcr-pull-image-secret"
-    namespace = "pgsql"
-  }
-
-  data = {
-    ".dockerconfigjson" = jsonencode({
-      auths = {
-        "ghcr.io" = {
-          username = var.pgsql_secrets.github.username
-          password = var.pgsql_secrets.github.token_packages_read
-        }
-      }
-    })
-  }
-
-  type = "kubernetes.io/dockerconfigjson"
-}
-
 resource "kubernetes_secret_v1" "gitlab_registry" {
   metadata {
     name      = "gitlab-registry"
