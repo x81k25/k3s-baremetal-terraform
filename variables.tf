@@ -1049,5 +1049,57 @@ variable "gitlab_sensitive" {
 }
 
 ################################################################################
+# infra variables
+################################################################################
+
+variable "infra_config" {
+  description = "Resource configuration for infra namespace"
+  type = object({
+    resource_quota = object({
+      cpu_request    = string
+      cpu_limit      = string
+      memory_request = string
+      memory_limit   = string
+    })
+    container_defaults = object({
+      cpu_request    = string
+      cpu_limit      = string
+      memory_request = string
+      memory_limit   = string
+    })
+  })
+}
+
+variable "adguard_config" {
+  description = "Configuration for AdGuard Home DNS server"
+  type = object({
+    image_tag      = string
+    web_node_port  = number
+    dns_node_port  = number
+    upstream_dns        = list(string)
+    tailscale_ip        = string
+    tld                 = string
+    environments        = list(string)
+    dns_domains_single  = list(string)
+    dns_domains_multi   = list(string)
+    resources = object({
+      cpu_request    = string
+      cpu_limit      = string
+      memory_request = string
+      memory_limit   = string
+    })
+  })
+}
+
+variable "adguard_secrets" {
+  description = "AdGuard Home admin credentials"
+  type = object({
+    username        = string
+    password_bcrypt = string
+  })
+  sensitive = true
+}
+
+################################################################################
 # end of variables.tf
 ################################################################################

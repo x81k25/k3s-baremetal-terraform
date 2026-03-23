@@ -841,5 +841,35 @@ locals {
 }
 
 ################################################################################
+# infra module
+################################################################################
+
+locals {
+  # construct full domain list from single + multi-env services
+  dns_domains = concat(
+    # single-env: service.tld
+    [for s in var.adguard_config.dns_domains_single : "${s}.${var.adguard_config.tld}"],
+    # multi-env prod: service.tld
+    [for s in var.adguard_config.dns_domains_multi : "${s}.${var.adguard_config.tld}"],
+    # multi-env per-env: service.env.tld
+    flatten([
+      for s in var.adguard_config.dns_domains_multi : [
+        for env in var.adguard_config.environments : "${s}.${env}.${var.adguard_config.tld}"
+      ]
+    ])
+  )
+
+  adguard_config = {
+    image_tag      = var.adguard_config.image_tag
+    web_node_port  = var.adguard_config.web_node_port
+    dns_node_port  = var.adguard_config.dns_node_port
+    upstream_dns   = var.adguard_config.upstream_dns
+    tailscale_ip   = var.adguard_config.tailscale_ip
+    resources      = var.adguard_config.resources
+    dns_rewrites   = { for domain in local.dns_domains : domain => var.server_ip }
+  }
+}
+
+################################################################################
 # end of locals.tf
 ################################################################################

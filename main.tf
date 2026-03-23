@@ -171,5 +171,19 @@ module "gitlab" {
 }
 
 ################################################################################
+# infra module
+################################################################################
+
+module "infra" {
+  source     = "./modules/infra"
+  depends_on = [module.k3s]
+
+  server_ip       = var.server_ip
+  infra_config    = var.infra_config
+  adguard_config  = local.adguard_config
+  adguard_secrets = var.adguard_secrets
+}
+
+################################################################################
 # end of main.tf
 ################################################################################
