@@ -3,21 +3,12 @@
 ################################################################################
 
 locals {
-  environments = ["dev", "stg", "prod"]
+  environments = ["dev", "prod"]
 }
 
 resource "kubernetes_namespace_v1" "media-prod" {
   metadata {
     name = "media-prod"
-    labels = {
-      managed-by = "terraform"
-    }
-  }
-}
-
-resource "kubernetes_namespace_v1" "media-stg" {
-  metadata {
-    name = "media-stg"
     labels = {
       managed-by = "terraform"
     }
@@ -49,22 +40,6 @@ resource "kubernetes_resource_quota_v1" "media_prod_quota" {
       "limits.cpu"      = var.media_config.prod.resource_quota.cpu_limit
       "requests.memory" = var.media_config.prod.resource_quota.memory_request
       "limits.memory"   = var.media_config.prod.resource_quota.memory_limit
-    }
-  }
-}
-
-resource "kubernetes_resource_quota_v1" "media_stg_quota" {
-  metadata {
-    name      = "media-stg-resource-quota"
-    namespace = kubernetes_namespace_v1.media-stg.metadata[0].name
-  }
-
-  spec {
-    hard = {
-      "requests.cpu"    = var.media_config.stg.resource_quota.cpu_request
-      "limits.cpu"      = var.media_config.stg.resource_quota.cpu_limit
-      "requests.memory" = var.media_config.stg.resource_quota.memory_request
-      "limits.memory"   = var.media_config.stg.resource_quota.memory_limit
     }
   }
 }
@@ -105,27 +80,6 @@ resource "kubernetes_limit_range_v1" "media_prod_limits" {
       default_request = {
         cpu    = var.media_config.prod.container_defaults.cpu_request
         memory = var.media_config.prod.container_defaults.memory_request
-      }
-    }
-  }
-}
-
-resource "kubernetes_limit_range_v1" "media_stg_limits" {
-  metadata {
-    name      = "media-stg-limit-range"
-    namespace = kubernetes_namespace_v1.media-stg.metadata[0].name
-  }
-
-  spec {
-    limit {
-      type = "Container"
-      default = {
-        cpu    = var.media_config.stg.container_defaults.cpu_limit
-        memory = var.media_config.stg.container_defaults.memory_limit
-      }
-      default_request = {
-        cpu    = var.media_config.stg.container_defaults.cpu_request
-        memory = var.media_config.stg.container_defaults.memory_request
       }
     }
   }
@@ -178,7 +132,7 @@ resource "kubernetes_config_map_v1" "environment" {
 ################################################################################
 
 resource "kubernetes_secret_v1" "gitlab_registry" {
-  for_each = toset(["media-dev", "media-stg", "media-prod"])
+  for_each = toset(["media-dev", "media-prod"])
 
   metadata {
     name      = "gitlab-registry"
@@ -423,7 +377,7 @@ resource "kubernetes_secret_v1" "wst_secrets" {
 ################################################################################
 
 resource "kubernetes_secret_v1" "vpn_config" {
-  for_each = toset(["media-dev", "media-stg", "media-prod"])
+  for_each = toset(["media-dev", "media-prod"])
 
   metadata {
     name      = "vpn-config"

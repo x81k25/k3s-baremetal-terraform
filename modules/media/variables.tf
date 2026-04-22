@@ -23,20 +23,6 @@ variable "media_config" {
         memory_limit   = string
       })
     })
-    stg = object({
-      resource_quota = object({
-        cpu_request    = string
-        cpu_limit      = string
-        memory_request = string
-        memory_limit   = string
-      })
-      container_defaults = object({
-        cpu_request    = string
-        cpu_limit      = string
-        memory_request = string
-        memory_limit   = string
-      })
-    })
     dev = object({
       resource_quota = object({
         cpu_request    = string
@@ -58,7 +44,6 @@ variable "environment" {
   description = "Map of environment names"
   type = object({
     dev  = string
-    stg  = string
     prod = string
   })
 }
@@ -148,26 +133,6 @@ variable "transmission_config" {
         preallocation            = number
       })
     })
-    stg = object({
-      host = string
-      port = string
-      env_vars = object({
-        speed_limit_down         = number
-        speed_limit_down_enabled = bool
-        speed_limit_up           = number
-        speed_limit_up_enabled   = bool
-        download_queue_enabled   = bool
-        download_queue_size      = number
-        seed_queue_enabled       = bool
-        seed_queue_size          = number
-        queue_stalled_enabled    = bool
-        queue_stalled_minutes    = number
-        peer_limit_global        = number
-        peer_limit_per_torrent   = number
-        cache_size_mb            = number
-        preallocation            = number
-      })
-    })
     dev = object({
       host = string
       port = string
@@ -198,10 +163,6 @@ variable "transmission_secrets" {
       username = string
       password = string
     })
-    stg = object({
-      username = string
-      password = string
-    })
     dev = object({
       username = string
       password = string
@@ -218,34 +179,6 @@ variable "rear_diff_config" {
   description = "parameters to connect rear differential API to DB"
   type = object({
     prod = object({
-      host                  = string
-      port_external         = string
-      prefix                = string
-      file_deletion_enabled = bool
-      pgsql = object({
-        host     = string
-        port     = string
-        database = string
-      })
-      transmission = object({
-        host = string
-        port = string
-      })
-      paths = object({
-        media_cache_path          = string
-        media_library_path_movies = string
-        media_library_path_tv     = string
-      })
-      api_urls = object({
-        movie_search  = string
-        movie_details = string
-        movie_ratings = string
-        tv_search     = string
-        tv_details    = string
-        tv_ratings    = string
-      })
-    })
-    stg = object({
       host                  = string
       port_external         = string
       prefix                = string
@@ -323,22 +256,6 @@ variable "rear_diff_secrets" {
       tv_details_api_key    = string
       tv_ratings_api_key    = string
     })
-    stg = object({
-      pgsql = object({
-        username = string
-        password = string
-      })
-      transmission = object({
-        username = string
-        password = string
-      })
-      movie_search_api_key  = string
-      movie_details_api_key = string
-      movie_ratings_api_key = string
-      tv_search_api_key     = string
-      tv_details_api_key    = string
-      tv_ratings_api_key    = string
-    })
     dev = object({
       pgsql = object({
         username = string
@@ -374,14 +291,6 @@ variable "center_console_config" {
         port = string
       })
     })
-    stg = object({
-      port_external = string
-      api_timeout   = string
-      mlflow = object({
-        host = string
-        port = string
-      })
-    })
     dev = object({
       port_external = string
       api_timeout   = string
@@ -397,12 +306,6 @@ variable "center_console_secrets" {
   description = "secrets for center-console UI tool"
   type = object({
     prod = object({
-      mlflow = object({
-        username = string
-        password = string
-      })
-    })
-    stg = object({
       mlflow = object({
         username = string
         password = string
@@ -432,11 +335,6 @@ variable "dagster_config" {
         workspace = string
         timezone  = string
       })
-      stg = object({
-        home      = string
-        workspace = string
-        timezone  = string
-      })
       dev = object({
         home      = string
         workspace = string
@@ -445,11 +343,6 @@ variable "dagster_config" {
     })
     pgsql = object({
       prod = object({
-        host     = string
-        port     = string
-        database = string
-      })
-      stg = object({
         host     = string
         port     = string
         database = string
@@ -470,10 +363,6 @@ variable "dagster_secrets" {
       username = string
       password = string
     })
-    stg = object({
-      username = string
-      password = string
-    })
     dev = object({
       username = string
       password = string
@@ -490,39 +379,6 @@ variable "at_config" {
   description = "Automatic transmission configuration per environment"
   type = object({
     prod = object({
-      movie_search_api_base_url      = string
-      movie_details_api_base_url     = string
-      movie_ratings_api_base_url     = string
-      tv_search_api_base_utl         = string
-      tv_details_api_base_url        = string
-      tv_ratings_api_base_url        = string
-      rss_sources                    = string
-      rss_urls                       = string
-      uid                            = string
-      gid                            = string
-      batch_size                     = string
-      log_level                      = string
-      stale_metadata_threshold       = string
-      reel_driver_threshold          = string
-      target_active_items            = string
-      transferred_item_cleanup_delay = string
-      hung_item_cleanup_delay        = string
-      download_dir                   = string
-      movie_dir                      = string
-      tv_show_dir                    = string
-      pgsql = object({
-        host     = string
-        port     = string
-        database = string
-        schema   = string
-      })
-      reel_driver = object({
-        host   = string
-        port   = string
-        prefix = string
-      })
-    })
-    stg = object({
       movie_search_api_base_url      = string
       movie_details_api_base_url     = string
       movie_ratings_api_base_url     = string
@@ -606,18 +462,6 @@ variable "at_secrets" {
         password = string
       })
     })
-    stg = object({
-      movie_search_api_key  = string
-      movie_details_api_key = string
-      movie_ratings_api_key = string
-      tv_search_api_key     = string
-      tv_details_api_key    = string
-      tv_ratings_api_key    = string
-      pgsql = object({
-        username = string
-        password = string
-      })
-    })
     dev = object({
       movie_search_api_key  = string
       movie_details_api_key = string
@@ -647,11 +491,6 @@ variable "wst_config" {
         port     = string
         database = string
       })
-      stg = object({
-        host     = string
-        port     = string
-        database = string
-      })
       dev = object({
         host     = string
         port     = string
@@ -666,10 +505,6 @@ variable "wst_secrets" {
   type = object({
     pgsql = object({
       prod = object({
-        username = string
-        password = string
-      })
-      stg = object({
         username = string
         password = string
       })

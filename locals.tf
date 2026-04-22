@@ -37,13 +37,6 @@ locals {
         database = var.pgsql_default_config.database
       }
     }
-    stg = {
-      pgsql = {
-        host     = var.pgsql_default_config.stg.host
-        port     = var.pgsql_default_config.stg.port
-        database = var.pgsql_default_config.database
-      }
-    }
     dev = {
       pgsql = {
         host     = var.pgsql_default_config.dev.host
@@ -58,12 +51,6 @@ locals {
       pgsql = {
         username = var.pgsql_config.prod.user
         password = var.pgsql_config.prod.password
-      }
-    }
-    stg = {
-      pgsql = {
-        username = var.pgsql_config.stg.user
-        password = var.pgsql_config.stg.password
       }
     }
     dev = {
@@ -93,26 +80,6 @@ locals {
       }
       path = {
         data = "${var.minio_config.path.root}prod/${var.minio_config.path.directories.data}"
-      }
-    }
-    stg = {
-      uid = var.minio_config.uid
-      gid = var.minio_config.gid
-      region = var.minio_config.region
-      port = {
-        external = {
-          console = var.minio_config.stg.port.external.console
-          api     = var.minio_config.stg.port.external.api
-        }
-        internal = {
-          api = var.minio_config.stg.port.internal.api
-        }
-      }
-      endpoint = {
-        internal = var.minio_config.stg.endpoint.internal
-      }
-      path = {
-        data = "${var.minio_config.path.root}stg/${var.minio_config.path.directories.data}"
       }
     }
     dev = {
@@ -157,11 +124,6 @@ locals {
         workspace = var.dagster_vars.path.prod.workspace
         timezone  = var.dagster_vars.timezone
       }
-      stg = {
-        home      = var.dagster_vars.path.stg.home
-        workspace = var.dagster_vars.path.stg.workspace
-        timezone  = var.dagster_vars.timezone
-      }
       dev = {
         home      = var.dagster_vars.path.dev.home
         workspace = var.dagster_vars.path.dev.workspace
@@ -169,7 +131,7 @@ locals {
       }
     }
     pgsql = {
-      for env in ["prod", "stg", "dev"] : env => {
+      for env in ["prod", "dev"] : env => {
         host     = var.pgsql_default_config[env].host
         port     = var.pgsql_default_config[env].port
         database = "dagster"
@@ -196,26 +158,6 @@ locals {
         peer_limit_per_torrent   = var.transmission_env_config.prod.peer_limit_per_torrent
         cache_size_mb            = var.transmission_env_config.prod.cache_size_mb
         preallocation            = var.transmission_env_config.prod.preallocation
-      }
-    }
-    stg = {
-      host = var.server_ip
-      port = var.transmission_vars.stg.port
-      env_vars = {
-        speed_limit_down         = var.transmission_env_config.stg.speed_limit_down
-        speed_limit_down_enabled = var.transmission_env_config.stg.speed_limit_down_enabled
-        speed_limit_up           = var.transmission_env_config.stg.speed_limit_up
-        speed_limit_up_enabled   = var.transmission_env_config.stg.speed_limit_up_enabled
-        download_queue_enabled   = var.transmission_env_config.stg.download_queue_enabled
-        download_queue_size      = var.transmission_env_config.stg.download_queue_size
-        seed_queue_enabled       = var.transmission_env_config.stg.seed_queue_enabled
-        seed_queue_size          = var.transmission_env_config.stg.seed_queue_size
-        queue_stalled_enabled    = var.transmission_env_config.stg.queue_stalled_enabled
-        queue_stalled_minutes    = var.transmission_env_config.stg.queue_stalled_minutes
-        peer_limit_global        = var.transmission_env_config.stg.peer_limit_global
-        peer_limit_per_torrent   = var.transmission_env_config.stg.peer_limit_per_torrent
-        cache_size_mb            = var.transmission_env_config.stg.cache_size_mb
-        preallocation            = var.transmission_env_config.stg.preallocation
       }
     }
     dev = {
@@ -274,39 +216,6 @@ locals {
         prefix = var.reel_driver_api_config.prefix
       }
     }
-    stg = {
-      movie_search_api_base_url      = var.at_vars.movie_search_api_base_url
-      movie_details_api_base_url     = var.at_vars.movie_details_api_base_url
-      movie_ratings_api_base_url     = var.at_vars.movie_ratings_api_base_url
-      tv_search_api_base_utl         = var.at_vars.tv_search_api_base_utl
-      tv_details_api_base_url        = var.at_vars.tv_details_api_base_url
-      tv_ratings_api_base_url        = var.at_vars.tv_ratings_api_base_url
-      rss_sources                    = var.at_vars.rss_sources
-      rss_urls                       = var.at_vars.rss_urls
-      uid                            = var.at_vars.stg.uid
-      gid                            = var.at_vars.stg.gid
-      batch_size                     = var.at_vars.stg.batch_size
-      log_level                      = var.at_vars.stg.log_level
-      stale_metadata_threshold       = var.at_vars.stg.stale_metadata_threshold
-      reel_driver_threshold          = var.at_vars.stg.reel_driver_threshold
-      target_active_items            = var.at_vars.stg.target_active_items
-      transferred_item_cleanup_delay = var.at_vars.stg.transferred_item_cleanup_delay
-      hung_item_cleanup_delay        = var.at_vars.stg.hung_item_cleanup_delay
-      download_dir                   = var.at_vars.stg.download_dir
-      movie_dir                      = var.at_vars.stg.movie_dir
-      tv_show_dir                    = var.at_vars.stg.tv_show_dir
-      pgsql = {
-        host     = var.pgsql_default_config.stg.host
-        port     = var.pgsql_default_config.stg.port
-        database = var.pgsql_default_config.database
-        schema   = var.pgsql_default_config.schema
-      }
-      reel_driver = {
-        host   = var.reel_driver_api_config.stg.host.internal
-        port   = var.reel_driver_api_config.stg.port.internal
-        prefix = var.reel_driver_api_config.prefix
-      }
-    }
     dev = {
       movie_search_api_base_url      = var.at_vars.movie_search_api_base_url
       movie_details_api_base_url     = var.at_vars.movie_details_api_base_url
@@ -355,18 +264,6 @@ locals {
         password = var.pgsql_config.prod.password
       }
     }
-    stg = {
-      movie_search_api_key  = var.at_secret_vars.movie_search_api_key
-      movie_details_api_key = var.at_secret_vars.movie_details_api_key
-      movie_ratings_api_key = var.at_secret_vars.movie_ratings_api_key
-      tv_search_api_key     = var.at_secret_vars.tv_search_api_key
-      tv_details_api_key    = var.at_secret_vars.tv_details_api_key
-      tv_ratings_api_key    = var.at_secret_vars.tv_ratings_api_key
-      pgsql = {
-        username = var.pgsql_config.stg.user
-        password = var.pgsql_config.stg.password
-      }
-    }
     dev = {
       movie_search_api_key  = var.at_secret_vars.movie_search_api_key
       movie_details_api_key = var.at_secret_vars.movie_details_api_key
@@ -400,34 +297,6 @@ locals {
         media_cache_path          = var.at_vars.prod.download_dir
         media_library_path_movies = var.at_vars.prod.movie_dir
         media_library_path_tv     = var.at_vars.prod.tv_show_dir
-      }
-      api_urls = {
-        movie_search  = var.at_vars.movie_search_api_base_url
-        movie_details = var.at_vars.movie_details_api_base_url
-        movie_ratings = var.at_vars.movie_ratings_api_base_url
-        tv_search     = var.at_vars.tv_search_api_base_utl
-        tv_details    = var.at_vars.tv_details_api_base_url
-        tv_ratings    = var.at_vars.tv_ratings_api_base_url
-      }
-    }
-    stg = {
-      host                  = var.server_ip
-      port_external         = var.rear_diff_vars.stg.port_external
-      prefix                = var.rear_diff_vars.prefix
-      file_deletion_enabled = var.rear_diff_vars.file_deletion_enabled
-      pgsql = {
-        host     = var.pgsql_default_config.stg.host
-        port     = var.pgsql_default_config.stg.port
-        database = var.pgsql_default_config.database
-      }
-      transmission = {
-        host = var.server_ip
-        port = var.transmission_vars.stg.port
-      }
-      paths = {
-        media_cache_path          = var.at_vars.stg.download_dir
-        media_library_path_movies = var.at_vars.stg.movie_dir
-        media_library_path_tv     = var.at_vars.stg.tv_show_dir
       }
       api_urls = {
         movie_search  = var.at_vars.movie_search_api_base_url
@@ -485,22 +354,6 @@ locals {
       tv_details_api_key    = var.at_secret_vars.tv_details_api_key
       tv_ratings_api_key    = var.at_secret_vars.tv_ratings_api_key
     }
-    stg = {
-      pgsql = {
-        username = var.rear_diff_secrets.stg.pgsql.username
-        password = var.rear_diff_secrets.stg.pgsql.password
-      }
-      transmission = {
-        username = var.transmission_secrets.stg.username
-        password = var.transmission_secrets.stg.password
-      }
-      movie_search_api_key  = var.at_secret_vars.movie_search_api_key
-      movie_details_api_key = var.at_secret_vars.movie_details_api_key
-      movie_ratings_api_key = var.at_secret_vars.movie_ratings_api_key
-      tv_search_api_key     = var.at_secret_vars.tv_search_api_key
-      tv_details_api_key    = var.at_secret_vars.tv_details_api_key
-      tv_ratings_api_key    = var.at_secret_vars.tv_ratings_api_key
-    }
     dev = {
       pgsql = {
         username = var.rear_diff_secrets.dev.pgsql.username
@@ -521,7 +374,7 @@ locals {
 
   wst_config = {
     pgsql = {
-      for env in ["prod", "stg", "dev"] : env => {
+      for env in ["prod", "dev"] : env => {
         host     = var.pgsql_default_config[env].host
         port     = var.pgsql_default_config[env].port
         database = var.pgsql_default_config.database
@@ -530,7 +383,7 @@ locals {
   }
 
   center_console_config = {
-    for env in ["prod", "stg", "dev"] : env => {
+    for env in ["prod", "dev"] : env => {
       port_external = var.center_console_config[env].port_external
       api_timeout   = var.center_console_config[env].api_timeout
       mlflow = {
@@ -541,7 +394,7 @@ locals {
   }
 
   center_console_secrets = {
-    for env in ["prod", "stg", "dev"] : env => {
+    for env in ["prod", "dev"] : env => {
       mlflow = {
         username = var.mlflow_secrets[env].username
         password = var.mlflow_secrets[env].password
@@ -588,31 +441,6 @@ locals {
         }
       }
     }
-    stg = {
-      uid = var.minio_config.uid
-      gid = var.minio_config.gid
-      port_external = var.mlflow_vars.stg.port_external
-      path = {
-        logs = "${var.mlflow_vars.path.root}stg/${var.mlflow_vars.path.directories.logs}"
-        packages = "${var.mlflow_vars.path.root}stg/${var.mlflow_vars.path.directories.packages}"
-      }
-      pgsql = {
-        host = var.pgsql_default_config.stg.host
-        port = var.pgsql_default_config.stg.port
-        database = var.mlflow_vars.pgsql.database
-      }
-      minio = {
-        default_artifact_root = var.mlflow_vars.minio.default_artifact_root
-        endpoint = {
-          external = var.server_ip
-          internal = var.minio_config.stg.endpoint.internal
-        }
-        port = {
-          external = var.minio_config.stg.port.external.api
-          internal = var.minio_config.stg.port.internal.api
-        }
-      }
-    }
     dev = {
       uid = var.minio_config.uid
       gid = var.minio_config.gid
@@ -653,18 +481,6 @@ locals {
         aws_secret_access_key = var.minio_secrets.prod.secret_key
       }
     }
-    stg = {
-      username = var.mlflow_secrets.stg.username
-      password = var.mlflow_secrets.stg.password
-      pgsql = {
-        username = var.mlflow_secrets.stg.pgsql.username
-        password = var.mlflow_secrets.stg.pgsql.password
-      }
-      minio = {
-        aws_access_key_id = var.minio_secrets.stg.access_key
-        aws_secret_access_key = var.minio_secrets.stg.secret_key
-      }
-    }
     dev = {
       username = var.mlflow_secrets.dev.username
       password = var.mlflow_secrets.dev.password
@@ -692,18 +508,6 @@ locals {
         port = var.minio_config.prod.port.internal.api
       }
     }
-    stg = {
-      mflow = {
-        host = var.mflow_conifg.stg.host.internal
-        port = var.mflow_conifg.stg.port.internal
-        experiment = var.reel_driver_config.mlflow.experiment
-        model = var.reel_driver_config.mlflow.model
-      }
-      minio = {
-        endpoint = var.minio_config.stg.endpoint.internal
-        port = var.minio_config.stg.port.internal.api
-      }
-    }
     dev = {
       mflow = {
         host = var.mflow_conifg.dev.host.internal
@@ -728,15 +532,6 @@ locals {
       prefix     = var.reel_driver_api_config.prefix
       log_level  = var.reel_driver_api_config.log_level
     }
-    stg ={
-      host       = var.reel_driver_api_config.stg.host.external
-      port = {
-        external = var.reel_driver_api_config.stg.port.external
-        internal = var.reel_driver_api_config.stg.port.internal
-      }
-      prefix     = var.reel_driver_api_config.prefix
-      log_level  = var.reel_driver_api_config.log_level      
-    }
     dev = {
       host       = var.reel_driver_api_config.dev.host.external
       port = {
@@ -755,16 +550,6 @@ locals {
       pgsql = {
         host     = var.pgsql_default_config.prod.host
         port     = var.pgsql_default_config.prod.port
-        database = var.pgsql_default_config.database
-        schema   = var.pgsql_default_config.schema
-      }
-    }
-    stg = {
-      optuna_n_trials          = var.reel_driver_training_config.stg.optuna_n_trials
-      xgboost_n_estimators_max = var.reel_driver_training_config.stg.xgboost_n_estimators_max
-      pgsql = {
-        host     = var.pgsql_default_config.stg.host
-        port     = var.pgsql_default_config.stg.port
         database = var.pgsql_default_config.database
         schema   = var.pgsql_default_config.schema
       }
@@ -788,16 +573,10 @@ locals {
         secrest_key = var.minio_secrets.prod.secret_key  
       }
     }
-    stg = {
-      minio = {
-        access_key  = var.minio_secrets.stg.access_key
-        secrest_key = var.minio_secrets.stg.secret_key  
-      }
-    }
     dev = {
       minio = {
-        access_key  = var.minio_secrets.stg.access_key
-        secrest_key = var.minio_secrets.stg.secret_key  
+        access_key  = var.minio_secrets.dev.access_key
+        secrest_key = var.minio_secrets.dev.secret_key  
       }
     }
   }
@@ -807,12 +586,6 @@ locals {
       pgsql = {
         username = var.pgsql_config.prod.user
         password = var.pgsql_config.prod.password
-      }
-    }
-    stg = {
-      pgsql = {
-        username = var.pgsql_config.stg.user
-        password = var.pgsql_config.stg.password
       }
     }
     dev = {

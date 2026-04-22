@@ -95,7 +95,7 @@ variable "cici_config" {
 ################################################################################
 
 variable "environment" {
-  description = "Environment names (dev, stg, prod)"
+  description = "Environment names (dev, prod)"
   type = any
 }
 

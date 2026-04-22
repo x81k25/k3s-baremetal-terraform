@@ -40,7 +40,7 @@ This project contains Terraform configurations to automate the deployment of a f
 - **Container Registry Integration**: GitHub Container Registry authentication
 - **Backup Configuration**: Built-in etcd snapshot backups
 - **Network Customization**: Flexible network configuration options
-- **Multi-environment Support**: Development, staging, and production environments for media and database services
+- **Multi-environment Support**: Development and production environments for media and database services
 
 ## Dependencies
 
@@ -127,7 +127,7 @@ This project uses variable files for configuration. You'll need to create a `ter
 - Kubeconfig path (consolidated into configuration object)
 
 ### PostgreSQL Configuration
-- Database credentials for dev/staging/prod environments
+- Database credentials for dev/prod environments
 - pgAdmin4 configuration
 
 ### AI/ML Configuration
@@ -141,7 +141,7 @@ This project uses variable files for configuration. You'll need to create a `ter
 - Rear differential service database connections
 - VPN configuration
 - GPU resource allocation
-- Multi-environment settings (dev/staging/prod)
+- Multi-environment settings (dev/prod)
 
 ## Prerequisites
 
@@ -246,7 +246,7 @@ Configures GitOps with ArgoCD:
 Manages PostgreSQL database infrastructure:
 
 - Creates dedicated namespace
-- Sets up database credentials for dev/staging/prod environments
+- Sets up database credentials for dev/prod environments
 - Configures pgAdmin4 web interface
 
 ### AI/ML Module
@@ -319,7 +319,7 @@ kubectl get nodes -o json | grep nvidia.com
 
 Sets up comprehensive media and data services infrastructure:
 
-- Creates dedicated namespaces (media-dev/media-stg/media-prod)
+- Creates dedicated namespaces (media-dev/media-prod)
 - **Plex Media Server**: Configures GPU access with NVIDIA runtime for hardware acceleration
 - **Dagster Orchestration**: Data pipeline platform with workspace configuration and PostgreSQL backend
 - **Rear Diff Service**: Automotive monitoring service with dedicated database connections
@@ -356,7 +356,7 @@ To adapt this project for your environment:
 - The media module requires GPU drivers pre-installed on the host system for Plex hardware acceleration
 - MLflow and Dagster require PostgreSQL databases to be properly initialized
 - Dagster orchestration has been integrated into the media module for tighter coupling with media processing workflows
-- Each service (Dagster, Rear Diff) maintains separate database credentials for dev/staging/prod environments
+- Each service (Dagster, Rear Diff) maintains separate database credentials for dev/prod environments
 - ArgoCD configuration uses consolidated `locals` objects for cleaner module interfaces
 
 ## Resource Quota Management
@@ -376,17 +376,16 @@ The resource allocation is designed for a system with sufficient CPU cores and R
 | **PostgreSQL** | 4.0 | 8.0 | 6.0Gi | 10.0Gi | Database services with pgAdmin |
 | **AI/ML** | 4.0 | 20.0 | 6.0Gi | 16.0Gi | MLflow, reel-driver ML services, 2x GPUs |
 | **Media (prod)** | 4.0 | 8.0 | 6.0Gi | 8.0Gi | Plex, Dagster, ATD production |
-| **Media (stg)** | - | 2.0 | - | 2.0Gi | Staging media services* |
 | **Media (dev)** | - | 2.0 | - | 2.0Gi | Development media services* |
 | **Observability** | 1.0 | 4.0 | 1.0Gi | 8.0Gi | Prometheus, Grafana, Loki |
 | **Experiments** | - | 8.0 | - | 8.0Gi | Research and development* |
 | **Cert-Manager** | 1.0 | 2.0 | 1.0Gi | 2.0Gi | Certificate management |
 
-*Note: Staging, development, and experiments namespaces use only resource limits without requests for greater flexibility.
+*Note: Development and experiments namespaces use only resource limits without requests for greater flexibility.
 
 ### Resource Quota Configuration
 
-Resource quotas are configured using a consistent pattern across all modules in the `terraform.tfvars` file. Production environments typically include both resource requests and limits, while development and staging environments may use only limits for greater flexibility.
+Resource quotas are configured using a consistent pattern across all modules in the `terraform.tfvars` file. Production environments typically include both resource requests and limits, while development environments may use only limits for greater flexibility.
 
 ### Checking Resource Quota Usage
 

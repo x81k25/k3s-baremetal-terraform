@@ -37,10 +37,6 @@ variable "pgsql_default_config" {
       host = string
       port = string
     })
-    stg = object({
-      host = string
-      port = string
-    })
     dev = object({
       host = string
       port = string
@@ -258,13 +254,6 @@ variable "pgsql_config" {
       port     = number
       database = string
     })
-    stg = object({
-      user     = string
-      password = string
-      host     = string
-      port     = number
-      database = string
-    })
     dev = object({
       user     = string
       password = string
@@ -302,20 +291,6 @@ variable "minio_config" {
         internal = string
       })
     })
-    stg = object({
-      port = object({
-        external = object({
-          console = string
-          api     = string
-        })
-        internal = object({
-          api = string
-        })
-      })
-      endpoint = object({
-        internal = string
-      })
-    })
     dev = object({
       port = object({
         external = object({
@@ -340,10 +315,6 @@ variable "minio_secrets" {
       access_key = string
       secret_key = string
     })
-    stg = object({
-      access_key = string
-      secret_key = string
-    })
     dev = object({
       access_key = string
       secret_key = string
@@ -361,20 +332,6 @@ variable "media_config" {
   description = "Resource configuration for media namespaces"
   type = object({
     prod = object({
-      resource_quota = object({
-        cpu_request    = string
-        cpu_limit      = string
-        memory_request = string
-        memory_limit   = string
-      })
-      container_defaults = object({
-        cpu_request    = string
-        cpu_limit      = string
-        memory_request = string
-        memory_limit   = string
-      })
-    })
-    stg = object({
       resource_quota = object({
         cpu_request    = string
         cpu_limit      = string
@@ -410,7 +367,6 @@ variable "environment" {
   description = "Map of environment names"
   type = object({
     dev  = string
-    stg  = string
     prod = string
   })
 }
@@ -422,10 +378,6 @@ variable "dagster_vars" {
     timezone = string
     path = object({
       prod = object({
-        home      = string
-        workspace = string
-      })
-      stg = object({
         home      = string
         workspace = string
       })
@@ -441,10 +393,6 @@ variable "dagster_secrets" {
   description = "parameters to insantiate and connect the pgsql databases within the cluster"
   type = object({
     prod = object({
-      username = string
-      password = string
-    })
-    stg = object({
       username = string
       password = string
     })
@@ -473,9 +421,6 @@ variable "rear_diff_vars"  {
     prod = object({
       port_external = string
     })
-    stg = object({
-      port_external = string
-    })
     dev = object({
       port_external = string
     })
@@ -489,12 +434,6 @@ variable "rear_diff_secrets" {
       pgsql = object({
           username = string
           password = string
-      })
-    })
-    stg = object({
-      pgsql = object({
-        username = string
-        password = string
       })
     })
     dev = object({
@@ -515,10 +454,6 @@ variable "center_console_config" {
       port_external = string
       api_timeout = string
     })
-    stg = object({
-      port_external = string
-      api_timeout = string
-    })
     dev = object({
       port_external = string
       api_timeout = string
@@ -533,9 +468,6 @@ variable "transmission_vars" {
     prod = object({
       port = string
     })
-    stg = object({
-      port = string
-    })
     dev = object({
       port = string
     })
@@ -546,22 +478,6 @@ variable "transmission_env_config" {
   description = "Transmission daemon settings per environment"
   type = object({
     prod = object({
-      speed_limit_down         = number
-      speed_limit_down_enabled = bool
-      speed_limit_up           = number
-      speed_limit_up_enabled   = bool
-      download_queue_enabled   = bool
-      download_queue_size      = number
-      seed_queue_enabled       = bool
-      seed_queue_size          = number
-      queue_stalled_enabled    = bool
-      queue_stalled_minutes    = number
-      peer_limit_global        = number
-      peer_limit_per_torrent   = number
-      cache_size_mb            = number
-      preallocation            = number
-    })
-    stg = object({
       speed_limit_down         = number
       speed_limit_down_enabled = bool
       speed_limit_up           = number
@@ -603,10 +519,6 @@ variable "transmission_secrets" {
       username = string
       password = string
     })
-    stg = object({
-      username = string
-      password = string
-    })
     dev = object({
       username = string
       password = string
@@ -637,20 +549,6 @@ variable "at_vars" {
       target_active_items            = string
       transferred_item_cleanup_delay = string
       hung_item_cleanup_delay        = string
-      download_dir                   = string
-      movie_dir                      = string
-      tv_show_dir                    = string
-    })
-    stg = object({
-      batch_size                     = string
-      log_level                      = string
-      stale_metadata_threshold       = string
-      reel_driver_threshold          = string
-      target_active_items            = string
-      transferred_item_cleanup_delay = string
-      hung_item_cleanup_delay        = string
-      uid                            = string
-      gid                            = string
       download_dir                   = string
       movie_dir                      = string
       tv_show_dir                    = string
@@ -691,10 +589,6 @@ variable "wst_secrets" {
   type = object({
     pgsql = object({
       prod = object({
-        username = string
-        password = string
-      })
-      stg = object({
         username = string
         password = string
       })
@@ -814,9 +708,6 @@ variable "mlflow_vars" {
     prod = object ({
       port_external = string
     })
-    stg = object ({
-      port_external = string
-    })
     dev = object ({
       port_external = string
     })
@@ -828,14 +719,6 @@ variable "mflow_conifg" {
   description = "hold mlflow env vars"
   type = object({
     prod = object({
-      host = object({
-        internal = string
-      })
-      port = object({
-        internal = string
-      })
-    })
-    stg = object({
       host = object({
         internal = string
       })
@@ -858,14 +741,6 @@ variable "mlflow_secrets" {
   description = "credentials for mlflow instances"
   type = object({
     prod = object({
-      username = string
-      password = string
-      pgsql = object({
-        username = string
-        password = string
-      })
-    })
-    stg = object({
       username = string
       password = string
       pgsql = object({
@@ -911,16 +786,6 @@ variable "reel_driver_api_config" {
         internal = string
       })
     })
-    stg = object({
-      host = object({
-        external = string
-        internal = string
-      })
-      port = object({
-        external = string
-        internal = string
-      })
-    })
     dev = object({
       host = object({
         external = string
@@ -938,10 +803,6 @@ variable "reel_driver_training_config" {
   description = "env vars used by the reel-driver training containers"
   type = object({
     prod = object({
-      optuna_n_trials          = number
-      xgboost_n_estimators_max = number
-    })
-    stg = object({
       optuna_n_trials          = number
       xgboost_n_estimators_max = number
     })

@@ -50,13 +50,6 @@ variable "pgsql_config" {
       port     = number
       database = string
     })
-    stg = object({
-      user     = string
-      password = string
-      host     = string
-      port     = number
-      database = string
-    })
     dev = object({
       user     = string
       password = string
@@ -82,13 +75,6 @@ variable "flyway_config" {
         database = string
       })
     })  
-    stg = object({
-      pgsql = object({
-        host = string
-        port = string
-        database = string
-      })
-    })
     dev = object({
       pgsql = object({
         host = string
@@ -103,12 +89,6 @@ variable "flyway_secrets" {
   description = "secret env vars for flyway migration containers"
   type = object({
     prod = object({
-      pgsql = object({  
-        username = string
-        password = string
-      })
-    })
-    stg = object({
       pgsql = object({  
         username = string
         password = string
@@ -131,26 +111,6 @@ variable "minio_config" {
   description = "all env vars for minio"
   type = object({
     prod = object({
-      uid = string
-      gid = string
-      region = string
-      port = object({
-        external = object({
-          console = string
-          api     = string
-        })
-        internal = object({
-          api = string
-        })
-      })
-      endpoint = object({
-        internal = string
-      })
-      path = object({
-        data = string
-      })
-    })
-    stg = object({
       uid = string
       gid = string
       region = string
@@ -197,10 +157,6 @@ variable "minio_secrets" {
   description = "credentials for minio service"
   type = object({
     prod = object({
-      access_key = string
-      secret_key = string
-    })
-    stg = object({
       access_key = string
       secret_key = string
     })

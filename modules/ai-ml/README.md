@@ -14,9 +14,6 @@ The MLflow service requires dedicated directories for logs and packages storage 
 ├── dev/
 │   ├── logs/
 │   └── packages/
-├── stg/
-│   ├── logs/
-│   └── packages/
 └── prod/
     ├── logs/
     └── packages/
@@ -28,13 +25,13 @@ Create directories and set permissions for all environments:
 
 ```bash
 # Create directory structure
-sudo mkdir -p /d/k8s/volumes/mlflow/{dev,stg,prod}/{logs,packages}
+sudo mkdir -p /d/k8s/volumes/mlflow/{dev,prod}/{logs,packages}
 
 # Set ownership (all MLflow instances use 1000:1000)
-sudo chown -R 1000:1000 /d/k8s/volumes/mlflow/{dev,stg,prod}/{logs,packages}
+sudo chown -R 1000:1000 /d/k8s/volumes/mlflow/{dev,prod}/{logs,packages}
 
 # Set permissions
-sudo chmod 755 /d/k8s/volumes/mlflow/{dev,stg,prod}/{logs,packages}
+sudo chmod 755 /d/k8s/volumes/mlflow/{dev,prod}/{logs,packages}
 ```
 
 #### Configuration Variables
@@ -61,9 +58,6 @@ mlflow_vars = {
   prod = {
     port_external = "30500"
   }
-  stg = {
-    port_external = "30501"
-  }
   dev = {
     port_external = "30502"
   }
@@ -71,14 +65,6 @@ mlflow_vars = {
 
 mlflow_secrets = {
   prod = {
-    username = "admin"
-    password = "your-secure-password"
-    pgsql = {
-      username = "mlflow_user"
-      password = "your-secure-db-password"
-    }
-  }
-  stg = {
     username = "admin"
     password = "your-secure-password"
     pgsql = {
@@ -101,18 +87,16 @@ mlflow_secrets = {
 
 ### ConfigMaps
 - `mlflow-config-dev` - Non-sensitive MLflow dev configuration
-- `mlflow-config-stg` - Non-sensitive MLflow stg configuration
 - `mlflow-config-prod` - Non-sensitive MLflow prod configuration
 
 ### Secrets
 - `mlflow-secrets-dev` - MLflow dev access credentials and database connection
-- `mlflow-secrets-stg` - MLflow stg access credentials and database connection
 - `mlflow-secrets-prod` - MLflow prod access credentials and database connection
 - `github-registry` - GitHub Container Registry authentication
 
 ## Important Notes
 
-1. **Environment Isolation**: Each environment (dev/stg/prod) uses separate directories and database connections
+1. **Environment Isolation**: Each environment (dev/prod) uses separate directories and database connections
 2. **Permissions**: The hostPath directories must be owned by 1000:1000 before deployment
 3. **Storage**: MLflow directories should be on persistent storage with adequate space for logs and model packages
 4. **Security**: Use strong, unique passwords for each environment

@@ -13,8 +13,6 @@ The MinIO service requires a dedicated data directory for object storage across 
 /d/k8s/volumes/minio/
 ├── dev/
 │   └── data/
-├── stg/
-│   └── data/
 └── prod/
     └── data/
 ```
@@ -25,13 +23,13 @@ Create directories and set permissions for all environments:
 
 ```bash
 # Create directory structure
-sudo mkdir -p /d/k8s/volumes/minio/{dev,stg,prod}/data
+sudo mkdir -p /d/k8s/volumes/minio/{dev,prod}/data
 
 # Set ownership (all MinIO instances use 1000:1000)
-sudo chown -R 1000:1000 /d/k8s/volumes/minio/{dev,stg,prod}/data
+sudo chown -R 1000:1000 /d/k8s/volumes/minio/{dev,prod}/data
 
 # Set permissions
-sudo chmod 755 /d/k8s/volumes/minio/{dev,stg,prod}/data
+sudo chmod 755 /d/k8s/volumes/minio/{dev,prod}/data
 ```
 
 #### Configuration Variables
@@ -51,9 +49,6 @@ minio_config = {
   prod = {
     port_external = "30900"
   }
-  stg = {
-    port_external = "30901"
-  }
   dev = {
     port_external = "30902"
   }
@@ -63,10 +58,6 @@ minio_secrets = {
   dev = {
     access_key = "dev-access-key"
     secret_key = "dev-secret-key"
-  }
-  stg = {
-    access_key = "stg-access-key"
-    secret_key = "stg-secret-key"
   }
   prod = {
     access_key = "prod-access-key"
@@ -79,17 +70,15 @@ minio_secrets = {
 
 ### ConfigMaps
 - `minio-config-dev` - Non-sensitive MinIO dev configuration
-- `minio-config-stg` - Non-sensitive MinIO stg configuration  
 - `minio-config-prod` - Non-sensitive MinIO prod configuration
 
 ### Secrets
 - `minio-secrets-dev` - MinIO dev access credentials
-- `minio-secrets-stg` - MinIO stg access credentials
 - `minio-secrets-prod` - MinIO prod access credentials
 
 ## Important Notes
 
-1. **Environment Isolation**: Each environment (dev/stg/prod) uses separate data directories but same UID/GID (1000:1000)
+1. **Environment Isolation**: Each environment (dev/prod) uses separate data directories but same UID/GID (1000:1000)
 2. **Permissions**: The hostPath directories must be owned by 1000:1000 before deployment
 3. **Storage**: MinIO data directories should be on persistent storage with adequate space
 4. **Security**: Use strong, unique access keys for each environment

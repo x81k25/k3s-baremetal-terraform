@@ -3,7 +3,7 @@
 ################################################################################
 
 locals {
-  environments = ["dev", "stg", "prod"]
+  environments = ["dev", "prod"]
 }
 
 resource "kubernetes_namespace_v1" "pgsql" {
@@ -100,21 +100,6 @@ resource "kubernetes_secret_v1" "pgsql_prod_config" {
   type = "Opaque"
 }
 
-resource "kubernetes_secret_v1" "pgsql_stg_config" {
-  metadata {
-    name      = "pgsql-stg-config"
-    namespace = kubernetes_namespace_v1.pgsql.metadata[0].name
-  }
-
-  data = {
-    pgsql_stg_user     = var.pgsql_config.stg.user
-    pgsql_stg_password = var.pgsql_config.stg.password
-    pgsql_stg_database = var.pgsql_config.stg.database
-  }
-
-  type = "Opaque"
-}
-
 resource "kubernetes_secret_v1" "pgsql_dev_config" {
   metadata {
     name      = "pgsql-dev-config"
@@ -149,20 +134,6 @@ resource "kubernetes_config_map_v1" "flway_config_prod" {
   }
 }
 
-resource "kubernetes_config_map_v1" "flway_config_stg" {
-
-  metadata {
-    name      = "flyway-config-stg"
-    namespace = "pgsql"
-  }
-
-  data = {
-    FLYWAY_PGSQL_HOST     = var.flyway_config.stg.pgsql.host
-    FLYWAY_PGSQL_PORT     = var.flyway_config.stg.pgsql.port
-    FLYWAY_PGSQL_DATABASE = var.flyway_config.stg.pgsql.database
-  }
-}
-
 resource "kubernetes_config_map_v1" "flway_config_dev" {
 
   metadata {
@@ -190,21 +161,6 @@ resource "kubernetes_secret_v1" "flyway_secrets_prod" {
   data = {
     FLYWAY_PGSQL_USERNAME = var.flyway_secrets.prod.pgsql.username
     FLYWAY_PGSQL_PASSWORD = var.flyway_secrets.prod.pgsql.password
-  }
-}
-
-resource "kubernetes_secret_v1" "flyway_secrets_stg" {
-
-  metadata {
-    name      = "flyway-secrets-stg"
-    namespace = "pgsql"
-  }
-
-  type = "Opaque"
-
-  data = {
-    FLYWAY_PGSQL_USERNAME = var.flyway_secrets.stg.pgsql.username
-    FLYWAY_PGSQL_PASSWORD = var.flyway_secrets.stg.pgsql.password
   }
 }
 

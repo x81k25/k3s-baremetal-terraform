@@ -3,7 +3,7 @@
 ################################################################################
 
 locals {
-  environments = ["dev", "stg", "prod"]
+  environments = ["dev", "prod"]
 }
 
 resource "kubernetes_namespace_v1" "ai_ml" {
